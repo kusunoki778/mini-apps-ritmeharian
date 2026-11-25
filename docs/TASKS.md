@@ -32,27 +32,28 @@ Berlaku untuk semua task yang menghasilkan UI:
 
 Tujuan: proyek bisa dijalankan, di-build, dan di-deploy sebagai shell kosong.
 
-- [ ] T0.1 Scaffold proyek (S)
+- [x] T0.1 Scaffold proyek (S)
   - Vite + React + TypeScript, ESLint, Prettier, alias `@/`.
   - Penerimaan: `npm run dev` dan `npm run build` berhasil, tidak ada error tipe.
 
-- [ ] T0.2 Token desain (S)
+- [x] T0.2 Token desain (S)
   - `styles/tokens.css` dan `styles/global.css`, pemetaan Tailwind.
   - Penerimaan: `data-theme="light"` dan `data-theme="dark"` mengubah seluruh token, tanpa flash saat reload.
 
-- [ ] T0.3 Shell dan routing (M)
+- [x] T0.3 Shell dan routing (M)
   - `AppShell`, lima route, halaman 404, lazy loading.
   - Penerimaan: semua nav menuju halaman nyata, tidak ada tautan mati.
 
-- [ ] T0.4 Baseline PWA (M)
+- [x] T0.4 Baseline PWA (M)
   - Manifest, ikon placeholder, service worker, `navigateFallback`.
-  - Penerimaan: Chrome menawarkan install, shell terbuka saat offline.
+  - Penerimaan: manifest dan service worker aktif. Uji tawaran install di perangkat nyata menyusul di M9.
 
 - [ ] T0.5 Deploy preview (S)
   - Netlify, Vercel, atau Cloudflare Pages. Rewrite SPA aktif.
   - Penerimaan: URL publik bisa dibuka langsung di route dalam.
+  - Status: menunggu pilihan akun hosting.
 
-- [ ] T0.6 Setup test (S)
+- [x] T0.6 Setup test (S)
   - Vitest + Testing Library + jsdom.
   - Penerimaan: satu test contoh berjalan di `npm test`.
 

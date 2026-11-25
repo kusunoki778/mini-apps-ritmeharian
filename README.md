@@ -1,59 +1,42 @@
-# 📒 NoteApp — Aplikasi Catatan React
+# Nadi
 
-Aplikasi catatan modern berbasis React yang memenuhi semua checklist submission Dicoding.
+Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-## ✅ Checklist yang Terpenuhi
+Status: M0, fondasi berjalan. Modul data menyusul.
 
-| Kriteria | Implementasi |
-|---|---|
-| **Penguasaan Array Function** | `.filter()`, `.map()` di `App.jsx` dan `NoteList.jsx` |
-| **Reusable Component** | `NoteItem`, `NoteList`, `SearchBar`, `NoteForm` |
-| **State & Event Management** | `useState` di `App.jsx` & `NoteForm.jsx`, event handlers |
-| **Controlled Form** | `NoteForm.jsx` — semua input dikontrol state React |
-
-## 🗂️ Struktur Proyek
+## Menjalankan
 
 ```
-notes-app/
-├── index.html
-├── package.json
-├── vite.config.js
-└── src/
-    ├── main.jsx
-    ├── App.jsx              ← Logika utama + Array Functions
-    ├── index.css            ← Global styling (dark mode)
-    ├── utils/
-    │   └── data.js          ← Data awal + helper functions
-    └── components/
-        ├── NoteForm.jsx     ← Controlled Form ✅
-        ├── NoteItem.jsx     ← Reusable Component ✅
-        ├── NoteList.jsx     ← Reusable Component + .map() ✅
-        └── SearchBar.jsx    ← Controlled Component ✅
-```
-
-## 🚀 Cara Menjalankan
-
-### 1. Install Node.js (jika belum)
-Download dari: https://nodejs.org (versi LTS)
-
-### 2. Install dependencies
-```bash
-cd notes-app
 npm install
-```
-
-### 3. Jalankan development server
-```bash
 npm run dev
 ```
 
-Buka browser di: `http://localhost:5173`
+Buka `http://localhost:5173`.
 
-## 🔧 Fitur Aplikasi
+## Skrip
 
-- ➕ **Tambah catatan** baru dengan judul (maks 50 karakter) dan isi
-- 🔍 **Cari catatan** berdasarkan judul (real-time)
-- 📦 **Arsipkan / Aktifkan** catatan
-- 🗑️ **Hapus** catatan
-- 📊 **Statistik** jumlah catatan aktif dan arsip
-- 📋 **Tab navigasi** antara catatan aktif dan arsip
+| Skrip | Fungsi |
+|---|---|
+| `npm run dev` | Server pengembangan |
+| `npm run build` | Cek tipe lalu build produksi |
+| `npm run preview` | Pratinjau hasil build |
+| `npm test` | Unit test sekali jalan |
+| `npm run test:watch` | Unit test mode pantau |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | Cek TypeScript |
+
+## Dokumen
+
+- [docs/README.md](docs/README.md) - ringkasan dan keputusan proyek
+- [docs/PRD.md](docs/PRD.md) - produk dan lingkup
+- [docs/DESIGN.md](docs/DESIGN.md) - arah visual dan sistem desain
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) - arsitektur teknis
+- [docs/TASKS.md](docs/TASKS.md) - milestone dan task
+
+## Catatan migrasi
+
+Kode notes-app versi lama tersimpan di commit git pertama dengan pesan `snapshot: notes-app sebelum migrasi ke Nadi`. Ikon di `public/icons` masih placeholder sampai identitas final disetujui.
+
+## Lisensi data
+
+Cuaca dan kualitas udara berasal dari Open-Meteo, dengan data CAMS untuk kualitas udara. Penggunaan non-komersial.

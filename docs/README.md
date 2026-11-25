@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: tahap perencanaan. Belum ada kode aplikasi. Dokumen di folder ini adalah sumber kebenaran sebelum implementasi.
+Status: M0 selesai. Fondasi React + TypeScript + Tailwind + PWA berjalan. Modul data menyusul.
 
 ## Dokumen
 
@@ -29,7 +29,7 @@ Baca berurutan:
 
 ## Struktur folder yang direncanakan
 
-Kode lama `notes-app` tetap ada sampai M0 dimulai. Saat M0, isi `src/` diganti bertahap dengan struktur Nadi di bawah ini.
+Kode lama `notes-app` tersimpan di commit git pertama dengan pesan `snapshot: notes-app sebelum migrasi ke Nadi`. Struktur di bawah ini sudah berjalan sejak M0.
 
 ```
 notes-app/            <- proyek Nadi
