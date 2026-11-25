@@ -46,7 +46,11 @@ try {
   );
   check(
     'label data contoh tampil',
-    await page.getByRole('link', { name: 'Aktifkan data nyata' }).isVisible(),
+    await page.getByRole('link', { name: 'Atur lokasi' }).isVisible(),
+  );
+  check(
+    'garis hari tampil dengan ringkasan',
+    await page.getByRole('img', { name: /hari berjalan/ }).isVisible(),
   );
 
   const manifestResponse = await context.request.get(`${BASE}/manifest.webmanifest`);
@@ -79,6 +83,15 @@ try {
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     );
   }
+
+  check(
+    'pengaturan punya pencarian kota',
+    await page.getByRole('textbox', { name: 'Cari kota' }).isVisible(),
+  );
+  check(
+    'lokasi bawaan tampil',
+    await page.getByText('Jakarta', { exact: true }).first().isVisible(),
+  );
 
   await page.getByRole('button', { name: 'Gelap' }).click();
   check(

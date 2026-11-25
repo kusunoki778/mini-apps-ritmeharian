@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M1 selesai. Design system dasar dan prototipe dasbor berjalan dengan data contoh. Integrasi API menyusul.
+Status: M2 selesai. Jam, garis hari, dan pengaturan lokasi berjalan. Data cuaca nyata menyusul di M3.
 
 ## Dokumen
 

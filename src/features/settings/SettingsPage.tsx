@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LocationSetting } from '@/features/location/LocationSetting';
 import { ThemeToggle } from './ThemeToggle';
 
 function Section({
@@ -17,7 +18,7 @@ function Section({
       <h2 id={id} className="text-base font-semibold">
         {title}
       </h2>
-      <div className="mt-3 text-sm leading-relaxed text-ink-muted">{children}</div>
+      <div className="mt-3">{children}</div>
     </section>
   );
 }
@@ -26,14 +27,14 @@ export default function SettingsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="M8"
+        eyebrow="M2"
         title="Pengaturan"
-        description="Tema aktif sekarang. Lokasi, data, dan preferensi lain menyusul."
+        description="Tema dan lokasi aktif sekarang. Data dan preferensi lain menyusul."
       />
 
       <div className="space-y-4">
         <Section title="Tampilan">
-          <p className="mb-4">
+          <p className="mb-4 text-sm leading-relaxed text-ink-muted">
             Pilih tema. Opsi Sistem mengikuti pengaturan perangkat dan berubah otomatis saat
             perangkat berganti mode.
           </p>
@@ -41,24 +42,21 @@ export default function SettingsPage() {
         </Section>
 
         <Section title="Lokasi">
-          <p>
-            Pencarian kota dan izin lokasi aktif di M2. Sampai saat itu, cuaca dan kualitas udara
-            belum bisa dimuat.
-          </p>
+          <LocationSetting />
         </Section>
 
         <Section title="Data">
-          <p>
+          <p className="text-sm leading-relaxed text-ink-muted">
             Ekspor, impor, dan hapus data aktif di M8. Semua data akan tersimpan di perangkat,
             tanpa akun dan tanpa server.
           </p>
         </Section>
 
         <Section title="Tentang">
-          <p>Nadi versi 0.1.0, milestone M1.</p>
-          <p className="mt-2">
-            Data cuaca dan kualitas udara oleh Open-Meteo, berisi data CAMS. Atribusi lengkap
-            ditampilkan saat modul data aktif.
+          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M2.</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+            Nama kota berasal dari Open-Meteo Geocoding. Cuaca dan kualitas udara memakai
+            Open-Meteo dan CAMS. Atribusi lengkap ditampilkan saat modul data aktif.
           </p>
         </Section>
       </div>

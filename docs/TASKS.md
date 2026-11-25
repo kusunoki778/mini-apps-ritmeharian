@@ -89,21 +89,22 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M2: Jam, tanggal, dan lokasi
 
-- [ ] T2.1 Hook waktu dan sapaan (S)
-  - Satu interval, format `id-ID`, sapaan pagi sampai malam.
-  - Penerimaan: pembaruan tiap detik, tidak memicu re-render seluruh halaman, jam tidak diumumkan pembaca layar tiap detik.
+- [x] T2.1 Hook waktu dan sapaan (S)
+  - `useNow` satu interval per panel jam, berhenti saat tab tersembunyi, langsung menyegarkan saat tab kembali. Format `id-ID`.
+  - Penerimaan: jam hanya ada di `ClockPanel`, jadi detik tidak memicu re-render seluruh halaman. Jam tidak memakai `aria-live`, jadi tidak diumumkan tiap detik.
 
-- [ ] T2.2 Alur lokasi (M)
-  - Izin geolocation, fallback pencarian kota, default Jakarta berlabel.
-  - Penerimaan: izin ditolak tidak memblokir aplikasi, lokasi tersimpan setelah reload.
+- [x] T2.2 Alur lokasi (M)
+  - Default Jakarta berlabel "Lokasi bawaan", tombol gunakan lokasi saat ini, dan lokasi tersimpan di localStorage.
+  - Penerimaan: izin ditolak memunculkan pesan inline dan toast, aplikasi tetap jalan. Lokasi pilihan bertahan setelah reload (diuji dengan Bandung).
+  - Catatan: dialog izin perangkat nyata belum diuji otomatis, hanya jalur sukses dan gagal manual.
 
-- [ ] T2.3 Pencarian kota (M)
-  - Geocoding Open-Meteo, debounce 300ms, minimal dua karakter.
-  - Penerimaan: state loading, kosong, error, dan hasil; memilih hasil langsung menyimpan lokasi.
+- [x] T2.3 Pencarian kota (M)
+  - Geocoding Open-Meteo, debounce 300ms, minimal dua karakter, validasi Zod.
+  - Penerimaan: state loading, kosong, error, dan hasil ada. Memilih hasil langsung menyimpan lokasi dan tampil di Beranda.
 
-- [ ] T2.4 Garis hari (M)
-  - Posisi waktu sekarang, matahari terbit dan terbenam, agenda berikutnya.
-  - Penerimaan: akurat pada 00.00 dan 23.59, punya ringkasan teks untuk pembaca layar.
+- [x] T2.4 Garis hari (M)
+  - Posisi sekarang, penanda terbit dan terbenam, agenda berikutnya, ringkasan teks untuk pembaca layar.
+  - Penerimaan: `dayFraction` diuji pada 00.00, 12.00, dan 23.59, tidak pernah keluar dari rentang 0 sampai 1.
 
 ## M3: Cuaca
 
