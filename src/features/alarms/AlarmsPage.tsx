@@ -1,4 +1,4 @@
-import { EmptyPanel } from '@/components/ui/EmptyPanel';
+import { EmptyState } from '@/components/ui/EmptyState';
 import { PageHeader } from '@/components/ui/PageHeader';
 
 export default function AlarmsPage() {
@@ -7,9 +7,9 @@ export default function AlarmsPage() {
       <PageHeader
         eyebrow="M7"
         title="Alarm"
-        description="Alarm lokal dengan pengulangan. Belum aktif pada M0."
+        description="Alarm lokal dengan pengulangan. Belum aktif."
       />
-      <EmptyPanel
+      <EmptyState
         title="Alarm belum tersedia"
         description="Alarm berbunyi selama Nadi terbuka. Alarm latar belakang memerlukan pembungkus native dan masuk backlog setelah v1."
       />

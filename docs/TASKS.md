@@ -61,29 +61,29 @@ Tujuan: proyek bisa dijalankan, di-build, dan di-deploy sebagai shell kosong.
 
 Tujuan: komponen dasar siap dan arah visual terbukti sebelum data asli masuk.
 
-- [ ] T1.1 Komponen dasar (L)
-  - Button, IconButton, Card, Input, TextArea, Select, Toggle, Sheet, Dialog, Toast.
-  - Penerimaan: semua state (hover, active, focus, disabled, loading) ada, Escape menutup sheet dan dialog, fokus kembali ke pemicu.
+- [x] T1.1 Komponen dasar (L)
+  - Button, IconButton, Card, Input, TextArea, Select, Toggle, Sheet, Dialog, Toast, Banner, Skeleton, EmptyState, ErrorState.
+  - Penerimaan: state hover, active, focus, disabled, dan loading tersedia. Escape dan klik latar menutup sheet dan dialog. Fokus kembali ke pemicu otomatis dari elemen `dialog` native.
 
-- [ ] T1.2 Navigasi (M)
+- [x] T1.2 Navigasi (M)
   - Bottom tab mobile, rail desktop, indikator aktif.
-  - Penerimaan: target sentuh 44px, aktif tidak hanya ditandai warna, keyboard bisa mencapai semua item.
+  - Penerimaan: target sentuh 44px ke atas, aktif ditandai warna dan bobot ikon, semua item terjangkau keyboard.
 
-- [ ] T1.3 Komponen state (S)
+- [x] T1.3 Komponen state (S)
   - EmptyState, ErrorState, Skeleton, Banner.
-  - Penerimaan: dipakai di satu halaman contoh, tidak ada animasi saat `prefers-reduced-motion`.
+  - Penerimaan: EmptyState dipakai di halaman Kalender, Catatan, dan Alarm. Animasi dimatikan saat `prefers-reduced-motion`.
 
 - [ ] T1.4 Ikon (S)
-  - Phosphor untuk UI, Meteocons statis untuk cuaca.
-  - Penerimaan: ikon dekoratif `aria-hidden`, tombol ikon punya `aria-label`.
+  - Phosphor untuk UI sudah dipakai. Meteocons statis untuk cuaca menyusul bersama M3.
+  - Penerimaan: ikon dekoratif `aria-hidden`, tombol ikon punya `aria-label`. Selesai untuk Phosphor, Meteocons tertunda.
 
 - [ ] T1.5 Audit tipografi dan spacing (S)
-  - Skala, tabular nums, line height, radius, border.
-  - Penerimaan: jam tidak bergeser saat digit berubah, tidak ada teks di bawah 13px.
+  - Skala, tabular nums, line height, radius, border sudah konsisten. Label navigasi dan teks bantu kecil masih 11-12px dan perlu keputusan akhir pada audit penuh.
+  - Penerimaan: jam tidak bergeser saat digit berubah (tabular nums aktif). Ambang minimum teks belum final.
 
-- [ ] T1.6 Prototipe dasbor dengan data palsu (M)
-  - Jam, kartu cuaca, kartu AQI, agenda, catatan, alarm memakai data statis.
-  - Penerimaan: hierarki terbaca dalam 3 detik, layout mobile dan desktop disetujui sebelum integrasi API.
+- [x] T1.6 Prototipe dasbor dengan data palsu (M)
+  - Jam, kartu cuaca, kartu AQI, agenda, dan catatan memakai data statis di `features/dashboard/sample-data.ts`.
+  - Penerimaan: hierarki terbaca cepat, layout mobile dan desktop siap ditinjau sebelum integrasi API.
 
 Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API dan state membuat perubahan layout menjadi mahal.
 

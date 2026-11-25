@@ -55,7 +55,7 @@ export default function SettingsPage() {
         </Section>
 
         <Section title="Tentang">
-          <p>Nadi versi 0.1.0, milestone M0.</p>
+          <p>Nadi versi 0.1.0, milestone M1.</p>
           <p className="mt-2">
             Data cuaca dan kualitas udara oleh Open-Meteo, berisi data CAMS. Atribusi lengkap
             ditampilkan saat modul data aktif.

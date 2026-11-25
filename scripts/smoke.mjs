@@ -38,6 +38,17 @@ try {
     await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
   );
 
+  check(
+    'prototipe dasbor tampil',
+    (await page.getByText('Kualitas udara (US AQI)').isVisible()) &&
+      (await page.getByRole('heading', { name: 'Agenda hari ini' }).isVisible()) &&
+      (await page.getByRole('heading', { name: 'Catatan terakhir' }).isVisible()),
+  );
+  check(
+    'label data contoh tampil',
+    await page.getByRole('link', { name: 'Aktifkan data nyata' }).isVisible(),
+  );
+
   const manifestResponse = await context.request.get(`${BASE}/manifest.webmanifest`);
   check('manifest tersedia', manifestResponse.ok());
 

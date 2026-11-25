@@ -8,6 +8,8 @@
   --accent: #b23a26;
   --accent-soft: #f3d9d2;
   --focus: #b23a26;
+  --danger: #b3261e;
+  --danger-soft: #f6dad7;
 }
 
 [data-theme='dark'] {
@@ -19,4 +21,6 @@
   --accent: #e8836f;
   --accent-soft: #3a241f;
   --focus: #e8836f;
+  --danger: #f07a72;
+  --danger-soft: #3a211f;
 }

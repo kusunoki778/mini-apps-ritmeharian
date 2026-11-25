@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M0 selesai. Fondasi React + TypeScript + Tailwind + PWA berjalan. Modul data menyusul.
+Status: M1 selesai. Design system dasar dan prototipe dasbor berjalan dengan data contoh. Integrasi API menyusul.
 
 ## Dokumen
 

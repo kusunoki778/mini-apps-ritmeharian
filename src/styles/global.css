@@ -12,6 +12,8 @@
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-focus: var(--focus);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
   --radius-card: 14px;
   --radius-control: 10px;
 }

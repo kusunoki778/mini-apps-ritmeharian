@@ -8,6 +8,9 @@ import {
   type Icon,
 } from '@phosphor-icons/react';
 
+import { Banner } from '@/components/ui/Banner';
+import { Toaster } from '@/components/ui/Toaster';
+import { useOnline } from '@/lib/hooks/useOnline';
 import { cn } from '@/lib/utils/cn';
 import { PwaUpdater } from './PwaUpdater';
 
@@ -27,6 +30,8 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 export function AppShell() {
+  const online = useOnline();
+
   return (
     <div className="min-h-dvh bg-paper text-ink">
       <a
@@ -76,11 +81,18 @@ export function AppShell() {
           </ul>
         </nav>
 
-        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M0</div>
+        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M1</div>
       </aside>
 
       <div className="md:pl-60">
         <main id="konten" className="mx-auto w-full max-w-5xl px-4 pb-28 pt-8 md:px-8 md:pb-12">
+          {!online ? (
+            <div className="mb-6">
+              <Banner variant="warning">
+                Kamu sedang offline. Sebagian data mungkin tertinggal versi lama.
+              </Banner>
+            </div>
+          ) : null}
           <Outlet />
         </main>
       </div>
@@ -119,6 +131,7 @@ export function AppShell() {
       </nav>
 
       <PwaUpdater />
+      <Toaster />
     </div>
   );
 }

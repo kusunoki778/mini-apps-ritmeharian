@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M0, fondasi berjalan. Modul data menyusul.
+Status: M1, design system dan prototipe dasbor dengan data contoh. Integrasi API menyusul.
 
 ## Menjalankan
 
