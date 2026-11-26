@@ -1,11 +1,10 @@
 import { DEFAULT_LOCATION, type Location } from './types';
 
-const STORAGE_KEY = 'nadi-location';
+export const LOCATION_STORAGE_KEY = 'nadi-location';
 
-// ponytail: simpan di localStorage sampai tabel settings Dexie masuk di M8.
 export function readLocation(): Location {
   try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
+    const raw = window.localStorage.getItem(LOCATION_STORAGE_KEY);
     if (!raw) return DEFAULT_LOCATION;
 
     const parsed: unknown = JSON.parse(raw);
@@ -19,7 +18,7 @@ export function readLocation(): Location {
 
 export function writeLocation(location: Location): void {
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(location));
+    window.localStorage.setItem(LOCATION_STORAGE_KEY, JSON.stringify(location));
   } catch {
     // Penyimpanan bisa diblokir. Lokasi tetap berlaku untuk sesi ini.
   }

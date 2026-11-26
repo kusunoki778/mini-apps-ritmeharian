@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M7, alarm nyata dengan pengulangan, tunda, dan layar berbunyi. Pengaturan lengkap menyusul.
+Status: M8, pengaturan lengkap, ekspor dan impor JSON, serta hapus data sudah ada. Audit offline, aksesibilitas, dan performa menyusul.
 
 ## Menjalankan
 
@@ -15,15 +15,15 @@ Buka `http://localhost:5173`.
 
 ## Skrip
 
-| Skrip | Fungsi |
-|---|---|
-| `npm run dev` | Server pengembangan |
-| `npm run build` | Cek tipe lalu build produksi |
-| `npm run preview` | Pratinjau hasil build |
-| `npm test` | Unit test sekali jalan |
-| `npm run test:watch` | Unit test mode pantau |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | Cek TypeScript |
+| Skrip                | Fungsi                       |
+| -------------------- | ---------------------------- |
+| `npm run dev`        | Server pengembangan          |
+| `npm run build`      | Cek tipe lalu build produksi |
+| `npm run preview`    | Pratinjau hasil build        |
+| `npm test`           | Unit test sekali jalan       |
+| `npm run test:watch` | Unit test mode pantau        |
+| `npm run lint`       | ESLint                       |
+| `npm run typecheck`  | Cek TypeScript               |
 
 ## Dokumen
 

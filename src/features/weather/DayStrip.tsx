@@ -1,4 +1,5 @@
 import { useNow } from '@/lib/hooks/useNow';
+import { formatTemperature } from '@/lib/format/units';
 import type { WeatherHourly } from './weather-api';
 import { currentHourIndex, formatClock, hourIsDaylight } from './weather-utils';
 import { WeatherGlyph } from './WeatherGlyph';
@@ -43,7 +44,7 @@ export function DayStrip({ hourly, sunrise, sunset }: DayStripProps) {
             >
               <p className="text-ink-muted">{isCurrent ? 'Kini' : formatClock(time)}</p>
               <WeatherGlyph code={code} isDay={isDay} size={20} className="mx-auto my-1 text-ink" />
-              <p className="tabular text-sm font-medium">{Math.round(temperature)}°</p>
+              <p className="tabular text-sm font-medium">{formatTemperature(temperature)}</p>
               <p className="mt-0.5 text-[11px] text-ink-muted" title="Peluang hujan">
                 {precipitation}%
               </p>

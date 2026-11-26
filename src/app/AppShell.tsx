@@ -80,7 +80,7 @@ export function AppShell() {
           </ul>
         </nav>
 
-        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M7</div>
+        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M8</div>
       </aside>
 
       <div className="md:pl-60">

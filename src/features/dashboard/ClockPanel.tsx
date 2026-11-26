@@ -7,6 +7,7 @@ import { useLocationStore } from '@/features/location/location-store';
 import { SOURCE_LABEL } from '@/features/location/types';
 import { useWeather } from '@/features/weather/useWeather';
 import { formatClock } from '@/features/weather/weather-utils';
+import { formatTimeOfDay } from '@/lib/format/time';
 import { useNow } from '@/lib/hooks/useNow';
 import { getGreeting } from '@/lib/utils/greeting';
 import { DayLine } from './DayLine';
@@ -18,11 +19,7 @@ export function ClockPanel() {
   const weather = useWeather(location.lat, location.lon);
   const dayEvents = useEventsBetween(dayStart(now), dayEnd(now));
 
-  const time = new Intl.DateTimeFormat('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(now);
+  const time = formatTimeOfDay(now);
   const date = new Intl.DateTimeFormat('id-ID', {
     weekday: 'long',
     day: 'numeric',
@@ -60,7 +57,9 @@ export function ClockPanel() {
           now={now}
           sunrise={sunrise}
           sunset={sunset}
-          nextEvent={nextEvent ? { title: nextEvent.title, time: formatTime(nextEvent.start) } : null}
+          nextEvent={
+            nextEvent ? { title: nextEvent.title, time: formatTime(nextEvent.start) } : null
+          }
         />
       </div>
     </section>

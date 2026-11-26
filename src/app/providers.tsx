@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 
-import { ThemeProvider } from '@/features/settings/ThemeProvider';
+import { SettingsProvider } from '@/features/settings/SettingsProvider';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
 export function Providers({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider>{children}</ThemeProvider>
+      <SettingsProvider>{children}</SettingsProvider>
     </QueryClientProvider>
   );
 }

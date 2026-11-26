@@ -1,11 +1,11 @@
-const KEY = 'nadi-week-start';
-
 export type WeekStart = 0 | 1;
 
-// Default Senin. Pengaturan awal minggu lewat UI masuk di M8.
+export const WEEK_START_STORAGE_KEY = 'nadi-week-start';
+
+// Default Senin. Nilai lama dibaca sekali untuk memindahkannya ke tabel settings.
 export function readWeekStart(): WeekStart {
   try {
-    return localStorage.getItem(KEY) === '0' ? 0 : 1;
+    return localStorage.getItem(WEEK_START_STORAGE_KEY) === '0' ? 0 : 1;
   } catch {
     return 1;
   }
@@ -13,7 +13,7 @@ export function readWeekStart(): WeekStart {
 
 export function writeWeekStart(value: WeekStart): void {
   try {
-    localStorage.setItem(KEY, String(value));
+    localStorage.setItem(WEEK_START_STORAGE_KEY, String(value));
   } catch {
     // Penyimpanan tidak tersedia, nilai default tetap dipakai.
   }

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { formatTemperature } from '@/lib/format/units';
 import { DayStrip } from './DayStrip';
 import type { WeatherResult } from './weather-service';
 import { formatUpdatedAt } from './weather-utils';
@@ -18,7 +19,13 @@ interface WeatherCardProps {
   onOpenDetail: () => void;
 }
 
-export function WeatherCard({ result, isPending, isError, onRetry, onOpenDetail }: WeatherCardProps) {
+export function WeatherCard({
+  result,
+  isPending,
+  isError,
+  onRetry,
+  onOpenDetail,
+}: WeatherCardProps) {
   if (!result && isPending) {
     return (
       <Card className="p-5">
@@ -62,10 +69,13 @@ export function WeatherCard({ result, isPending, isError, onRetry, onOpenDetail 
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-[13px] font-medium text-ink-muted">{description.label}</p>
-          <p className="tabular mt-1 text-4xl font-bold">{Math.round(current.temperature_2m)}°</p>
+          <p className="tabular mt-1 text-4xl font-bold">
+            {formatTemperature(current.temperature_2m)}
+          </p>
           <p className="mt-1 text-[13px] text-ink-muted">
-            Terasa {Math.round(current.apparent_temperature)}° · Tinggi{' '}
-            {Math.round(daily.temperature_2m_max[0])}° · Rendah {Math.round(daily.temperature_2m_min[0])}°
+            Terasa {formatTemperature(current.apparent_temperature)} · Tinggi{' '}
+            {formatTemperature(daily.temperature_2m_max[0])} · Rendah{' '}
+            {formatTemperature(daily.temperature_2m_min[0])}
           </p>
         </div>
         <WeatherGlyph

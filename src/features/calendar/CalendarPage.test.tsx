@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { db } from '@/lib/db/db';
+import { renderWithProviders as render } from '@/test/render';
 import CalendarPage from './CalendarPage';
 import { fullDateLabel } from './calendar-utils';
 

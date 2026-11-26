@@ -8,7 +8,7 @@ import { IconButton } from '@/components/ui/IconButton';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { toast } from '@/components/ui/toast-store';
 import type { CalendarEvent } from '@/lib/db/db';
-import { readWeekStart, type WeekStart } from '@/features/settings/week-start';
+import { useSettings } from '@/features/settings/useSettings';
 import { cn } from '@/lib/utils/cn';
 import {
   buildMonthGrid,
@@ -26,7 +26,8 @@ import { deleteEvent } from './events-repo';
 import { useEventsBetween } from './useEvents';
 
 export default function CalendarPage() {
-  const [weekStart] = useState<WeekStart>(() => readWeekStart());
+  const { settings } = useSettings();
+  const weekStart = settings.weekStart;
   const [month, setMonth] = useState(() => new Date());
   const [selectedDay, setSelectedDay] = useState<Date | null>(null);
   const [editorOpen, setEditorOpen] = useState(false);

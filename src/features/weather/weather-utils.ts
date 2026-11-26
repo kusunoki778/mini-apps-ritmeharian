@@ -1,22 +1,20 @@
+import { getClockFormat, type ClockFormat } from '@/lib/format/preferences';
+import { formatClockParts, formatTimeOfDay } from '@/lib/format/time';
 import { currentHourIndex } from '@/lib/utils/hour-series';
 
 const TIME_PATTERN = /T(\d{2}):(\d{2})/;
 
 export { currentHourIndex };
 
-export function formatClock(iso: string): string {
+export function formatClock(iso: string, format: ClockFormat = getClockFormat()): string {
   const match = TIME_PATTERN.exec(iso);
-  return match ? `${match[1]}.${match[2]}` : iso;
+  if (!match) return iso;
+
+  return formatClockParts(Number(match[1]), Number(match[2]), format);
 }
 
 export function formatUpdatedAt(timestamp: number): string {
-  const time = new Intl.DateTimeFormat('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(timestamp));
-
-  return `Diperbarui ${time}`;
+  return `Diperbarui ${formatTimeOfDay(new Date(timestamp))}`;
 }
 
 export function formatDayLabel(iso: string): string {

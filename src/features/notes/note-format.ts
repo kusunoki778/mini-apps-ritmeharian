@@ -1,8 +1,4 @@
-const TIME = new Intl.DateTimeFormat('id-ID', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
-});
+import { formatTimeOfDay } from '@/lib/format/time';
 
 function startOfDay(date: Date): number {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
@@ -17,9 +13,9 @@ export function formatNoteTime(timestamp: number, now: Date = new Date()): strin
   const date = new Date(timestamp);
   const diff = daysBetween(now, date);
 
-  if (diff === 0) return `Hari ini, ${TIME.format(date)}`;
-  if (diff === 1) return `Kemarin, ${TIME.format(date)}`;
-  if (diff === -1) return `Besok, ${TIME.format(date)}`;
+  if (diff === 0) return `Hari ini, ${formatTimeOfDay(date)}`;
+  if (diff === 1) return `Kemarin, ${formatTimeOfDay(date)}`;
+  if (diff === -1) return `Besok, ${formatTimeOfDay(date)}`;
 
   if (date.getFullYear() === now.getFullYear()) {
     return new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'short' }).format(date);

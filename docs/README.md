@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M7 selesai. Alarm berjalan dengan pengulangan, tunda, layar berbunyi, dan batas bahwa alarm hanya aktif saat aplikasi terbuka. Pengaturan lengkap, ekspor data, dan audit menyusul di M8.
+Status: M8 sedang berjalan. Pengaturan lengkap, ekspor dan impor JSON, serta hapus data sudah ada. Audit offline, aksesibilitas, performa, dan uji lintas perangkat menyusul.
 
 ## Dokumen
 
@@ -15,17 +15,17 @@ Baca berurutan:
 
 ## Keputusan yang sudah dikunci
 
-| Topik | Keputusan |
-|---|---|
-| Nama | Nadi |
-| Bahasa UI | Indonesia |
-| Platform | PWA web dulu, Capacitor menyusul |
-| Stack | React + TypeScript + Vite + Tailwind CSS |
-| Backend | Tidak ada |
-| Sumber data | Open-Meteo (cuaca, kualitas udara, geocoding) |
-| Penyimpanan | IndexedDB lewat Dexie |
-| Tema | Terang dan gelap, mengikuti sistem secara default |
-| Target rilis pertama | Enam modul, alarm terbatas saat aplikasi terbuka |
+| Topik                | Keputusan                                         |
+| -------------------- | ------------------------------------------------- |
+| Nama                 | Nadi                                              |
+| Bahasa UI            | Indonesia                                         |
+| Platform             | PWA web dulu, Capacitor menyusul                  |
+| Stack                | React + TypeScript + Vite + Tailwind CSS          |
+| Backend              | Tidak ada                                         |
+| Sumber data          | Open-Meteo (cuaca, kualitas udara, geocoding)     |
+| Penyimpanan          | IndexedDB lewat Dexie                             |
+| Tema                 | Terang dan gelap, mengikuti sistem secara default |
+| Target rilis pertama | Enam modul, alarm terbatas saat aplikasi terbuka  |
 
 ## Struktur folder yang direncanakan
 

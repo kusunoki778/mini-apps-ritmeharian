@@ -1,13 +1,11 @@
-import { useContext } from 'react';
-
-import { ThemeContext } from './theme-context';
+import { useSettings } from './useSettings';
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
+  const { settings, resolvedTheme, setTheme } = useSettings();
 
-  if (!context) {
-    throw new Error('useTheme harus dipakai di dalam ThemeProvider.');
-  }
-
-  return context;
+  return {
+    preference: settings.theme,
+    resolved: resolvedTheme,
+    setPreference: setTheme,
+  };
 }

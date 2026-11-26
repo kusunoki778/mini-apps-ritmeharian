@@ -9,8 +9,9 @@ import {
   startOfWeek,
 } from 'date-fns';
 
-import type { CalendarEvent } from '@/lib/db/db';
 import type { WeekStart } from '@/features/settings/week-start';
+import { formatTimeOfDay } from '@/lib/format/time';
+import type { CalendarEvent } from '@/lib/db/db';
 
 const MONTH_LABEL = new Intl.DateTimeFormat('id-ID', { month: 'long', year: 'numeric' });
 const FULL_DATE = new Intl.DateTimeFormat('id-ID', {
@@ -18,11 +19,6 @@ const FULL_DATE = new Intl.DateTimeFormat('id-ID', {
   day: 'numeric',
   month: 'long',
   year: 'numeric',
-});
-const TIME = new Intl.DateTimeFormat('id-ID', {
-  hour: '2-digit',
-  minute: '2-digit',
-  hourCycle: 'h23',
 });
 
 export function toDateKey(date: Date): string {
@@ -79,7 +75,7 @@ export function fullDateLabel(date: Date): string {
 }
 
 export function formatTime(timestamp: number): string {
-  return TIME.format(new Date(timestamp));
+  return formatTimeOfDay(new Date(timestamp));
 }
 
 export function toTimeInput(timestamp: number): string {

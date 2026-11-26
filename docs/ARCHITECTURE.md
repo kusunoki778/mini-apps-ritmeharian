@@ -37,21 +37,21 @@ Browser
 
 ## 3. Stack
 
-| Lapisan | Pilihan | Alasan |
-|---|---|---|
-| Build | Vite | Cepat, konfigurasi kecil, output statis |
-| UI | React 18 + TypeScript | Ekosistem luas, tipe membantu model data dan API |
-| Gaya | Tailwind CSS 4 + CSS variables | Token tema mudah, utility cukup, tanpa file CSS besar |
-| Routing | React Router 7 | Lima route, lazy loading, data router bila perlu |
-| Server state | TanStack Query 5 | Cache, retry, stale time, refetch on focus |
-| UI state | Zustand 5 | Ringan untuk state sheet, pencarian, dan preferensi sementara |
-| Penyimpanan | Dexie 4 (IndexedDB) | Query terindeks, transaksi, kapasitas lebih besar dari localStorage |
-| Tanggal | date-fns + Intl | Format lokal Indonesia, operasi tanggal yang jelas |
-| Grafik | Recharts, dimuat malas | Cukup untuk grafik AQI dan suhu |
-| Ikon | Phosphor + Meteocons | Alasan ada di DESIGN.md |
-| PWA | vite-plugin-pwa (Workbox) | Precache dan runtime cache dengan konfigurasi kecil |
-| Test | Vitest + Testing Library | Satu toolchain dengan Vite |
-| Validasi impor | Zod | Validasi JSON impor tanpa menulis parser manual |
+| Lapisan        | Pilihan                        | Alasan                                                              |
+| -------------- | ------------------------------ | ------------------------------------------------------------------- |
+| Build          | Vite                           | Cepat, konfigurasi kecil, output statis                             |
+| UI             | React 18 + TypeScript          | Ekosistem luas, tipe membantu model data dan API                    |
+| Gaya           | Tailwind CSS 4 + CSS variables | Token tema mudah, utility cukup, tanpa file CSS besar               |
+| Routing        | React Router 7                 | Lima route, lazy loading, data router bila perlu                    |
+| Server state   | TanStack Query 5               | Cache, retry, stale time, refetch on focus                          |
+| UI state       | Zustand 5                      | Ringan untuk state sheet, pencarian, dan preferensi sementara       |
+| Penyimpanan    | Dexie 4 (IndexedDB)            | Query terindeks, transaksi, kapasitas lebih besar dari localStorage |
+| Tanggal        | date-fns + Intl                | Format lokal Indonesia, operasi tanggal yang jelas                  |
+| Grafik         | Recharts, dimuat malas         | Cukup untuk grafik AQI dan suhu                                     |
+| Ikon           | Phosphor + Meteocons           | Alasan ada di DESIGN.md                                             |
+| PWA            | vite-plugin-pwa (Workbox)      | Precache dan runtime cache dengan konfigurasi kecil                 |
+| Test           | Vitest + Testing Library       | Satu toolchain dengan Vite                                          |
+| Validasi impor | Zod                            | Validasi JSON impor tanpa menulis parser manual                     |
 
 ## 4. Struktur folder
 
@@ -157,20 +157,21 @@ nadi/
 ```
 
 Aturan folder:
+
 - `features` tidak saling mengimpor komponen internal. Impor lintas fitur lewat `lib` atau `components/ui`.
 - `lib/api` tidak tahu React.
 - `repo` adalah satu-satunya tempat yang menyentuh Dexie langsung.
 
 ## 5. Routing
 
-| Path | Halaman | Catatan |
-|---|---|---|
-| `/` | Beranda | Dasbor |
-| `/kalender` | Kalender | Bulan dan agenda |
-| `/catatan` | Catatan | Daftar dan editor |
-| `/alarm` | Alarm | Daftar dan form |
-| `/pengaturan` | Pengaturan | Lokasi, tema, data, tentang |
-| `*` | Tidak ditemukan | Tautan kembali ke Beranda |
+| Path          | Halaman         | Catatan                     |
+| ------------- | --------------- | --------------------------- |
+| `/`           | Beranda         | Dasbor                      |
+| `/kalender`   | Kalender        | Bulan dan agenda            |
+| `/catatan`    | Catatan         | Daftar dan editor           |
+| `/alarm`      | Alarm           | Daftar dan form             |
+| `/pengaturan` | Pengaturan      | Lokasi, tema, data, tentang |
+| `*`           | Tidak ditemukan | Tautan kembali ke Beranda   |
 
 Semua route dimuat malas dengan `React.lazy` dan `Suspense`. Halaman Beranda dimuat paling awal karena itu entry point. Grafik hanya dimuat saat kartu AQI terlihat.
 
@@ -225,6 +226,7 @@ interface Settings {
 ```
 
 Catatan model:
+
 - `pinned` memakai 0 atau 1 karena Dexie mengindeks angka, bukan boolean.
 - Waktu disimpan sebagai epoch milidetik, bukan string, agar sorting dan perbandingan konsisten.
 - `days` memakai 0 untuk Minggu sampai 6 untuk Sabtu, mengikuti `Date.getDay()`. Array kosong berarti sekali pakai.
@@ -245,20 +247,31 @@ db.version(1).stores({
 ```
 
 Tabel:
+
 - `notes`: catatan.
 - `events`: agenda.
 - `alarms`: alarm.
-- `settings`: key-value. Kunci `app` menyimpan objek `Settings`.
+- `settings`: key-value. Kunci `app` menyimpan objek `Settings` (tema, satuan suhu, format jam, awal minggu).
 - `cache`: key-value untuk payload API terakhir. Kunci `weather:<lat>,<lon>`, `air:<lat>,<lon>`.
 
 Migrasi:
+
 - Setiap perubahan skema menambah `db.version(n).stores(...)`.
 - Migrasi data memakai `.upgrade(tx => ...)`.
 - Tidak ada penghapusan data pengguna tanpa aksi eksplisit.
 
-Pengaturan tema untuk boot:
-- Sumber kebenaran tetap `settings.app.theme` di Dexie.
-- Nilai tema juga dicerminkan ke `localStorage` dengan kunci `nadi-theme` agar tema bisa diterapkan sebelum paint, karena Dexie bersifat asinkron. Sinkronisasi terjadi setiap kali pengguna mengubah tema.
+Pengaturan untuk boot:
+
+- Sumber kebenaran `Settings` ada di `settings.app` pada Dexie.
+- Nilai awal dibaca dari `localStorage` lebih dulu agar paint pertama tidak menunggu Dexie: tema dari `nadi-theme`, awal minggu dari `nadi-week-start`. Setelah Dexie selesai dibaca, nilai lama ditulis ke tabel dan `localStorage` tetap dicerminkan untuk tema.
+- Lokasi tetap di `localStorage` dengan kunci `nadi-location`, di luar `Settings`, karena dibaca sinkron oleh semua modul.
+- Satuan suhu dan format jam dipakai fungsi format murni lewat nilai modul di `lib/format/preferences`, yang disinkronkan provider sebelum anak komponen merender.
+
+Ekspor dan impor:
+
+- Ekspor menulis satu berkas JSON berisi `app`, `version`, `exportedAt`, `settings`, `location`, `notes`, `events`, dan `alarms`.
+- Impor divalidasi dengan Zod terhadap `version` yang didukung dan dibatasi 5 MB sebelum ditulis. Impor menimpa tabel terkait dalam satu transaksi Dexie.
+- Hapus semua data mengosongkan semua tabel dan kunci `localStorage` terkait, lalu memuat ulang aplikasi.
 
 ## 8. Lapisan API
 
@@ -300,6 +313,7 @@ GET https://geocoding-api.open-meteo.com/v1/search
 ```
 
 Aturan:
+
 - Tidak ada API key.
 - `timezone=auto` agar jam data mengikuti lokasi.
 - `language=id` untuk nama kota.
@@ -361,37 +375,37 @@ interface AirQualityResponse {
 
 ### 8.3 Pemetaan kode cuaca WMO
 
-| Kode | Label | Ikon |
-|---|---|---|
-| 0 | Cerah | cerah |
-| 1 | Cerah berawan | cerah-berawan |
-| 2 | Berawan | berawan |
-| 3 | Mendung | mendung |
-| 45, 48 | Kabut | kabut |
-| 51, 53, 55 | Gerimis | gerimis |
-| 56, 57 | Gerimis beku | gerimis |
-| 61, 63, 65 | Hujan | hujan |
-| 66, 67 | Hujan beku | hujan |
-| 71, 73, 75 | Salju | salju |
-| 77 | Butir salju | salju |
-| 80, 81, 82 | Hujan lokal | hujan |
-| 85, 86 | Hujan salju lokal | salju |
-| 95 | Badai petir | badai |
-| 96, 99 | Badai petir dengan hujan es | badai |
-| lainnya | Tidak diketahui | awan |
+| Kode       | Label                       | Ikon          |
+| ---------- | --------------------------- | ------------- |
+| 0          | Cerah                       | cerah         |
+| 1          | Cerah berawan               | cerah-berawan |
+| 2          | Berawan                     | berawan       |
+| 3          | Mendung                     | mendung       |
+| 45, 48     | Kabut                       | kabut         |
+| 51, 53, 55 | Gerimis                     | gerimis       |
+| 56, 57     | Gerimis beku                | gerimis       |
+| 61, 63, 65 | Hujan                       | hujan         |
+| 66, 67     | Hujan beku                  | hujan         |
+| 71, 73, 75 | Salju                       | salju         |
+| 77         | Butir salju                 | salju         |
+| 80, 81, 82 | Hujan lokal                 | hujan         |
+| 85, 86     | Hujan salju lokal           | salju         |
+| 95         | Badai petir                 | badai         |
+| 96, 99     | Badai petir dengan hujan es | badai         |
+| lainnya    | Tidak diketahui             | awan          |
 
 Varian siang dan malam ditentukan oleh `current.is_day` untuk data saat ini, dan oleh jam matahari terbit serta terbenam untuk data per jam.
 
 ### 8.4 Pemetaan AQI
 
-| Rentang US AQI | Label | Saran umum |
-|---|---|---|
-| 0-50 | Baik | Aktivitas luar ruang aman untuk umum. |
-| 51-100 | Sedang | Kelompok sensitif perlu memperhatikan gejala. |
-| 101-150 | Tidak sehat bagi kelompok sensitif | Kelompok sensitif kurangi aktivitas luar ruang yang berat. |
-| 151-200 | Tidak sehat | Kurangi aktivitas luar ruang. |
-| 201-300 | Sangat tidak sehat | Hindari aktivitas luar ruang. |
-| 301 ke atas | Berbahaya | Tetap di dalam ruang, tutup ventilasi. |
+| Rentang US AQI | Label                              | Saran umum                                                 |
+| -------------- | ---------------------------------- | ---------------------------------------------------------- |
+| 0-50           | Baik                               | Aktivitas luar ruang aman untuk umum.                      |
+| 51-100         | Sedang                             | Kelompok sensitif perlu memperhatikan gejala.              |
+| 101-150        | Tidak sehat bagi kelompok sensitif | Kelompok sensitif kurangi aktivitas luar ruang yang berat. |
+| 151-200        | Tidak sehat                        | Kurangi aktivitas luar ruang.                              |
+| 201-300        | Sangat tidak sehat                 | Hindari aktivitas luar ruang.                              |
+| 301 ke atas    | Berbahaya                          | Tetap di dalam ruang, tutup ventilasi.                     |
 
 Saran ini bersifat umum, bukan nasihat medis. Teks disclaimer tampil di kartu.
 
@@ -426,6 +440,7 @@ const queryKeys = {
 ```
 
 Pengaturan query:
+
 - `staleTime`: cuaca 10 menit, kualitas udara 20 menit, pencarian kota 5 menit.
 - `gcTime`: 24 jam.
 - `retry`: 2 kali dengan backoff, tidak untuk status 4xx.
@@ -435,6 +450,7 @@ Pengaturan query:
 ## 9. State
 
 Pembagian:
+
 - Server state: TanStack Query. Tidak disalin ke Zustand.
 - Data domain: Dexie, dibaca lewat hook `useNotes`, `useEvents`, `useAlarms`, `useSettings`. Setiap perubahan memicu pembacaan ulang.
 - UI state: Zustand untuk sheet yang terbuka, query pencarian, dan toast. Tidak untuk data domain.
@@ -462,8 +478,8 @@ VitePWA({
     icons: [
       { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
       { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-      { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
-    ]
+      { src: '/icons/maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
   },
   workbox: {
     globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
@@ -475,8 +491,8 @@ VitePWA({
         options: {
           cacheName: 'open-meteo-weather',
           networkTimeoutSeconds: 5,
-          expiration: { maxEntries: 40, maxAgeSeconds: 3600 }
-        }
+          expiration: { maxEntries: 40, maxAgeSeconds: 3600 },
+        },
       },
       {
         urlPattern: /^https:\/\/air-quality-api\.open-meteo\.com\//,
@@ -484,8 +500,8 @@ VitePWA({
         options: {
           cacheName: 'open-meteo-air',
           networkTimeoutSeconds: 5,
-          expiration: { maxEntries: 40, maxAgeSeconds: 3600 }
-        }
+          expiration: { maxEntries: 40, maxAgeSeconds: 3600 },
+        },
       },
       {
         urlPattern: /^https:\/\/geocoding-api\.open-meteo\.com\//,
@@ -493,21 +509,23 @@ VitePWA({
         options: {
           cacheName: 'open-meteo-geocoding',
           networkTimeoutSeconds: 5,
-          expiration: { maxEntries: 20, maxAgeSeconds: 86400 }
-        }
-      }
-    ]
-  }
-})
+          expiration: { maxEntries: 20, maxAgeSeconds: 86400 },
+        },
+      },
+    ],
+  },
+});
 ```
 
 Cache berlapis:
+
 - Service worker: menyajikan respons HTTP terakhir saat offline, termasuk untuk cold start.
 - Dexie: menyimpan payload terstruktur dan `fetchedAt`, sehingga UI bisa menampilkan label waktu yang benar tanpa menebak dari header cache.
 
 Alasan dua lapis: service worker menjamin shell dan respons mentah, Dexie menjamin data terstruktur dan label basi yang dapat diuji. Biayanya kecil karena payload cuaca hanya beberapa kilobyte.
 
 Perilaku offline:
+
 - `useOnline` mendengarkan `online` dan `offline`.
 - Banner offline muncul di atas konten.
 - Modul yang gagal memakai cache dan menampilkan label waktu.
@@ -515,6 +533,7 @@ Perilaku offline:
 - Pencarian kota menampilkan pesan bahwa pencarian butuh koneksi, sementara lokasi tersimpan tetap dipakai.
 
 Pembaruan:
+
 - `registerType: 'prompt'` menampilkan banner "Versi baru tersedia" dengan tombol "Muat ulang".
 - Tidak ada reload paksa saat pengguna sedang mengetik catatan.
 
@@ -552,9 +571,12 @@ Penerapan sebelum paint, di `index.html`:
   (function () {
     try {
       var saved = localStorage.getItem('nadi-theme');
-      var theme = saved === 'light' || saved === 'dark'
-        ? saved
-        : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      var theme =
+        saved === 'light' || saved === 'dark'
+          ? saved
+          : window.matchMedia('(prefers-color-scheme: dark)').matches
+            ? 'dark'
+            : 'light';
       document.documentElement.dataset.theme = theme;
     } catch (error) {
       document.documentElement.dataset.theme = 'light';
@@ -564,6 +586,7 @@ Penerapan sebelum paint, di `index.html`:
 ```
 
 Aturan:
+
 - Pilihan "Sistem" mendengarkan perubahan `prefers-color-scheme` dan memperbarui atribut.
 - Pilihan manual mengalahkan sistem.
 - Perubahan tema tidak memakai transisi warna global agar tidak terasa lambat.
@@ -574,6 +597,7 @@ Aturan:
 Batasan produk: alarm hanya berbunyi saat aplikasi terbuka. Ini bukan bug yang bisa ditutup dengan kode frontend. Alarm latar belakang memerlukan Capacitor dan `@capacitor/local-notifications`.
 
 Alur:
+
 1. Saat aplikasi mount, muat alarm aktif.
 2. Hitung waktu berbunyi berikutnya untuk setiap alarm.
 3. Satu interval 1 detik memeriksa apakah ada alarm yang jatuh tempo.
@@ -596,6 +620,7 @@ function nextOccurrence(alarm: Alarm, now: Date): Date | null {
 ```
 
 Catatan:
+
 - `days` kosong berarti sekali pakai, bukan setiap hari.
 - `days` berisi tujuh angka berarti setiap hari.
 - Perhitungan memakai setter waktu lokal agar perubahan DST ditangani oleh `Date`.
@@ -604,6 +629,7 @@ Catatan:
 - Pemeriksaan latar belakang browser tidak diandalkan. Saat tab kembali aktif, alarm yang terlewat dalam 60 detik terakhir tetap ditampilkan; yang lebih lama ditandai terlewat.
 
 Notifikasi:
+
 - Izin diminta saat pengguna pertama kali membuat alarm, bukan saat aplikasi dibuka.
 - Jika izin ditolak, UI tetap berfungsi dan menampilkan catatan bahwa notifikasi tidak aktif.
 
@@ -622,6 +648,7 @@ Notifikasi:
 ## 14. Performa
 
 Anggaran:
+
 - JavaScript awal di bawah 200KB gzip.
 - Halaman non-Beranda dimuat malas.
 - Recharts dimuat malas saat kartu AQI masuk viewport atau dibuka.
@@ -631,6 +658,7 @@ Anggaran:
 - Animasi hanya transform dan opacity.
 
 Teknik:
+
 - `React.lazy` per route.
 - `content-visibility: auto` pada bagian bawah dasbor bila pengukuran menunjukkan manfaat.
 - `Intl.DateTimeFormat` dibuat sekali per locale, tidak per render.
@@ -641,6 +669,7 @@ Target terukur saat rilis: Lighthouse Performance minimal 90 mobile, LCP di bawa
 ## 15. Testing
 
 Unit:
+
 - `nextOccurrence`: sekali pakai, harian, hari tertentu, pergantian tengah malam, DST.
 - Pemetaan kode WMO, termasuk kode tidak dikenal.
 - Kategori AQI, batas setiap rentang, nilai kosong.
@@ -649,6 +678,7 @@ Unit:
 - Validasi impor JSON: skema benar, skema salah, versi tidak dikenal.
 
 Komponen:
+
 - Catatan: tambah, cari, pin, hapus dengan konfirmasi.
 - Alarm: validasi form, toggle, label berikutnya.
 - Kalender: navigasi bulan, buka panel hari.
@@ -656,12 +686,14 @@ Komponen:
 - State kosong, loading, dan error pada setiap kartu data.
 
 End-to-end opsional dengan Playwright:
+
 - Dasbor memuat tanpa error konsol.
 - Tambah catatan, reload, catatan masih ada.
 - Mode offline menampilkan banner dan data cache.
 - Instalasi PWA diuji manual di Android dan iOS.
 
 Aksesibilitas:
+
 - Pemeriksaan otomatis dengan axe di pengembangan.
 - Pemeriksaan manual: tab melalui semua kontrol, Escape pada sheet, fokus kembali.
 
@@ -670,6 +702,7 @@ Aksesibilitas:
 Target: hosting statis dengan HTTPS. Netlify, Vercel, atau Cloudflare Pages semuanya cocok.
 
 Build:
+
 ```
 npm ci
 npm run build
@@ -678,6 +711,7 @@ npm run build
 Output: `dist`.
 
 Aturan hosting:
+
 - Rewrite semua path ke `index.html` untuk SPA.
 - Aset ber-hash: cache `immutable` satu tahun.
 - `index.html` dan `sw.js`: `no-cache`.
@@ -721,11 +755,11 @@ Alasan: shell dan respons mentah dari service worker, data terstruktur dan label
 
 ## 19. Risiko teknis
 
-| Risiko | Mitigasi |
-|---|---|
-| Alarm terlewat saat aplikasi tertutup | Batasan ditulis di UI, notifikasi browser, Capacitor di backlog |
-| Payload API berubah bentuk | Validasi opsional dengan Zod di batas API, test fixture |
-| Data cache menumpuk | Batas entri Workbox dan pembersihan cache berdasarkan kunci lokasi |
-| IndexedDB diblokir mode privat | Deteksi kegagalan buka DB, tampilkan pesan dan mode sementara tanpa penyimpanan |
-| DST dan zona waktu | Simpan epoch, tampilkan dengan `Intl`, uji perhitungan alarm |
-| PWA iOS berbeda | Uji perangkat nyata, jelaskan batasan di Tentang |
+| Risiko                                | Mitigasi                                                                        |
+| ------------------------------------- | ------------------------------------------------------------------------------- |
+| Alarm terlewat saat aplikasi tertutup | Batasan ditulis di UI, notifikasi browser, Capacitor di backlog                 |
+| Payload API berubah bentuk            | Validasi opsional dengan Zod di batas API, test fixture                         |
+| Data cache menumpuk                   | Batas entri Workbox dan pembersihan cache berdasarkan kunci lokasi              |
+| IndexedDB diblokir mode privat        | Deteksi kegagalan buka DB, tampilkan pesan dan mode sementara tanpa penyimpanan |
+| DST dan zona waktu                    | Simpan epoch, tampilkan dengan `Intl`, uji perhitungan alarm                    |
+| PWA iOS berbeda                       | Uji perangkat nyata, jelaskan batasan di Tentang                                |

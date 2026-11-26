@@ -104,6 +104,8 @@ try {
 
   await page.getByRole('button', { name: 'Tambah agenda' }).click();
   await page.getByLabel('Judul').fill('Rapat asap');
+  // Sepanjang hari supaya agenda tidak bergantung waktu berjalan saat uji.
+  await page.getByRole('switch', { name: 'Sepanjang hari' }).click();
   await page.getByRole('button', { name: 'Simpan' }).click();
   await page.getByText('Rapat asap').first().waitFor({ timeout: 10000 });
   check('agenda cepat tampil di dasbor', await page.getByText('Rapat asap').first().isVisible());
@@ -262,6 +264,50 @@ try {
     'tema terang aktif',
     (await page.evaluate(() => document.documentElement.dataset.theme)) === 'light',
   );
+
+  await page.getByRole('button', { name: 'Fahrenheit' }).click();
+  await page.getByRole('button', { name: '12 jam' }).click();
+  await page.getByRole('button', { name: 'Minggu' }).click();
+  check(
+    'satuan suhu tersimpan',
+    (await page.getByRole('button', { name: 'Fahrenheit' }).getAttribute('aria-pressed')) ===
+      'true',
+  );
+
+  await page.reload({ waitUntil: 'load' });
+  check(
+    'satuan suhu bertahan setelah reload',
+    (await page.getByRole('button', { name: 'Fahrenheit' }).getAttribute('aria-pressed')) ===
+      'true',
+  );
+
+  await page.goto(`${BASE}/`, { waitUntil: 'load' });
+  await page.locator('h1').first().waitFor();
+  const clockText = await page
+    .locator('section[aria-label="Jam dan garis hari"] p.tabular')
+    .first()
+    .innerText();
+  check('format jam 12 jam dipakai', /(AM|PM)/.test(clockText), clockText);
+
+  await page.goto(`${BASE}/kalender`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Kalender', exact: true }).waitFor();
+  const firstWeekday = await page
+    .locator('div.grid-cols-7')
+    .first()
+    .locator('span')
+    .first()
+    .innerText();
+  check('awal minggu Minggu dipakai', firstWeekday === 'Min', firstWeekday);
+
+  await page.goto(`${BASE}/pengaturan`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Pengaturan', exact: true }).waitFor();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Ekspor JSON' }).click();
+  const download = await downloadPromise;
+  check('ekspor JSON terunduh', download.suggestedFilename().endsWith('.json'));
+
+  await page.getByRole('button', { name: '24 jam' }).click();
+  await page.getByRole('button', { name: 'Senin' }).click();
 
   await page.goto(`${BASE}/tidak-ada`, { waitUntil: 'load' });
   const notFoundHeading = page.getByRole('heading', {

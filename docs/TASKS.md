@@ -8,6 +8,7 @@ Tanggal: 25 November 2026
 Kerjakan berurutan per milestone. Satu task selesai hanya jika kriteria penerimaan dan Definition of Done terpenuhi. Centang kotak saat selesai.
 
 Estimasi memakai skala:
+
 - S: setengah hari atau kurang.
 - M: satu sampai dua hari.
 - L: tiga hari atau lebih.
@@ -237,21 +238,21 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M8: Pengaturan, offline, aksesibilitas, performa
 
-- [ ] T8.1 Halaman Pengaturan (M)
-  - Lokasi, tema, satuan, format jam, awal minggu.
-  - Penerimaan: semua pilihan bertahan setelah reload.
+- [x] T8.1 Halaman Pengaturan (M)
+  - Lokasi, tema, satuan suhu, format jam, dan awal minggu. Semua menulis ke objek `Settings` di Dexie, dengan tema dan awal minggu bercermin ke `localStorage` untuk boot.
+  - Penerimaan: semua pilihan bertahan setelah reload. Diuji di unit dan smoke.
 
-- [ ] T8.2 Ekspor dan impor JSON (M)
-  - Ekspor semua data, impor dengan validasi Zod dan batas ukuran.
-  - Penerimaan: roundtrip utuh, file rusak ditolak dengan pesan jelas.
+- [x] T8.2 Ekspor dan impor JSON (M)
+  - Ekspor seluruh tabel ke satu berkas JSON berisi pengaturan dan lokasi. Impor divalidasi dengan Zod terhadap versi yang didukung dan dibatasi 5 MB.
+  - Penerimaan: roundtrip utuh, berkas rusak atau versi asing ditolak dengan pesan jelas.
 
-- [ ] T8.3 Hapus semua data (S)
-  - Konfirmasi dengan mengetik kata kunci.
-  - Penerimaan: data terhapus, aplikasi kembali ke state awal.
+- [x] T8.3 Hapus semua data (S)
+  - Konfirmasi dengan mengetik kata kunci HAPUS, lalu semua tabel dan kunci `localStorage` dibersihkan.
+  - Penerimaan: data terhapus, aplikasi kembali ke state awal setelah muat ulang.
 
-- [ ] T8.4 Pembaruan PWA (S)
-  - Banner versi baru, tombol muat ulang.
-  - Penerimaan: tidak reload paksa saat pengguna sedang mengetik.
+- [x] T8.4 Pembaruan PWA (S)
+  - Banner versi baru dengan tombol muat ulang, tanpa reload paksa.
+  - Penerimaan: pembaruan menunggu tindakan pengguna.
 
 - [ ] T8.5 Uji offline (M)
   - Matriks: cold start offline, offline setelah data segar, offline tanpa cache.
@@ -304,18 +305,18 @@ Jangan mulai dari catatan atau alarm. Keduanya menggoda karena terasa mudah, tet
 
 ## Perkiraan total
 
-| Milestone | Perkiraan |
-|---|---|
-| M0 | 2 hari |
-| M1 | 4 hari |
-| M2 | 2 hari |
-| M3 | 3 hari |
-| M4 | 2 hari |
-| M5 | 3 hari |
-| M6 | 3 hari |
-| M7 | 3 hari |
-| M8 | 4 hari |
-| M9 | 1 hari |
-| Total | sekitar 27 hari kerja |
+| Milestone | Perkiraan             |
+| --------- | --------------------- |
+| M0        | 2 hari                |
+| M1        | 4 hari                |
+| M2        | 2 hari                |
+| M3        | 3 hari                |
+| M4        | 2 hari                |
+| M5        | 3 hari                |
+| M6        | 3 hari                |
+| M7        | 3 hari                |
+| M8        | 4 hari                |
+| M9        | 1 hari                |
+| Total     | sekitar 27 hari kerja |
 
 Paruh waktu sekitar 6 sampai 8 minggu. Jika waktu terbatas, tunda M6 dan M7 ke v1.1 dan rilis dasbor, cuaca, AQI, serta catatan lebih dulu. Jangan memotong state, aksesibilitas, atau pengujian offline, karena ketiganya adalah nilai jual proyek ini.
