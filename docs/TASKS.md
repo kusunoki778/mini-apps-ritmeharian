@@ -314,6 +314,7 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
 
 - [x] T10.5 Tier 2: alarm layar penuh (L)
   - Plugin native `NativeAlarm` (Java) dengan penjadwalan `AlarmManager`, layanan latar depan `mediaPlayback`, full-screen intent, bunyi berulang lewat `MediaPlayer`, dan tombol Tunda serta Matikan di notifikasi dan di `AlarmActivity`. `BootReceiver` memasang ulang alarm setelah reboot.
+  - Alarm dijadwalkan dengan `setAlarmClock` supaya dianggap jam bawaan sistem: pasti, lolos mode hemat daya, dan diizinkan menyalakan layanan latar depan dari latar belakang, jadi tetap berbunyi walau aplikasi tertutup. Timer memakai `setExactAndAllowWhileIdle`.
   - Lapisan web memilih Tier 2 bila plugin terdaftar, dengan `@capacitor/local-notifications` sebagai cadangan.
   - Penerimaan: kode terkompilasi dan APK terbangun. Verifikasi di perangkat ada di T10.6.
 

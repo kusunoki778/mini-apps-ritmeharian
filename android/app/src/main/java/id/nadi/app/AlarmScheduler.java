@@ -37,16 +37,34 @@ final class AlarmScheduler {
         PendingIntent intent = pendingIntent(context, notificationId, triggerAt, label, alarmId,
                 snoozeMinutes, soundId);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !manager.canScheduleExactAlarms()) {
-            // Izin alarm pasti belum diberikan. Pakai alarm tidak pasti agar tetap berbunyi.
-            manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        boolean canExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
+                || manager.canScheduleExactAlarms();
+
+        if (notificationId != TIMER_ID && canExact) {
+            // Alarm diperlakukan seperti jam bawaan sistem: pasti, lolos mode hemat daya,
+            // dan boleh menyalakan layanan latar depan walau aplikasi tertutup. Sistem
+            // juga menampilkannya di info alarm berikutnya.
+            manager.setAlarmClock(alarmClockInfo(context, notificationId, triggerAt), intent);
+        } else if (canExact) {
             manager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent);
         } else {
-            manager.setExact(AlarmManager.RTC_WAKEUP, triggerAt, intent);
+            // Izin alarm pasti belum diberikan. Pakai alarm tidak pasti agar tetap berbunyi.
+            manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent);
         }
 
         persist(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId);
+    }
+
+    // Info untuk setAlarmClock: intent yang membuka aplikasi saat pengguna menekan
+    // penanda alarm berikutnya di sistem. Memakai ulang intent yang sama dengan
+    // konten notifikasi alarm.
+    private static AlarmManager.AlarmClockInfo alarmClockInfo(Context context, int notificationId,
+                                                              long triggerAt) {
+        Intent show = new Intent(context, MainActivity.class);
+        show.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent showIntent = PendingIntent.getActivity(context, notificationId + 1, show,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        return new AlarmManager.AlarmClockInfo(triggerAt, showIntent);
     }
 
     static void cancel(Context context, int notificationId) {
