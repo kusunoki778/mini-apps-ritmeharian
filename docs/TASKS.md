@@ -375,6 +375,11 @@ Tujuan: memadatkan navigasi bawah dan memindahkan kalkulator ke halaman sendiri,
   - `buildNativeEventItems` menjadwalkan agenda sebagai alarm native sekali jalan dengan nada terpilih. Di web, `CalendarReminderEngine` berbunyi lewat `RingScreen` dan menandai `reminderFiredAt`. Titik merah di kalender menandai agenda dengan nada dering.
   - Penerimaan: agenda dengan nada dering berbunyi seperti alarm, bisa ditunda, dan tidak berbunyi dua kali. Diuji di unit.
 
+- [x] T12.4 Nada dering per alarm (S)
+  - `Alarm` dapat `soundId` opsional dan `AlarmInput` mewajibkan `soundId`. Form alarm punya pilihan **Nada dering** dengan enam nada bundel, default dari pengaturan. Baris alarm menampilkan nada terpilih.
+  - `buildNativeAlarms` memakai nada khusus alarm bila ada, jika tidak nada dari pengaturan. `AlarmEngine` dan `CalendarReminderEngine` memutar nada terpilih di web lewat `startAlarmSound`.
+  - Penerimaan: tiap alarm bisa punya nada berbeda, tersimpan di perangkat, dan berbunyi dengan nada itu. Diuji di unit.
+
 ## Backlog setelah v1
 
 - Sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot untuk menekan LCP di bawah 2.5 s pada throttle mobile.

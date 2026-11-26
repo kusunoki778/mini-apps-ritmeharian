@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { db, type Alarm } from '@/lib/db/db';
+import { DEFAULT_ALARM_SOUND, type AlarmSoundId } from './alarm-sounds';
 import {
   buildAlarmFields,
   createAlarm,
@@ -21,6 +22,7 @@ function input(overrides: Partial<AlarmInput> = {}): AlarmInput {
     days: [],
     snoozeMinutes: 5,
     enabled: true,
+    soundId: DEFAULT_ALARM_SOUND,
     ...overrides,
   };
 }
@@ -42,6 +44,13 @@ describe('buildAlarmFields', () => {
   it('memberi label bawaan dan memangkas spasi', () => {
     expect(buildAlarmFields(input({ label: '   ' })).label).toBe('Alarm');
     expect(buildAlarmFields(input({ label: '  Bangun  ' })).label).toBe('Bangun');
+  });
+
+  it('menyimpan nada dering dan jatuh ke nada bawaan bila tidak dikenal', () => {
+    expect(buildAlarmFields(input({ soundId: 'lonceng' })).soundId).toBe('lonceng');
+    expect(
+      buildAlarmFields(input({ soundId: 'tidak-ada' as unknown as AlarmSoundId })).soundId,
+    ).toBe(DEFAULT_ALARM_SOUND);
   });
 });
 

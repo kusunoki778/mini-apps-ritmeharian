@@ -3,6 +3,7 @@ import { Trash } from '@phosphor-icons/react';
 import { IconButton } from '@/components/ui/IconButton';
 import type { Alarm } from '@/lib/db/db';
 import { cn } from '@/lib/utils/cn';
+import { alarmSoundLabel } from './alarm-sounds';
 import { formatAlarmTime, formatRepeat } from './alarm-utils';
 
 interface AlarmListItemProps {
@@ -32,7 +33,9 @@ export function AlarmListItem({ alarm, next, onOpen, onToggle, onDelete }: Alarm
           ) : null}
         </span>
         <span className="mt-0.5 block truncate text-sm font-medium">{alarm.label}</span>
-        <span className="mt-0.5 block text-[12px] text-ink-muted">{formatRepeat(alarm)}</span>
+        <span className="mt-0.5 block text-[12px] text-ink-muted">
+          {formatRepeat(alarm)} · Nada {alarmSoundLabel(alarm.soundId ?? '')}
+        </span>
       </button>
 
       <div className="flex shrink-0 items-center gap-1">

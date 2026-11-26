@@ -136,7 +136,8 @@ Rina, 31, reviewer portofolio. Membuka aplikasi sekali untuk menilai kualitas te
 
 ### FR-07 Alarm
 
-- Field: label, waktu, ulangi (sekali, setiap hari, atau hari tertentu), aktif, menit tunda.
+- Field: label, waktu, ulangi (sekali, setiap hari, atau hari tertentu), aktif, menit tunda, dan nada dering per alarm.
+- Nada dering dipilih dari enam nada bundel; pengaturan menyediakan nada bawaan untuk alarm baru dan timer.
 - Alarm berbunyi saat aplikasi terbuka. Bunyi memakai Web Audio, tanpa file audio eksternal pada v1.
 - Di aplikasi Android, alarm dijadwalkan ke sistem, berbunyi tepat waktu walau aplikasi tertutup, dan memakai salah satu dari enam nada bundel: Nadi, Lembut, Tegas, Lonceng, Denyut, Fajar.
 - Notifikasi browser dipakai jika izin diberikan.

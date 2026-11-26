@@ -125,16 +125,17 @@ export default function SettingsPage() {
         <Section title="Alarm">
           <div className="space-y-3">
             <p className="text-sm leading-relaxed text-ink-muted">
-              Nada yang berbunyi saat alarm dan timer berbunyi. Semua nada dibundel di aplikasi,
-              jadi tetap berbunyi tanpa internet.
+              Nada bawaan untuk alarm baru dan timer. Tiap alarm bisa memilih nadanya sendiri saat
+              dibuat atau diubah. Semua nada dibundel di aplikasi, jadi tetap berbunyi tanpa
+              internet.
             </p>
             <Select
-              label="Nada alarm"
+              label="Nada alarm bawaan"
               value={settings.alarmSoundId}
               hint={
                 isNativeApp()
-                  ? 'Pilihan berlaku untuk alarm dan timer di aplikasi Android.'
-                  : 'Pilihan ini berlaku di aplikasi Android. Di web alarm memakai nada bawaan browser.'
+                  ? 'Dipakai alarm baru dan timer. Tiap alarm bisa menggantinya.'
+                  : 'Dipakai alarm baru dan timer selama halaman terbuka. Tiap alarm bisa menggantinya.'
               }
               onChange={(event) =>
                 updateSettings({ alarmSoundId: event.target.value as AlarmSoundId })

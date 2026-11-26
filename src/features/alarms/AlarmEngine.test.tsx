@@ -73,6 +73,19 @@ describe('AlarmEngine', () => {
     expect(screen.getByText('Bangun')).toBeInTheDocument();
   });
 
+  it('memutar nada khusus alarm bila dipilih', async () => {
+    vi.setSystemTime(new Date(2026, 10, 26, 7, 30, 30));
+    holder.alarms = [dueAlarm({ soundId: 'fajar' })];
+    const factory = vi.fn(() => () => {});
+    render(<AlarmEngine soundFactory={factory} intervalMs={1000} />);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+
+    expect(factory).toHaveBeenCalledWith('fajar');
+  });
+
   it('berhenti saat dimatikan dan menandai sekali pakai menjadi nonaktif', async () => {
     vi.setSystemTime(new Date(2026, 10, 26, 7, 30, 30));
     holder.alarms = [dueAlarm()];

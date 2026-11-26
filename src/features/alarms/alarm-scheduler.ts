@@ -3,7 +3,7 @@ import type { LocalNotificationSchema } from '@capacitor/local-notifications';
 
 import type { Alarm, CalendarEvent } from '@/lib/db/db';
 import { formatAlarmTime, isOnce, nextTrigger } from './alarm-utils';
-import { DEFAULT_ALARM_SOUND, type AlarmSoundId } from './alarm-sounds';
+import { DEFAULT_ALARM_SOUND, isAlarmSoundId, type AlarmSoundId } from './alarm-sounds';
 import { fullAlarm, fullAlarmSupported, type NativeAlarmItem } from './native-alarm';
 
 export const ALARM_CHANNEL_ID = 'nadi-alarm';
@@ -51,7 +51,8 @@ export function upcomingOccurrences(alarm: Alarm, from: Date, count: number): nu
 }
 
 // Kumpulkan kemunculan berikutnya sebagai item alarm native. Murni supaya bisa
-// diuji tanpa runtime native. Nada dipilih global, jadi disalin ke tiap kemunculan.
+// diuji tanpa runtime native. Nada diambil dari alarm bila ada, jika tidak dari
+// pilihan global di pengaturan.
 export function buildNativeAlarms(
   alarms: Alarm[],
   from: Date,
@@ -60,6 +61,8 @@ export function buildNativeAlarms(
   const items: NativeAlarmItem[] = [];
 
   for (const alarm of alarms) {
+    const alarmSound = isAlarmSoundId(alarm.soundId) ? alarm.soundId : soundId;
+
     for (const at of upcomingOccurrences(alarm, from, OCCURRENCES_PER_ALARM)) {
       items.push({
         id: notificationId(`${alarm.id}:${at}`),
@@ -67,7 +70,7 @@ export function buildNativeAlarms(
         label: alarm.label || 'Alarm',
         alarmId: alarm.id,
         snoozeMinutes: alarm.snoozeMinutes,
-        soundId,
+        soundId: alarmSound,
       });
     }
   }

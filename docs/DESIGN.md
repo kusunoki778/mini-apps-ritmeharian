@@ -278,10 +278,10 @@ Satu halaman, agenda lebih dulu lalu catatan:
 ### 11.4 Alarm
 
 - Header dengan tombol tambah.
-- Baris alarm: waktu besar, label, hari pengulangan, toggle aktif.
+- Baris alarm: waktu besar, label, hari pengulangan, nada dering, toggle aktif.
 - Alarm berikutnya ditandai dengan label "Berikutnya".
-- Form: label, waktu, ulangi (sekali, setiap hari, pilih hari), tunda, aktif.
-- Banner batasan di atas daftar: "Alarm berbunyi selama Nadi terbuka."
+- Form: label, waktu, ulangi (sekali, setiap hari, pilih hari), tunda, nada dering (enam nada bundel, default dari Pengaturan), aktif.
+- Banner batasan di atas daftar: "Alarm berbunyi selama Nadi terbuka." di web, digantikan penjadwalan sistem di Android.
 - Di bawah daftar: stopwatch dan timer. Timer tetap berbunyi saat aplikasi tertutup di Android.
 - Saat berbunyi: layar penuh dengan waktu, label, tombol Tunda dan Matikan. Layar yang sama dipakai pengingat agenda.
 - State kosong: "Belum ada alarm." dengan tombol tambah.
@@ -293,7 +293,7 @@ Bagian:
 1. Lokasi: nama lokasi aktif, tombol gunakan lokasi saat ini, pencarian kota.
 2. Tampilan: tema (Sistem, Terang, Gelap).
 3. Satuan: Celsius atau Fahrenheit, format jam, awal minggu.
-4. Alarm: nada alarm (enam nada bundel, berlaku untuk aplikasi Android) dan tempat membuka alat alarm.
+4. Alarm: nada alarm bawaan untuk alarm baru dan timer (enam nada bundel), plus cara membuka alat alarm.
 5. Data: ekspor JSON, impor JSON, hapus semua data.
 6. Aplikasi Android: unduh APK.
 7. Tentang: versi, sumber data, atribusi Open-Meteo dan CAMS, lisensi, tautan ke dokumentasi.

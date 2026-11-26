@@ -16,7 +16,7 @@ interface RingingState {
 }
 
 interface AlarmEngineProps {
-  soundFactory?: () => () => void;
+  soundFactory?: (soundId?: string) => () => void;
   intervalMs?: number;
 }
 
@@ -42,7 +42,7 @@ export function AlarmEngine({
       ringingRef.current = state;
       handledRef.current.set(alarm.id, at);
       setRinging(state);
-      stopSoundRef.current = soundFactory();
+      stopSoundRef.current = soundFactory(alarm.soundId);
       showAlarmNotification(alarm.label, formatAlarmTime(alarm.hour, alarm.minute));
     };
 

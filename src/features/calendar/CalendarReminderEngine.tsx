@@ -21,7 +21,7 @@ interface RingingState {
 }
 
 interface CalendarReminderEngineProps {
-  soundFactory?: () => () => void;
+  soundFactory?: (soundId?: string) => () => void;
   intervalMs?: number;
 }
 
@@ -51,7 +51,7 @@ export function CalendarReminderEngine({
       ringingRef.current = state;
       firedRef.current.set(event.id, at);
       setRinging(state);
-      stopRef.current = soundFactory();
+      stopRef.current = soundFactory(event.reminderSoundId);
     };
 
     const check = () => {

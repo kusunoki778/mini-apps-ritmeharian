@@ -33,6 +33,8 @@ export interface Alarm {
   days: number[];
   enabled: boolean;
   snoozeMinutes: number;
+  // Nada alarm khusus alarm ini. Tidak ada nilai berarti memakai nada dari pengaturan.
+  soundId?: string;
   lastTriggeredAt?: number;
   createdAt?: number;
 }

@@ -6,9 +6,11 @@ import { Select } from '@/components/ui/Select';
 import { Sheet } from '@/components/ui/Sheet';
 import { Toggle } from '@/components/ui/Toggle';
 import { toast } from '@/components/ui/toast-store';
+import { useAlarmSoundId } from '@/features/settings/useSettings';
 import type { Alarm } from '@/lib/db/db';
 import { cn } from '@/lib/utils/cn';
 import { nativeAlarmsSupported, requestNativeAlarmPermissions } from './alarm-scheduler';
+import { ALARM_SOUNDS, isAlarmSoundId, type AlarmSoundId } from './alarm-sounds';
 import { allDays, DAY_LABELS, DAY_ORDER, repeatModeFromDays, type RepeatMode } from './alarm-utils';
 import { hasAlarmErrors, validateAlarm, type AlarmErrors } from './alarm-validation';
 import {
@@ -36,7 +38,7 @@ function timeValue(hour: number, minute: number): string {
   return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
 }
 
-function initialInput(alarm: Alarm | null): AlarmInput {
+function initialInput(alarm: Alarm | null, defaultSoundId: AlarmSoundId): AlarmInput {
   if (!alarm) {
     return {
       label: '',
@@ -45,6 +47,7 @@ function initialInput(alarm: Alarm | null): AlarmInput {
       days: [],
       snoozeMinutes: DEFAULT_SNOOZE_MINUTES,
       enabled: true,
+      soundId: defaultSoundId,
     };
   }
 
@@ -55,11 +58,13 @@ function initialInput(alarm: Alarm | null): AlarmInput {
     days: alarm.days,
     snoozeMinutes: alarm.snoozeMinutes,
     enabled: alarm.enabled,
+    soundId: isAlarmSoundId(alarm.soundId) ? alarm.soundId : defaultSoundId,
   };
 }
 
 export function AlarmFormSheet({ alarm, onClose, onSaved }: AlarmFormSheetProps) {
-  const [input, setInput] = useState<AlarmInput>(() => initialInput(alarm));
+  const defaultSoundId = useAlarmSoundId();
+  const [input, setInput] = useState<AlarmInput>(() => initialInput(alarm, defaultSoundId));
   const [errors, setErrors] = useState<AlarmErrors>({});
   const [saving, setSaving] = useState(false);
 
@@ -192,6 +197,19 @@ export function AlarmFormSheet({ alarm, onClose, onSaved }: AlarmFormSheetProps)
           {SNOOZE_OPTIONS.map((minutes) => (
             <option key={minutes} value={minutes}>
               {minutes} menit
+            </option>
+          ))}
+        </Select>
+
+        <Select
+          label="Nada dering"
+          value={input.soundId}
+          hint="Nada berbunyi saat alarm ini berdering."
+          onChange={(event) => update({ soundId: event.target.value as AlarmSoundId })}
+        >
+          {ALARM_SOUNDS.map((option) => (
+            <option key={option.id} value={option.id}>
+              {option.label}
             </option>
           ))}
         </Select>

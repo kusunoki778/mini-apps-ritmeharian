@@ -223,6 +223,7 @@ interface Alarm {
   days: number[];
   enabled: boolean;
   snoozeMinutes: number;
+  soundId?: string;
   lastTriggeredAt?: number;
 }
 
@@ -629,7 +630,7 @@ Alur di aplikasi (lapisan web):
 
 **Tier 2, plugin `NativeAlarm` (layar penuh).** Dipakai bila plugin terdaftar (`Capacitor.isPluginAvailable('NativeAlarm')`), yaitu di pembungkus native.
 
-- `alarm-scheduler.ts` menyusun item alarm murni lewat `buildNativeAlarms`, lalu pengingat agenda lewat `buildNativeEventItems`, lalu memanggil `cancelAll` dan `schedule`. Setiap alarm berulang dijadwalkan sebagai tujuh kemunculan pasti satu per satu. Agenda berpengingat dijadwalkan sekali di waktu pengingatnya.
+- `alarm-scheduler.ts` menyusun item alarm murni lewat `buildNativeAlarms`, lalu pengingat agenda lewat `buildNativeEventItems`, lalu memanggil `cancelAll` dan `schedule`. Setiap alarm berulang dijadwalkan sebagai tujuh kemunculan pasti satu per satu. Agenda berpengingat dijadwalkan sekali di waktu pengingatnya. Nada tiap item diambil dari `Alarm.soundId` bila ada, jika tidak dari nada bawaan di pengaturan.
 - Plugin Java menjadwalkan ke `AlarmManager` dengan `setExactAndAllowWhileIdle` dan menyimpan daftar di `SharedPreferences` agar bisa dipasang ulang.
 - Saat jatuh tempo, `AlarmReceiver` menyalakan `AlarmService`, sebuah layanan latar depan tipe `mediaPlayback`.
 - `AlarmService` menampilkan notifikasi dengan `setFullScreenIntent` dan memainkan nada terpilih dari `res/raw/` berulang lewat `MediaPlayer` dengan `USAGE_ALARM`, lalu menahan `PARTIAL_WAKE_LOCK`. Enam nada bundel dipetakan oleh `AlarmSounds.java`. Bila berkas tidak ada, dipakai nada alarm bawaan sistem.

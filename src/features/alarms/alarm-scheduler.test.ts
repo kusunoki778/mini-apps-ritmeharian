@@ -98,6 +98,11 @@ describe('buildNativeAlarms', () => {
     expect(alarms.every((item) => item.soundId === 'lonceng')).toBe(true);
   });
 
+  it('memakai nada khusus alarm bila ada, mengalahkan pilihan global', () => {
+    const alarms = buildNativeAlarms([makeAlarm({ soundId: 'fajar' })], FROM, 'lonceng');
+    expect(alarms.every((item) => item.soundId === 'fajar')).toBe(true);
+  });
+
   it('melewati alarm nonaktif', () => {
     expect(buildNativeAlarms([makeAlarm({ enabled: false })], FROM)).toEqual([]);
   });

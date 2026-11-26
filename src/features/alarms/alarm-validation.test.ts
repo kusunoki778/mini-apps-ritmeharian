@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { DEFAULT_ALARM_SOUND } from './alarm-sounds';
 import { hasAlarmErrors, validateAlarm } from './alarm-validation';
 import type { AlarmInput } from './alarms-repo';
 
@@ -11,6 +12,7 @@ function input(overrides: Partial<AlarmInput> = {}): AlarmInput {
     days: [],
     snoozeMinutes: 5,
     enabled: true,
+    soundId: DEFAULT_ALARM_SOUND,
     ...overrides,
   };
 }

@@ -89,6 +89,21 @@ describe('AlarmsPage', () => {
     expect(await screen.findByText('Pilih minimal satu hari.')).toBeInTheDocument();
   });
 
+  it('menyimpan pilihan nada dering per alarm', async () => {
+    render(<AlarmsPage />);
+    await screen.findByText('Belum ada alarm');
+
+    await userEvent.click(screen.getAllByRole('button', { name: 'Alarm baru' })[0]);
+    await userEvent.type(screen.getByLabelText('Label'), 'Subuh');
+    await userEvent.selectOptions(screen.getByLabelText('Nada dering'), 'fajar');
+    await userEvent.click(screen.getByRole('button', { name: 'Simpan' }));
+
+    expect(await screen.findByText(/Nada Fajar/)).toBeInTheDocument();
+
+    const saved = (await db.alarms.toArray()).find((item) => item.label === 'Subuh');
+    expect(saved?.soundId).toBe('fajar');
+  });
+
   it('menghapus alarm lewat dialog konfirmasi dengan fokus di Batal', async () => {
     await seed('Bangun');
     render(<AlarmsPage />);

@@ -7,3 +7,4 @@ coverage
 lighthouse-report*.json
 Nadi.apk
 *.apk
+*.log

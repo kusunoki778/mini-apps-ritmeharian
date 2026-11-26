@@ -1,5 +1,6 @@
 import { db, type Alarm } from '@/lib/db/db';
 import { createId } from '@/lib/utils/id';
+import { DEFAULT_ALARM_SOUND, isAlarmSoundId, type AlarmSoundId } from './alarm-sounds';
 import { allDays, parseTimeInput, sortDays, type RepeatMode } from './alarm-utils';
 
 export const SNOOZE_OPTIONS = [1, 5, 10, 15, 30] as const;
@@ -12,6 +13,7 @@ export interface AlarmInput {
   days: number[];
   snoozeMinutes: number;
   enabled: boolean;
+  soundId: AlarmSoundId;
 }
 
 interface AlarmFields {
@@ -21,6 +23,7 @@ interface AlarmFields {
   days: number[];
   enabled: boolean;
   snoozeMinutes: number;
+  soundId: AlarmSoundId;
 }
 
 export function buildAlarmFields(input: AlarmInput): AlarmFields {
@@ -34,6 +37,7 @@ export function buildAlarmFields(input: AlarmInput): AlarmFields {
       input.repeat === 'once' ? [] : input.repeat === 'daily' ? allDays() : sortDays(input.days),
     enabled: input.enabled,
     snoozeMinutes: input.snoozeMinutes,
+    soundId: isAlarmSoundId(input.soundId) ? input.soundId : DEFAULT_ALARM_SOUND,
   };
 }
 

@@ -68,6 +68,19 @@ describe('CalendarReminderEngine', () => {
     expect(screen.getByText('Rapat')).toBeInTheDocument();
   });
 
+  it('memutar nada khusus agenda bila dipilih', async () => {
+    vi.setSystemTime(new Date(2026, 10, 26, 9, 0, 30));
+    holder.events = [eventAt(new Date(2026, 10, 26, 9, 0, 0), { reminderSoundId: 'tegas' })];
+    const factory = vi.fn(() => () => {});
+    render(<CalendarReminderEngine soundFactory={factory} intervalMs={1000} />);
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(1);
+    });
+
+    expect(factory).toHaveBeenCalledWith('tegas');
+  });
+
   it('menandai pengingat sudah berbunyi saat dimatikan', async () => {
     vi.setSystemTime(new Date(2026, 10, 26, 9, 0, 30));
     holder.events = [eventAt(new Date(2026, 10, 26, 9, 0, 0))];
