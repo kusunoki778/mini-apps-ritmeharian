@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M4 selesai. Cuaca dan kualitas udara nyata, dengan kartu AQI, grafik 24 jam, dan atribusi. Catatan menyusul di M5.
+Status: M5 selesai. Catatan berjalan dengan pencarian, pin, editor, dan konfirmasi hapus. Kalender dan agenda menyusul di M6.
 
 ## Dokumen
 

@@ -39,12 +39,12 @@ try {
   );
 
   check(
-    'modul agenda dan catatan contoh tampil',
+    'modul agenda dan catatan tampil',
     (await page.getByRole('heading', { name: 'Agenda hari ini' }).isVisible()) &&
       (await page.getByRole('heading', { name: 'Catatan terakhir' }).isVisible()),
   );
   check(
-    'label data contoh tampil',
+    'tautan atur lokasi tampil',
     await page.getByRole('link', { name: 'Atur lokasi' }).isVisible(),
   );
   check(
@@ -82,6 +82,17 @@ try {
 
   check('atribusi CAMS tampil', await page.getByText(/Open-Meteo, berisi data CAMS/).isVisible());
 
+  const notesEmpty = page.getByText('Belum ada catatan. Tulis satu hal yang ingin kamu ingat.');
+  await notesEmpty.waitFor({ timeout: 15000 });
+  check('kartu catatan kosong tampil', await notesEmpty.isVisible());
+
+  await page.getByRole('button', { name: 'Catatan baru' }).click();
+  await page.getByLabel('Judul').fill('Catatan asap');
+  await page.getByLabel('Isi').fill('Dibuat oleh uji asap.');
+  await page.getByRole('button', { name: 'Simpan' }).click();
+  await page.getByText('Catatan asap').first().waitFor({ timeout: 10000 });
+  check('catatan cepat langsung tampil di dasbor', await page.getByText('Catatan asap').first().isVisible());
+
   const manifestResponse = await context.request.get(`${BASE}/manifest.webmanifest`);
   check('manifest tersedia', manifestResponse.ok());
 
@@ -112,6 +123,40 @@ try {
       await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
     );
   }
+
+  await page.goto(`${BASE}/catatan`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Catatan', exact: true }).waitFor();
+  await page.getByText('Catatan asap').waitFor();
+  check('daftar catatan tampil', await page.getByText('Catatan asap').isVisible());
+
+  const search = page.getByRole('searchbox', { name: 'Cari catatan' });
+  await search.fill('tidakcocok');
+  await page.getByText('Tidak ada hasil').waitFor();
+  check('pesan tanpa hasil tampil', await page.getByText('Tidak ada hasil').isVisible());
+
+  await search.fill('asap');
+  await page.getByText('Catatan asap').waitFor();
+  check('pencarian menyaring daftar', await page.getByText('Catatan asap').isVisible());
+
+  await page.getByRole('button', { name: 'Pin Catatan asap' }).click();
+  await page.getByRole('button', { name: 'Lepas pin Catatan asap' }).waitFor();
+  check(
+    'pin catatan bekerja',
+    await page.getByRole('button', { name: 'Lepas pin Catatan asap' }).isVisible(),
+  );
+
+  await search.fill('');
+  await page.getByText('Catatan asap').waitFor();
+
+  await page.getByRole('button', { name: 'Hapus Catatan asap' }).click();
+  await page.getByRole('heading', { name: 'Hapus catatan?' }).waitFor();
+  check('dialog hapus menyebut judul', await page.getByText(/Catatan "Catatan asap"/).isVisible());
+  await page.getByRole('button', { name: 'Hapus', exact: true }).click();
+  await page.getByText('Belum ada catatan').waitFor();
+  check('catatan terhapus', await page.getByText('Belum ada catatan').isVisible());
+
+  await page.goto(`${BASE}/pengaturan`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Pengaturan', exact: true }).waitFor();
 
   check(
     'pengaturan punya pencarian kota',

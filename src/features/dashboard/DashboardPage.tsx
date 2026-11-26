@@ -1,4 +1,4 @@
-import { ArrowRight, NotePencil, PushPin } from '@phosphor-icons/react';
+import { ArrowRight } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -11,7 +11,8 @@ import { ForecastSheet } from '@/features/weather/ForecastSheet';
 import { WeatherCard } from '@/features/weather/WeatherCard';
 import { useWeather } from '@/features/weather/useWeather';
 import { ClockPanel } from './ClockPanel';
-import { SAMPLE_AGENDA, SAMPLE_NOTES } from './sample-data';
+import { NotesCard } from './NotesCard';
+import { SAMPLE_AGENDA } from './sample-data';
 
 export default function DashboardPage() {
   const location = useLocationStore((state) => state.location);
@@ -31,7 +32,7 @@ export default function DashboardPage() {
           </Link>
         }
       >
-        Cuaca dan kualitas udara sudah data nyata. Agenda dan catatan masih contoh sampai M5 dan M6.
+        Cuaca, kualitas udara, dan catatan sudah data nyata. Agenda masih contoh sampai M6.
       </Banner>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">
@@ -85,36 +86,7 @@ export default function DashboardPage() {
           </Card>
         </section>
 
-        <section aria-labelledby="catatan-heading">
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <h2 id="catatan-heading" className="text-base font-semibold">
-              Catatan terakhir
-            </h2>
-            <Link
-              to="/catatan"
-              className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:underline"
-            >
-              Semua catatan <ArrowRight size={14} aria-hidden="true" />
-            </Link>
-          </div>
-          <Card className="divide-y divide-line">
-            {SAMPLE_NOTES.map((note) => (
-              <div key={note.id} className="flex items-start gap-3 px-5 py-4">
-                <NotePencil size={18} aria-hidden="true" className="mt-0.5 shrink-0 text-ink-muted" />
-                <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-2 text-sm font-medium">
-                    <span className="truncate">{note.title}</span>
-                    {note.pinned ? (
-                      <PushPin size={13} weight="fill" aria-label="Disematkan" className="text-accent" />
-                    ) : null}
-                  </p>
-                  <p className="mt-0.5 line-clamp-1 text-[12px] text-ink-muted">{note.excerpt}</p>
-                </div>
-                <span className="shrink-0 text-[12px] text-ink-muted">{note.updatedAt}</span>
-              </div>
-            ))}
-          </Card>
-        </section>
+        <NotesCard />
       </div>
 
       {weather.data ? (

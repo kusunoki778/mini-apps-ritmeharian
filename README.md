@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M4, cuaca dan kualitas udara nyata dengan grafik 24 jam. Catatan menyusul.
+Status: M5, catatan nyata dengan pencarian, pin, dan hapus. Kalender dan agenda menyusul.
 
 ## Menjalankan
 

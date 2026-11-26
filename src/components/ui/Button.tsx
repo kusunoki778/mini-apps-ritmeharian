@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes } from 'react';
+import { forwardRef, type ButtonHTMLAttributes } from 'react';
 
 import { cn } from '@/lib/utils/cn';
 
@@ -23,17 +23,13 @@ const SIZES: Record<ButtonSize, string> = {
   sm: 'min-h-9 px-3 text-[13px]',
 };
 
-export function Button({
-  variant = 'primary',
-  size = 'md',
-  isLoading = false,
-  className,
-  children,
-  disabled,
-  ...props
-}: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  { variant = 'primary', size = 'md', isLoading = false, className, children, disabled, ...props },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type="button"
       disabled={disabled || isLoading}
       aria-busy={isLoading || undefined}
@@ -54,4 +50,4 @@ export function Button({
       {children}
     </button>
   );
-}
+});

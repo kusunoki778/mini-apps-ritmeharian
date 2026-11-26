@@ -155,29 +155,29 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M5: Catatan
 
-- [ ] T5.1 Skema dan repositori (M)
-  - Tabel `notes`, CRUD, urutan pin lalu terbaru.
-  - Penerimaan: unit test CRUD dan urutan.
+- [x] T5.1 Skema dan repositori (M)
+  - Tabel `notes`, CRUD, urutan pin lalu waktu diubah terbaru, satu-satunya lapisan yang menyentuh Dexie.
+  - Penerimaan: unit test CRUD, pemangkasan spasi, pin, hapus, dan urutan.
 
-- [ ] T5.2 Daftar, pencarian, pin (M)
-  - Pencarian judul dan isi, tidak peka huruf besar kecil.
-  - Penerimaan: state kosong, hasil kosong, dan daftar normal berbeda.
+- [x] T5.2 Daftar, pencarian, pin (M)
+  - Pencarian judul dan isi tanpa peduli huruf besar kecil, input di-debounce 200ms lewat `useDebouncedValue`.
+  - Penerimaan: state kosong, hasil kosong, dan daftar normal tampil berbeda.
 
-- [ ] T5.3 Editor (M)
-  - Sheet atau dialog, validasi 80 dan 5000 karakter, simpan dan batal.
-  - Penerimaan: perubahan belum disimpan memicu konfirmasi saat ditutup.
+- [x] T5.3 Editor (M)
+  - Sheet dengan judul dan isi, validasi 80 dan 5000 karakter, penghitung karakter, simpan dan batal.
+  - Penerimaan: menutup editor dengan perubahan memunculkan dialog "Buang perubahan?".
 
-- [ ] T5.4 Hapus dengan konfirmasi (S)
-  - Dialog menyebut judul catatan.
-  - Penerimaan: fokus awal di tombol batal, Escape menutup.
+- [x] T5.4 Hapus dengan konfirmasi (S)
+  - Dialog menyebut judul catatan, fokus awal di tombol Batal, Escape menutup.
+  - Penerimaan: batal mempertahankan catatan, konfirmasi menghapusnya.
 
-- [ ] T5.5 Kartu catatan di dasbor (S)
-  - Dua catatan terbaru atau dipin, tombol catatan cepat.
-  - Penerimaan: setelah menambah catatan, kartu langsung berubah.
+- [x] T5.5 Kartu catatan di dasbor (S)
+  - Dua catatan terbaru atau yang dipin lewat `useLiveQuery`, tombol catatan cepat.
+  - Penerimaan: setelah menambah catatan, kartu langsung berubah tanpa reload.
 
-- [ ] T5.6 Test komponen (M)
-  - Tambah, cari, pin, hapus.
-  - Penerimaan: semua alur lulus di jsdom.
+- [x] T5.6 Test komponen (M)
+  - Tambah, cari, pin, hapus, dan konfirmasi buang perubahan.
+  - Penerimaan: semua alur lulus di jsdom dengan fake-indexeddb.
 
 ## M6: Kalender dan agenda
 
