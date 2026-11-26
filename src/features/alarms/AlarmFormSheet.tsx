@@ -120,7 +120,11 @@ export function AlarmFormSheet({ alarm, onClose, onSaved }: AlarmFormSheetProps)
       open
       onClose={onClose}
       title={alarm ? 'Ubah alarm' : 'Alarm baru'}
-      description="Waktu wajib diisi. Alarm berbunyi selama Nadi terbuka."
+      description={
+        nativeAlarmsSupported()
+          ? 'Waktu wajib diisi. Alarm berbunyi lewat sistem, bahkan saat Nadi tertutup.'
+          : 'Waktu wajib diisi. Alarm berbunyi selama Nadi terbuka.'
+      }
       footer={
         <>
           <Button variant="secondary" onClick={onClose}>

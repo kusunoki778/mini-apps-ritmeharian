@@ -174,8 +174,9 @@ export default function SettingsPage() {
         <Section title="Tentang">
           <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M11.</p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Di web, alarm berbunyi selama Nadi terbuka. Di versi native, alarm dijadwalkan ke sistem
-            dan berbunyi saat aplikasi tertutup.
+            {isNativeApp()
+              ? 'Alarm dijadwalkan ke sistem dan berbunyi saat aplikasi tertutup, termasuk saat ponsel terkunci.'
+              : 'Alarm berbunyi selama Nadi terbuka. Versi Android menjadwalkan alarm ke sistem agar tetap berbunyi saat aplikasi tertutup.'}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
             Saran kualitas udara dan hasil tumbuh kembang bersifat umum, bukan nasihat medis.
