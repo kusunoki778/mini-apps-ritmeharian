@@ -1,5 +1,6 @@
-import { Ruler, Scales } from '@phosphor-icons/react';
+import { ArrowLeft, Ruler, Scales } from '@phosphor-icons/react';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import { Banner } from '@/components/ui/Banner';
 import { Card } from '@/components/ui/Card';
@@ -175,6 +176,14 @@ export default function GrowthPage() {
 
   return (
     <div>
+      <Link
+        to="/"
+        className="mb-4 inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-ink-muted transition-colors hover:text-ink"
+      >
+        <ArrowLeft size={16} aria-hidden="true" />
+        Beranda
+      </Link>
+
       <PageHeader
         eyebrow="Tumbuh kembang"
         title="Tinggi dan berat ideal"
