@@ -341,6 +341,7 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
 - [x] T10.10 APK rilis bertanda tangan tetap (S)
   - `android/app/build.gradle` memuat `android/keystore.properties` dan memakai `signingConfigs.release`, sehingga `gradlew assembleRelease` menghasilkan APK bertanda tangan `CN=Nadi` dengan `debuggable=false`. Kunci ada di `android/keystore/nadi-release.jks`. Keduanya diabaikan git supaya sandi tidak ikut terunggah.
   - `vite.config.ts` menyajikan `/Nadi.apk` dari APK rilis lebih dulu, lalu debug, lalu salinan di akar repo. Signature rilis berbeda dari debug, jadi versi debug lama harus dicopot dulu sebelum memasang yang rilis.
+  - `npm run publish:apk` mengunggah APK rilis ke aset rilis GitHub, mengganti aset lama bila ada. Tag diambil dari `versionName`, token dari `GITHUB_TOKEN` atau kredensial git tersimpan.
   - Penerimaan: `gradlew assembleRelease` sukses, `apksigner verify` menampilkan sertifikat rilis, dan berkas tersaji di web. Diuji di uji asap.
 
 ## M11: Tinggi dan berat badan ideal

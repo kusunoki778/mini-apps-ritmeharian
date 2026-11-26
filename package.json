@@ -17,7 +17,8 @@
     "screenshots": "node scripts/screenshots.mjs",
     "cap:sync": "cap sync android",
     "sound": "node scripts/make-alarm-sound.mjs",
-    "growth:data": "node scripts/build-growth-data.mjs"
+    "growth:data": "node scripts/build-growth-data.mjs",
+    "publish:apk": "node scripts/publish-apk.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.3",

@@ -46,6 +46,7 @@ Server dev mengikat jaringan (`server.host`), jadi Vite juga menampilkan URL **N
 | `npm run cap:sync`      | Salin bundel web ke proyek Android             |
 | `npm run sound`         | Buat ulang bunyi alarm bundel                  |
 | `npm run growth:data`   | Buat ulang tabel LMS tumbuh kembang            |
+| `npm run publish:apk`   | Unggah APK rilis ke aset GitHub Releases       |
 
 Uji asap dan tangkapan layar butuh pratinjau produksi yang berjalan:
 
@@ -96,7 +97,7 @@ APK debug ada di `android/app/build/outputs/apk/debug/app-debug.apk`, APK rilis 
 
 APK rilis ditandatangani memakai kunci `android/keystore/nadi-release.jks` dengan sandi dari `android/keystore.properties`. Keduanya di luar git. Jaga kunci dan sandinya, karena tanpa itu update tidak bisa dipasang menimpa aplikasi yang sudah ada. Tanda tangan rilis berbeda dari debug, jadi copot versi debug dulu sebelum memasang yang rilis.
 
-Unduh dari aplikasi web: server dev dan pratinjau menyajikan `/Nadi.apk` lewat plugin kecil di `vite.config.ts`, jadi berkas yang baru dibangun langsung bisa diunduh. Buka alamat Network komputer di peramban ponsel, lalu pakai tawaran di Beranda atau bagian **Aplikasi Android** di Pengaturan. Di hosting statis seperti Vercel berkas lokal tidak ada, jadi unduhan otomatis diarahkan ke aset rilis GitHub `Nadi.apk`. Unggah APK rilis ke rilis GitHub dengan nama aset `Nadi.apk` setiap kali membangun versi baru. Berkas tidak dibundel ke bundel web maupun ke dalam APK native, dan tawaran tidak muncul di dalam aplikasi native.
+Unduh dari aplikasi web: server dev dan pratinjau menyajikan `/Nadi.apk` lewat plugin kecil di `vite.config.ts`, jadi berkas yang baru dibangun langsung bisa diunduh. Buka alamat Network komputer di peramban ponsel, lalu pakai tawaran di Beranda atau bagian **Aplikasi Android** di Pengaturan. Di hosting statis seperti Vercel berkas lokal tidak ada, jadi unduhan otomatis diarahkan ke aset rilis GitHub `Nadi.apk`. Setiap kali membangun versi baru, unggah APK rilis dengan `npm run publish:apk`. Skrip itu memakai tag dari `versionName` di `android/app/build.gradle` (bisa diganti lewat `-- --tag v1.0.1`), mengganti aset `Nadi.apk` bila sudah ada, dan membaca token dari `GITHUB_TOKEN` atau kredensial git yang tersimpan. Berkas tidak dibundel ke bundel web maupun ke dalam APK native, dan tawaran tidak muncul di dalam aplikasi native.
 
 Bunyi alarm ada di `android/app/src/main/res/raw/alarm.wav` dan bisa dibuat ulang dengan `node scripts/make-alarm-sound.mjs`.
 
