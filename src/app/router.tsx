@@ -7,6 +7,7 @@ const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage'));
 const CalendarPage = lazy(() => import('@/features/calendar/CalendarPage'));
 const NotesPage = lazy(() => import('@/features/notes/NotesPage'));
 const AlarmsPage = lazy(() => import('@/features/alarms/AlarmsPage'));
+const GrowthPage = lazy(() => import('@/features/growth/GrowthPage'));
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
 const NotFoundPage = lazy(() => import('@/features/not-found/NotFoundPage'));
 
@@ -55,6 +56,7 @@ export const router = createBrowserRouter([
       { path: 'kalender', element: withSuspense(<CalendarPage />) },
       { path: 'catatan', element: withSuspense(<NotesPage />) },
       { path: 'alarm', element: withSuspense(<AlarmsPage />) },
+      { path: 'tumbuh-kembang', element: withSuspense(<GrowthPage />) },
       { path: 'pengaturan', element: withSuspense(<SettingsPage />) },
       { path: '*', element: withSuspense(<NotFoundPage />) },
     ],

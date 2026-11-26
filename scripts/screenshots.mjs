@@ -42,6 +42,16 @@ try {
     await page.screenshot({ path: `${OUT}/${name}.png` });
   }
 
+  await page.goto(`${BASE}/tumbuh-kembang`, { waitUntil: 'load' });
+  await page
+    .getByRole('heading', { level: 1, name: 'Tinggi dan berat ideal', exact: true })
+    .waitFor();
+  await page.getByLabel('Umur (tahun)').fill('8');
+  await page.getByLabel('Tinggi badan (cm)').fill('128');
+  await page.getByLabel('Berat badan (kg)').fill('26');
+  await page.getByText('Tinggi ideal').waitFor();
+  await page.screenshot({ path: `${OUT}/08-tumbuh-kembang.png` });
+
   await mobile.close();
 
   const desktop = await browser.newContext({ viewport: { width: 1280, height: 900 } });

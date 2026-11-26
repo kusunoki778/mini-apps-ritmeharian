@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M8 selesai dan pembungkus Capacitor (M10) sudah berjalan. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, uji lintas mesin, dan alarm native Tier 1 sudah ada. Berikutnya M9 rilis dan Tier 2 alarm layar penuh.
+Status: M8 selesai, pembungkus Capacitor (M10) dan fitur tumbuh kembang (M11) sudah berjalan. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, uji lintas mesin, alarm native Tier 1, serta kalkulator tinggi dan berat badan ideal sudah ada. Berikutnya M9 rilis dan Tier 2 alarm layar penuh.
 
 ## Tangkapan layar
 
@@ -13,6 +13,8 @@ Status: M8 selesai dan pembungkus Capacitor (M10) sudah berjalan. Pengaturan len
 | Catatan                                     | Alarm                                   | Pengaturan (gelap)                                      |
 | ------------------------------------------- | --------------------------------------- | ------------------------------------------------------- |
 | ![Catatan](docs/screenshots/04-catatan.png) | ![Alarm](docs/screenshots/05-alarm.png) | ![Pengaturan](docs/screenshots/06-pengaturan-gelap.png) |
+
+Tinggi dan berat ideal: ![Tumbuh kembang](docs/screenshots/08-tumbuh-kembang.png)
 
 Tampilan desktop memakai rail samping: ![Beranda desktop](docs/screenshots/07-beranda-desktop.png)
 
@@ -41,6 +43,7 @@ Buka `http://localhost:5173`. Port bisa berbeda jika sudah dipakai proyek lain, 
 | `npm run screenshots`   | Perbarui tangkapan layar di `docs/screenshots` |
 | `npm run cap:sync`      | Salin bundel web ke proyek Android             |
 | `npm run sound`         | Buat ulang bunyi alarm bundel                  |
+| `npm run growth:data`   | Buat ulang tabel LMS tumbuh kembang            |
 
 Uji asap dan tangkapan layar butuh pratinjau produksi yang berjalan:
 
@@ -61,6 +64,7 @@ Atur `SMOKE_BASE_URL` bila pratinjau berjalan di port lain.
 - Tanpa backend. Cuaca, kualitas udara, dan geocoding memakai Open-Meteo. Semua data pengguna tersimpan di perangkat lewat IndexedDB (Dexie).
 - Sumber kebenaran pengaturan adalah `settings.app` di Dexie. Tema dan awal minggu dicerminkan ke `localStorage` agar bisa dipakai sebelum render pertama.
 - Warna kategori AQI memakai skala adaptif, bukan warna resmi mentah, agar tetap lolos kontras di layar terang.
+- Tumbuh kembang dihitung dari tabel LMS WHO yang dibundel, jadi berjalan offline. Anak dan remaja 0 sampai 19 tahun memakai standar WHO dengan ambang Permenkes No. 2 Tahun 2020. Dewasa memakai rumus Devine dan titik potong IMT Asia-Pasifik. Halaman ada di rute `/tumbuh-kembang`, dimuat malas agar tabelnya tidak masuk bundel awal.
 
 ## Versi native (Android)
 
@@ -101,3 +105,5 @@ Kode notes-app versi lama tersimpan di commit git pertama dengan pesan `snapshot
 ## Lisensi data
 
 Cuaca dan kualitas udara berasal dari Open-Meteo, dengan data CAMS untuk kualitas udara. Penggunaan non-komersial.
+
+Tabel tumbuh kembang berasal dari WHO Child Growth Standards dan WHO Growth Reference, diambil lewat paket [child-growth-standards](https://www.npmjs.com/package/child-growth-standards) (MIT). Ambang status gizi mengikuti Permenkes No. 2 Tahun 2020. Hasil perhitungan adalah panduan umum, bukan nasihat medis.

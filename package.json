@@ -16,7 +16,8 @@
     "smoke:engines": "node scripts/smoke-engines.mjs",
     "screenshots": "node scripts/screenshots.mjs",
     "cap:sync": "cap sync android",
-    "sound": "node scripts/make-alarm-sound.mjs"
+    "sound": "node scripts/make-alarm-sound.mjs",
+    "growth:data": "node scripts/build-growth-data.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.6.3",
@@ -47,6 +48,7 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^6.3.0",
     "axe-core": "^4.14.1",
+    "child-growth-standards": "^0.3.0",
     "eslint": "^10.15.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.8",

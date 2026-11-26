@@ -320,6 +320,26 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
   - Uji alarm saat ponsel terkunci, setelah reboot, dan pada OEM yang agresif mematikan latar belakang (Xiaomi, Oppo, Vivo).
   - Penerimaan: catatan hasil per perangkat.
 
+## M11: Tinggi dan berat badan ideal
+
+Tujuan: menghitung tinggi dan berat badan ideal menurut umur, jenis kelamin, dan tinggi badan. Fitur punya rute sendiri `/tumbuh-kembang` dan kartu pintu masuk ringkas di dasbor.
+
+- [x] T11.1 Tabel LMS yang dibundel (M)
+  - `scripts/build-growth-data.mjs` mengubah tabel WHO menjadi modul `src/features/growth/growth-data.ts`. Sumber data dari paket `child-growth-standards` (MIT), yaitu WHO Child Growth Standards (0 sampai 5 tahun) dan WHO Growth Reference (5 sampai 19 tahun).
+  - Penerimaan: skrip dijalankan ulang menghasilkan berkas yang sama, tanpa permintaan jaringan.
+
+- [x] T11.2 Perhitungan z-score dan klasifikasi (M)
+  - `growth-calc.ts` menghitung z-score LMS, interpolasi antar bulan, dan rentang sehat. Anak memakai ambang Permenkes No. 2 Tahun 2020. Dewasa memakai rumus Devine dan titik potong IMT Asia-Pasifik.
+  - Penerimaan: rumus dan batas diuji di unit.
+
+- [x] T11.3 Halaman dan kartu dasbor (M)
+  - `GrowthPage.tsx` di rute `/tumbuh-kembang`, dimuat malas agar tabel tidak masuk bundel awal. Kartu masuk di dasbor.
+  - Penerimaan: hasil tampil tanpa internet, dan uji asap serta tangkapan layar menutup alurnya.
+
+- [ ] T11.4 Rumus dewasa alternatif (S)
+  - Pilihan rumus Robinson, Miller, dan Hamwi di samping Devine.
+  - Penerimaan: pilihan rumus tersimpan di pengaturan.
+
 ## Backlog setelah v1
 
 - Sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot untuk menekan LCP di bawah 2.5 s pada throttle mobile.
@@ -356,6 +376,8 @@ Jangan mulai dari catatan atau alarm. Keduanya menggoda karena terasa mudah, tet
 | M7        | 3 hari                |
 | M8        | 4 hari                |
 | M9        | 1 hari                |
-| Total     | sekitar 27 hari kerja |
+| M10       | 3 hari                |
+| M11       | 2 hari                |
+| Total     | sekitar 32 hari kerja |
 
 Paruh waktu sekitar 6 sampai 8 minggu. Jika waktu terbatas, tunda M6 dan M7 ke v1.1 dan rilis dasbor, cuaca, AQI, serta catatan lebih dulu. Jangan memotong state, aksesibilitas, atau pengujian offline, karena ketiganya adalah nilai jual proyek ini.

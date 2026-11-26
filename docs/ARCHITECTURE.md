@@ -110,11 +110,15 @@ nadi/
 │  │  │  ├─ useAlarms.ts
 │  │  │  ├─ alarm.engine.ts
 │  │  │  └─ alarms.repo.ts
-│  │  └─ settings/
-│  │     ├─ SettingsPage.tsx
-│  │     ├─ LocationPicker.tsx
-│  │     ├─ DataSection.tsx
-│  │     └─ useSettings.ts
+│  │  ├─ settings/
+│  │  │  ├─ SettingsPage.tsx
+│  │  │  ├─ LocationPicker.tsx
+│  │  │  ├─ DataSection.tsx
+│  │  │  └─ useSettings.ts
+│  │  └─ growth/
+│  │     ├─ GrowthPage.tsx
+│  │     ├─ growth-calc.ts
+│  │     └─ growth-data.ts
 │  ├─ components/
 │  │  └─ ui/
 │  │     ├─ Button.tsx
@@ -164,14 +168,15 @@ Aturan folder:
 
 ## 5. Routing
 
-| Path          | Halaman         | Catatan                     |
-| ------------- | --------------- | --------------------------- |
-| `/`           | Beranda         | Dasbor                      |
-| `/kalender`   | Kalender        | Bulan dan agenda            |
-| `/catatan`    | Catatan         | Daftar dan editor           |
-| `/alarm`      | Alarm           | Daftar dan form             |
-| `/pengaturan` | Pengaturan      | Lokasi, tema, data, tentang |
-| `*`           | Tidak ditemukan | Tautan kembali ke Beranda   |
+| Path              | Halaman         | Catatan                     |
+| ----------------- | --------------- | --------------------------- |
+| `/`               | Beranda         | Dasbor                      |
+| `/kalender`       | Kalender        | Bulan dan agenda            |
+| `/catatan`        | Catatan         | Daftar dan editor           |
+| `/alarm`          | Alarm           | Daftar dan form             |
+| `/tumbuh-kembang` | Tumbuh kembang  | Tinggi dan berat ideal      |
+| `/pengaturan`     | Pengaturan      | Lokasi, tema, data, tentang |
+| `*`               | Tidak ditemukan | Tautan kembali ke Beranda   |
 
 Semua route dimuat malas dengan `React.lazy` dan `Suspense`. Halaman Beranda dimuat paling awal karena itu entry point. Grafik hanya dimuat saat kartu AQI terlihat.
 
@@ -645,7 +650,34 @@ Notifikasi:
 - Izin diminta saat pengguna pertama kali membuat alarm, bukan saat aplikasi dibuka.
 - Jika izin ditolak, UI tetap berfungsi dan menampilkan catatan bahwa notifikasi tidak aktif.
 
-## 13. Penanganan error
+## 13. Tumbuh kembang dan berat badan ideal
+
+Modul mandiri di rute `/tumbuh-kembang`, dijangkau lewat kartu di dasbor, bukan lewat navigasi bawah. Tujuan: menghitung tinggi dan berat badan ideal menurut umur, jenis kelamin, dan tinggi badan.
+
+Alur:
+
+1. Pengguna memilih jenis kelamin dan mengisi umur. Umur boleh desimal untuk balita, misalnya `0,5`.
+2. Umur di bawah 20 tahun memakai tabel LMS WHO. Umur 20 tahun ke atas memakai rumus dewasa.
+3. Bila tinggi atau berat diisi, aplikasi menghitung z-score dan menampilkan status gizi.
+
+Data:
+
+- `scripts/build-growth-data.mjs` mengubah tabel WHO menjadi `src/features/growth/growth-data.ts`. Sumbernya paket `child-growth-standards` (MIT): WHO Child Growth Standards (0 sampai 5 tahun, `lhfa` dan `bfa`) dan WHO Growth Reference (5 sampai 19 tahun, `hfa` dan `bfa`).
+- Tabel disimpan sebagai `[umur dalam bulan, L, M, S]` per jenis kelamin dan indikator. Berkas hasil berukuran sekitar 34 kB dan hanya diunduh saat rute dibuka, karena `GrowthPage` dimuat malas.
+- Paket sumber hanya dipakai saat membangun tabel, jadi ia ada di `devDependencies` dan tidak masuk bundel aplikasi.
+
+Rumus:
+
+- z-score: `L = 0` memakai `ln(nilai / M) / S`, selain itu `((nilai / M)^L - 1) / (L * S)`.
+- Nilai pada z tertentu: kebalikan rumus di atas.
+- Interpolasi linear antar bulan agar umur pecahan tetap wajar.
+- Status tinggi menurut umur dan status gizi memakai ambang Permenkes No. 2 Tahun 2020, dengan batas IMT/U dibedakan pada 60 bulan.
+- Berat ideal anak adalah IMT median dikali tinggi kuadrat. Bila tinggi belum diisi, tinggi median menurut umur dipakai.
+- Dewasa memakai rumus Devine, dengan rentang sehat dari IMT 18,5 sampai 24,9. Klasifikasi IMT memakai titik potong Asia-Pasifik (23 dan 25).
+
+Catatan produk: hasil adalah panduan umum, bukan nasihat medis. Tabel yang dibundel berarti fitur berjalan tanpa internet, sesuai prinsip privasi dan offline.
+
+## 14. Penanganan error
 
 - `ErrorBoundary` di level route, dengan tampilan "Halaman gagal dimuat" dan tombol kembali ke Beranda.
 - Error API ditangani di level kartu, bukan route.
@@ -657,7 +689,7 @@ Notifikasi:
 - Pesan pengguna tidak menampilkan pesan mentah dari server. Detail teknis hanya di konsol saat mode pengembangan.
 - Validasi form dilakukan di sisi klien sebelum menulis ke Dexie.
 
-## 14. Performa
+## 15. Performa
 
 Anggaran:
 
@@ -685,7 +717,7 @@ Hasil ukur M8 (Chrome headless, throttle mobile default Lighthouse, pratinjau pr
 - LCP 2.6 sampai 2.8 s, sedikit di atas target. Penyebab utama adalah render delay SPA di klien: jam besar yang menjadi elemen LCP baru bisa dilukis setelah bundel awal dieksekusi. Di bawah throttle CPU 4x, render delay sekitar 82 persen dari LCP. Di perangkat tanpa throttle, shell tampil di bawah 130 ms menurut uji asap.
 - Kandidat perbaikan dicatat di backlog: sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot.
 
-## 15. Testing
+## 16. Testing
 
 Unit:
 
@@ -716,7 +748,7 @@ Aksesibilitas:
 - Pemeriksaan otomatis dengan axe di pengembangan.
 - Pemeriksaan manual: tab melalui semua kontrol, Escape pada sheet, fokus kembali.
 
-## 16. Deployment
+## 17. Deployment
 
 Target: hosting statis dengan HTTPS. Netlify, Vercel, atau Cloudflare Pages semuanya cocok.
 
@@ -738,7 +770,7 @@ Aturan hosting:
 
 Tidak ada variabel lingkungan rahasia.
 
-## 17. Keamanan dan privasi
+## 18. Keamanan dan privasi
 
 - Tidak ada kunci API di klien.
 - Tidak ada data pribadi yang dikirim ke server sendiri.
@@ -749,7 +781,7 @@ Tidak ada variabel lingkungan rahasia.
 - Ekspor data hanya lewat tindakan pengguna dan tidak diunggah otomatis.
 - Analitik tidak dipasang pada v1. Jika ditambahkan nanti, harus tanpa cookie dan dijelaskan di Tentang.
 
-## 18. ADR
+## 19. ADR
 
 ADR-001: Frontend murni dengan API publik.
 Alasan: tidak ada beban server, biaya nol, dan cocok untuk aplikasi data lokal. Konsekuensi: tidak ada sinkronisasi antar perangkat.
@@ -772,7 +804,7 @@ Alasan: beban unduh kecil dan konsistensi lebih mudah dijaga. Konsekuensi: ident
 ADR-007: Cache berlapis, service worker dan Dexie.
 Alasan: shell dan respons mentah dari service worker, data terstruktur dan label waktu dari Dexie. Konsekuensi: dua tempat yang harus diuji saat offline.
 
-## 19. Risiko teknis
+## 20. Risiko teknis
 
 | Risiko                                | Mitigasi                                                                        |
 | ------------------------------------- | ------------------------------------------------------------------------------- |

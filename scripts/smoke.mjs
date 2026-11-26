@@ -161,6 +161,20 @@ try {
     );
   }
 
+  // Modul tumbuh kembang, dicapai lewat kartu di dasbor.
+  await page.goto(`${BASE}/`, { waitUntil: 'load' });
+  await page.locator('h1').first().waitFor();
+  await page.getByRole('link', { name: /Tinggi dan berat ideal/ }).click();
+  await page.waitForURL('**/tumbuh-kembang');
+  await page
+    .getByRole('heading', { level: 1, name: 'Tinggi dan berat ideal', exact: true })
+    .waitFor();
+  check('rute /tumbuh-kembang', page.url().endsWith('/tumbuh-kembang'));
+
+  await page.getByLabel('Umur (tahun)').fill('8');
+  await page.getByText('Tinggi ideal').waitFor();
+  check('tumbuh kembang menghitung tinggi ideal', await page.getByText('Tinggi ideal').isVisible());
+
   await page.goto(`${BASE}/catatan`, { waitUntil: 'load' });
   await page.getByRole('heading', { level: 1, name: 'Catatan', exact: true }).waitFor();
   await page.getByText('Catatan asap').waitFor();

@@ -1,3 +1,4 @@
+import { CaretRight, Ruler } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
@@ -62,6 +63,24 @@ export default function DashboardPage() {
 
         <NotesCard />
       </div>
+
+      <Link
+        to="/tumbuh-kembang"
+        className="mt-8 flex items-center justify-between gap-4 rounded-card border border-line bg-surface px-5 py-4 transition-colors hover:bg-paper"
+      >
+        <span className="flex items-center gap-3">
+          <span className="flex size-10 items-center justify-center rounded-full bg-accent-soft text-accent">
+            <Ruler size={20} aria-hidden="true" />
+          </span>
+          <span>
+            <span className="block text-sm font-semibold">Tinggi dan berat ideal</span>
+            <span className="block text-[13px] text-ink-muted">
+              Hitung menurut umur dan jenis kelamin.
+            </span>
+          </span>
+        </span>
+        <CaretRight size={18} aria-hidden="true" className="shrink-0 text-ink-muted" />
+      </Link>
 
       {weather.data ? (
         <ForecastSheet
