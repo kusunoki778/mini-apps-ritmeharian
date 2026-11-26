@@ -141,6 +141,7 @@ Rina, 31, reviewer portofolio. Membuka aplikasi sekali untuk menilai kualitas te
 - Alarm berbunyi saat aplikasi terbuka. Bunyi memakai Web Audio, tanpa file audio eksternal pada v1.
 - Di aplikasi Android, alarm dijadwalkan ke sistem, berbunyi tepat waktu walau aplikasi tertutup, dan memakai salah satu dari enam nada bundel: Nadi, Lembut, Tegas, Lonceng, Denyut, Fajar.
 - Notifikasi browser dipakai jika izin diberikan.
+- Di Android, Nadi meminta izin notifikasi, alarm tepat waktu, dan intent layar penuh lewat ajakan yang terlihat di halaman Alarm, agar alarm bisa berbunyi walau aplikasi tertutup atau ponsel terkunci.
 - Tombol tunda menunda 5 menit sebagai default.
 - Batas jelas di layar saat web: "Alarm hanya berbunyi saat Nadi terbuka." Di Android batas ini digantikan penjadwalan native.
 - Alarm sekali pakai otomatis nonaktif setelah berbunyi.

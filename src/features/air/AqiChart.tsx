@@ -55,7 +55,11 @@ export default function AqiChart({ hourly, color, label }: AqiChartProps) {
 
       <div aria-hidden="true" className="h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={points} margin={{ top: 8, right: 8, bottom: 0, left: -24 }}>
+          <AreaChart
+            accessibilityLayer={false}
+            data={points}
+            margin={{ top: 8, right: 8, bottom: 0, left: -24 }}
+          >
             <defs>
               <linearGradient id="aqiFill" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={color} stopOpacity={0.35} />

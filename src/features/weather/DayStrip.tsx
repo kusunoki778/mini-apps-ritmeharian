@@ -38,7 +38,10 @@ export function DayStrip({ hourly, sunrise, sunset }: DayStripProps) {
             <li
               key={time}
               aria-current={isCurrent ? 'time' : undefined}
-              className={`min-w-16 shrink-0 rounded-control border px-2 py-3 text-center text-[12px] ${
+              // relative wajib: label sr-only memakai position absolute. Tanpa induk
+              // berposisi, containing block-nya jatuh ke body dan label item terjauh
+              // melebarkan lebar dokumen, sehingga seluruh Beranda ikut melar di WebView.
+              className={`relative min-w-16 shrink-0 rounded-control border px-2 py-3 text-center text-[12px] ${
                 isCurrent ? 'border-accent bg-accent-soft' : 'border-transparent bg-paper'
               }`}
             >

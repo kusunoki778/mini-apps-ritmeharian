@@ -22,9 +22,13 @@ try {
     for (const path of PAGES) {
       await page.goto(`${BASE}${path}`, { waitUntil: 'load' });
       await page.locator('h1').first().waitFor({ timeout: 10000 });
+      // Kartu yang memuat data (mis. prakiraan per jam) baru melebar setelah jaringan
+      // selesai, jadi tunggu sebentar sebelum mengukur.
+      await page.waitForLoadState('networkidle').catch(() => {});
 
       const report = await page.evaluate(() => {
-        const overflowX = document.documentElement.scrollWidth - window.innerWidth;
+        const root = document.documentElement;
+        const overflowX = root.scrollWidth - root.clientWidth;
         const offenders = [];
 
         if (overflowX > 1) {
@@ -43,11 +47,35 @@ try {
           }
         }
 
-        return { overflowX, offenders: offenders.slice(0, 6) };
+        // Elemen position:absolute tanpa induk berposisi memakai initial containing
+        // block, sehingga lolos dari klip wadah scroll dan bisa melebarkan dokumen.
+        const escaping = [];
+        for (const element of Array.from(document.querySelectorAll('body *'))) {
+          if (getComputedStyle(element).position !== 'absolute') continue;
+          const containingBlock = element.offsetParent;
+          if (containingBlock && containingBlock !== document.body) continue;
+          const rect = element.getBoundingClientRect();
+          if (rect.right > root.clientWidth + 1 || rect.left < -1) {
+            escaping.push({
+              tag: element.tagName.toLowerCase(),
+              text: (element.textContent ?? '').trim().slice(0, 30),
+              right: Math.round(rect.right),
+              cls: (element.getAttribute('class') ?? '').slice(0, 70),
+            });
+          }
+        }
+
+        return { overflowX, offenders: offenders.slice(0, 6), escaping: escaping.slice(0, 6) };
       });
 
-      if (report.overflowX > 1) {
-        problems.push({ width, path, overflowX: report.overflowX, offenders: report.offenders });
+      if (report.overflowX > 1 || report.escaping.length > 0) {
+        problems.push({
+          width,
+          path,
+          overflowX: report.overflowX,
+          offenders: report.offenders,
+          escaping: report.escaping,
+        });
       }
 
       await page.addScriptTag({ path: AXE_PATH });
@@ -77,16 +105,25 @@ if (problems.length === 0) {
   console.log('Tidak ada overflow horizontal maupun pelanggaran aksesibilitas berat.');
 } else {
   for (const problem of problems) {
-    if (problem.overflowX) {
-      console.log(`\nOVERFLOW ${problem.path} @${problem.width}px (${problem.overflowX}px)`);
-      for (const item of problem.offenders) {
-        console.log(`  <${item.tag}> ${item.left}..${item.right} "${item.text}" [${item.cls}]`);
-      }
-    } else {
+    if (problem.axe) {
       console.log(
         `\nAXE ${problem.path} @${problem.width}px ${problem.axe.id}:${problem.axe.impact}`,
       );
       for (const node of problem.axe.nodes) console.log(`  ${node}`);
+      continue;
+    }
+
+    if (problem.overflowX > 1) {
+      console.log(`\nOVERFLOW ${problem.path} @${problem.width}px (${problem.overflowX}px)`);
+      for (const item of problem.offenders) {
+        console.log(`  <${item.tag}> ${item.left}..${item.right} "${item.text}" [${item.cls}]`);
+      }
+    }
+
+    for (const item of problem.escaping ?? []) {
+      console.log(
+        `\nESCAPING ${problem.path} @${problem.width}px :: <${item.tag}> right=${item.right} "${item.text}" [${item.cls}]`,
+      );
     }
   }
   console.log(`\n${problems.length} masalah.`);

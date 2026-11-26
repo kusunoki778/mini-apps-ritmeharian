@@ -380,6 +380,16 @@ Tujuan: memadatkan navigasi bawah dan memindahkan kalkulator ke halaman sendiri,
   - `buildNativeAlarms` memakai nada khusus alarm bila ada, jika tidak nada dari pengaturan. `AlarmEngine` dan `CalendarReminderEngine` memutar nada terpilih di web lewat `startAlarmSound`.
   - Penerimaan: tiap alarm bisa punya nada berbeda, tersimpan di perangkat, dan berbunyi dengan nada itu. Diuji di unit.
 
+- [x] T12.5 Perbaikan halaman Beranda melar di WebView (S)
+  - Label `sr-only` pada tiap item `DayStrip` memakai `position: absolute` tanpa induk berposisi, sehingga containing block-nya jatuh ke body dan item terjauh melebarkan lebar dokumen. Di WebView ini melebarkan viewport sampai 839px dan membuat seluruh Beranda serta navigasi bawah ikut melar.
+  - Tiap `li` `DayStrip` diberi `relative` supaya label terkurung di wadah geser. Audit layout diperketat: menunggu jaringan selesai, memakai `clientWidth`, dan mendeteksi elemen `absolute` yang lolos dari klip wadah. Grafik AQI juga mematikan `accessibilityLayer` agar tidak ada elemen fokus di dalam `aria-hidden`.
+  - Penerimaan: `window.innerWidth` sama dengan lebar viewport di 320 sampai 430px, strip per jam tetap bisa digeser, dan audit layout bersih.
+
+- [x] T12.6 Ajakan izin alarm yang terlihat (S)
+  - `alarm-permissions.ts` membaca dan meminta izin notifikasi, alarm pasti, serta intent layar penuh (Android 14+). Plugin `NativeAlarm` menambah `canUseFullScreenIntent` dan `openFullScreenIntentSettings`.
+  - `AlarmPermissionBanner` tampil di halaman Alarm saat ada izin yang kurang, dengan tombol **Izinkan** dan toast hasilnya. Izin juga diminta saat pengguna membuat atau mengaktifkan alarm.
+  - Penerimaan: pengguna melihat ajakan izin di halaman Alarm dan dialog sistem muncul saat diminta. Diuji di unit.
+
 ## Backlog setelah v1
 
 - Sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot untuk menekan LCP di bawah 2.5 s pada throttle mobile.

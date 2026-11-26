@@ -17,6 +17,8 @@ interface NativeAlarmBridge {
   cancel(options: { id: number }): Promise<void>;
   cancelAll(): Promise<void>;
   canScheduleExactAlarms(): Promise<{ granted: boolean }>;
+  canUseFullScreenIntent(): Promise<{ granted: boolean }>;
+  openFullScreenIntentSettings(): Promise<void>;
   scheduleTimer(options: { at: number; label?: string; soundId?: string }): Promise<void>;
   cancelTimer(): Promise<void>;
 }

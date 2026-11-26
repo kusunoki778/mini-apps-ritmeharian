@@ -9,7 +9,8 @@ import { toast } from '@/components/ui/toast-store';
 import { useAlarmSoundId } from '@/features/settings/useSettings';
 import type { Alarm } from '@/lib/db/db';
 import { cn } from '@/lib/utils/cn';
-import { nativeAlarmsSupported, requestNativeAlarmPermissions } from './alarm-scheduler';
+import { ensureAlarmPermissions } from './alarm-permissions';
+import { nativeAlarmsSupported } from './alarm-scheduler';
 import { ALARM_SOUNDS, isAlarmSoundId, type AlarmSoundId } from './alarm-sounds';
 import { allDays, DAY_LABELS, DAY_ORDER, repeatModeFromDays, type RepeatMode } from './alarm-utils';
 import { hasAlarmErrors, validateAlarm, type AlarmErrors } from './alarm-validation';
@@ -96,7 +97,7 @@ export function AlarmFormSheet({ alarm, onClose, onSaved }: AlarmFormSheetProps)
     try {
       void requestNotificationPermission();
       if (input.enabled && nativeAlarmsSupported()) {
-        void requestNativeAlarmPermissions();
+        void ensureAlarmPermissions();
       }
       if (alarm) {
         await updateAlarm(alarm.id, input);

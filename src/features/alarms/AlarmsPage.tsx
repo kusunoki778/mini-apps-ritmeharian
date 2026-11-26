@@ -10,7 +10,9 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { toast } from '@/components/ui/toast-store';
 import type { Alarm } from '@/lib/db/db';
 import { AlarmFormSheet } from './AlarmFormSheet';
-import { nativeAlarmsSupported, requestNativeAlarmPermissions } from './alarm-scheduler';
+import { AlarmPermissionBanner } from './AlarmPermissionBanner';
+import { ensureAlarmPermissions } from './alarm-permissions';
+import { nativeAlarmsSupported } from './alarm-scheduler';
 import { nextTrigger } from './alarm-utils';
 import { AlarmListItem } from './AlarmListItem';
 import { AlarmTools } from './AlarmTools';
@@ -51,7 +53,7 @@ export default function AlarmsPage() {
 
   const handleToggle = async (alarm: Alarm, enabled: boolean) => {
     if (enabled && nativeAlarmsSupported()) {
-      await requestNativeAlarmPermissions().catch(() => {});
+      await ensureAlarmPermissions().catch(() => undefined);
     }
     await setAlarmEnabled(alarm.id, enabled);
   };
@@ -85,6 +87,8 @@ export default function AlarmsPage() {
             : 'Alarm berbunyi selama Nadi terbuka. Versi native menjadwalkan alarm lewat sistem.'}
         </Banner>
       </div>
+
+      <AlarmPermissionBanner />
 
       <AlarmTools />
 

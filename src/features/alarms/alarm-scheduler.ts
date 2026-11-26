@@ -141,23 +141,6 @@ export async function ensureAlarmChannel(): Promise<void> {
   });
 }
 
-export type NativeAlarmPermission = 'granted' | 'denied' | 'unsupported';
-
-export async function requestNativeAlarmPermissions(): Promise<NativeAlarmPermission> {
-  if (!nativeAlarmsSupported()) return 'unsupported';
-
-  const LocalNotifications = await plugin();
-  const status = await LocalNotifications.requestPermissions();
-  if (status.display !== 'granted') return 'denied';
-
-  const exact = await LocalNotifications.checkExactNotificationSetting();
-  if (exact.exact_alarm !== 'granted') {
-    await LocalNotifications.changeExactNotificationSetting();
-  }
-
-  return 'granted';
-}
-
 // Selaraskan alarm native dengan daftar saat ini. Dipanggil saat boot dan setiap
 // daftar alarm, agenda, atau pilihan nada berubah. Mengembalikan jumlah kemunculan.
 export async function syncNativeAlarms(

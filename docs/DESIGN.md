@@ -236,7 +236,7 @@ Urutan dan isi:
 
 1. Header ringan: sapaan ("Selamat pagi"), nama lokasi, tombol pengaturan cepat.
 2. Jam utama, tanggal lengkap, dan garis hari.
-3. Kartu cuaca: suhu, kondisi, suhu terasa, kelembapan, angin. Tombol membuka detail 7 hari di sheet.
+3. Kartu cuaca: suhu, kondisi, suhu terasa, kelembapan, angin. Tombol membuka detail 7 hari di sheet. Prakiraan per jam berupa strip geser mendatar; setiap item dibungkus posisi relatif supaya label pembaca layar tidak melebarkan halaman.
 4. Kartu kualitas udara: angka US AQI, kategori, PM2.5, saran singkat, grafik 24 jam. Atribusi kecil di bawah.
 5. Agenda: maksimal tiga item terdekat hari ini dan besok, tombol tambah.
 6. Catatan: dua catatan terbaru atau yang dipin, tombol catatan cepat.
@@ -282,6 +282,7 @@ Satu halaman, agenda lebih dulu lalu catatan:
 - Alarm berikutnya ditandai dengan label "Berikutnya".
 - Form: label, waktu, ulangi (sekali, setiap hari, pilih hari), tunda, nada dering (enam nada bundel, default dari Pengaturan), aktif.
 - Banner batasan di atas daftar: "Alarm berbunyi selama Nadi terbuka." di web, digantikan penjadwalan sistem di Android.
+- Banner perizinan di atas daftar, hanya di Android, muncul bila izin notifikasi, alarm pasti, atau intent layar penuh belum lengkap. Tombol **Izinkan** meminta izinnya dan memberi tahu hasilnya.
 - Di bawah daftar: stopwatch dan timer. Timer tetap berbunyi saat aplikasi tertutup di Android.
 - Saat berbunyi: layar penuh dengan waktu, label, tombol Tunda dan Matikan. Layar yang sama dipakai pengingat agenda.
 - State kosong: "Belum ada alarm." dengan tombol tambah.

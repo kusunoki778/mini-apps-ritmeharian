@@ -652,7 +652,9 @@ Alur di aplikasi (lapisan web):
 
 **Bersama.**
 
-- Izin: `POST_NOTIFICATIONS` diminta saat pengguna membuat atau mengaktifkan alarm. `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, dan `USE_FULL_SCREEN_INTENT` dideklarasikan. Plugin membuka layar pengaturan "Alarm & pengingat" bila izin alarm pasti belum diberikan.
+- Izin dijaga oleh `alarm-permissions.ts`. `alarmPermissionState` membaca status tanpa memicu dialog. `ensureAlarmPermissions` meminta `POST_NOTIFICATIONS` (dialog sistem Android 13+), membuka pengaturan "Alarm & pengingat" bila `SCHEDULE_EXACT_ALARM` belum ada, lalu membuka pengaturan izin intent layar penuh bila perlu.
+- Plugin `NativeAlarm` menambah `canUseFullScreenIntent` dan `openFullScreenIntentSettings` untuk Android 14 ke atas, karena `USE_FULL_SCREEN_INTENT` tidak lagi otomatis. `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, dan `USE_FULL_SCREEN_INTENT` dideklarasikan di manifes.
+- `AlarmPermissionBanner` menampilkan ajakan izin yang terlihat di halaman Alarm bila ada izin yang kurang, dan izin juga diminta saat pengguna membuat atau mengaktifkan alarm.
 - Di web, penjadwal ini tidak aktif (`Capacitor.isNativePlatform()` bernilai salah), jadi bundel web tidak membawa logika native. Lapisan web tetap memakai `AlarmEngine` selama aplikasi terbuka.
 - Belum diverifikasi di perangkat nyata. Android menjadi target utama.
 
