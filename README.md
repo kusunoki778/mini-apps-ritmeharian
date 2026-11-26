@@ -27,6 +27,8 @@ npm run dev
 
 Buka `http://localhost:5173`. Port bisa berbeda jika sudah dipakai proyek lain, cek keluaran Vite.
 
+Server dev mengikat jaringan (`server.host`), jadi Vite juga menampilkan URL **Network**. Buka URL itu dari ponsel di Wi-Fi yang sama untuk mencoba aplikasi dan mengunduh APK.
+
 ## Skrip
 
 | Skrip                   | Fungsi                                         |
@@ -82,6 +84,8 @@ cd android
 ```
 
 APK ada di `android/app/build/outputs/apk/debug/app-debug.apk`. Pasang lewat sideload (aktifkan "Instal dari sumber tidak dikenal"). Untuk hasil build, `android/` memerlukan JDK 17 sampai 21 dan Android SDK; JDK bawaan Android Studio bekerja.
+
+Unduh dari aplikasi web: server dev dan pratinjau menyajikan `/Nadi.apk` lewat plugin kecil di `vite.config.ts`, jadi berkas yang baru dibangun langsung bisa diunduh. Buka alamat Network komputer di peramban ponsel, lalu pakai tawaran di Beranda atau bagian **Aplikasi Android** di Pengaturan. Berkas tidak dibundel ke bundel web maupun ke dalam APK native, dan tawaran tidak muncul di dalam aplikasi native.
 
 Bunyi alarm ada di `android/app/src/main/res/raw/alarm.wav` dan bisa dibuat ulang dengan `node scripts/make-alarm-sound.mjs`.
 

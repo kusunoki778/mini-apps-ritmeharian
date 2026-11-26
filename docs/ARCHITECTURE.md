@@ -115,11 +115,16 @@ nadi/
 │  │  │  ├─ LocationPicker.tsx
 │  │  │  ├─ DataSection.tsx
 │  │  │  └─ useSettings.ts
-│  │  └─ growth/
-│  │     ├─ GrowthPage.tsx
-│  │     ├─ growth-calc.ts
-│  │     ├─ adult-formula.ts
-│  │     └─ growth-data.ts
+│  │  ├─ growth/
+│  │  │  ├─ GrowthPage.tsx
+│  │  │  ├─ growth-calc.ts
+│  │  │  ├─ adult-formula.ts
+│  │  │  └─ growth-data.ts
+│  │  └─ install/
+│  │     ├─ apk.ts
+│  │     ├─ useApkAvailability.ts
+│  │     ├─ ApkDownload.tsx
+│  │     └─ ApkInstallBanner.tsx
 │  ├─ components/
 │  │  └─ ui/
 │  │     ├─ Button.tsx
@@ -637,6 +642,14 @@ Alur di aplikasi (lapisan web):
 - Izin: `POST_NOTIFICATIONS` diminta saat pengguna membuat atau mengaktifkan alarm. `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, dan `USE_FULL_SCREEN_INTENT` dideklarasikan. Plugin membuka layar pengaturan "Alarm & pengingat" bila izin alarm pasti belum diberikan.
 - Di web, penjadwal ini tidak aktif (`Capacitor.isNativePlatform()` bernilai salah), jadi bundel web tidak membawa logika native. Lapisan web tetap memakai `AlarmEngine` selama aplikasi terbuka.
 - Belum diverifikasi di perangkat nyata. Android menjadi target utama.
+
+### 12.2 Distribusi APK dari aplikasi web
+
+Fitur install hanya untuk peramban, tidak untuk pembungkus native.
+
+- `vite.config.ts` menambahkan plugin kecil yang menyajikan `/Nadi.apk` dari keluaran gradle (`android/app/build/outputs/apk/debug/app-debug.apk`, dengan `Nadi.apk` di akar repo sebagai cadangan) pada server dev dan pratinjau. Berkas tidak ditaruh di `public`, jadi tidak masuk ke bundel web maupun ke dalam APK native, dan tidak di-precache service worker.
+- `src/features/install/apk.ts` menyimpan alamat unduh dan penanda aplikasi native. `useApkAvailability` mengirim permintaan `HEAD` supaya tawaran hanya muncul bila berkasnya benar-benar ada.
+- `ApkInstallBanner` tampil sekali di Beranda dan bisa ditolak permanen lewat `localStorage`. `ApkDownload` tampil di Pengaturan bagian Aplikasi Android. Keduanya disembunyikan di aplikasi native.
 
 Perhitungan waktu berikutnya:
 

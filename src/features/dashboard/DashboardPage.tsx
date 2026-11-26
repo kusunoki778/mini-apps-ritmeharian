@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Banner } from '@/components/ui/Banner';
 import { AqiCard } from '@/features/air/AqiCard';
 import { useAirQuality } from '@/features/air/useAirQuality';
+import { ApkInstallBanner } from '@/features/install/ApkInstallBanner';
 import { useLocationStore } from '@/features/location/location-store';
 import { ForecastSheet } from '@/features/weather/ForecastSheet';
 import { WeatherCard } from '@/features/weather/WeatherCard';
@@ -34,6 +35,10 @@ export default function DashboardPage() {
         Cuaca, kualitas udara, catatan, agenda, dan alarm sudah berjalan. Semua tersimpan di
         perangkat.
       </Banner>
+
+      <div className="mt-6">
+        <ApkInstallBanner />
+      </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">
         <ClockPanel />

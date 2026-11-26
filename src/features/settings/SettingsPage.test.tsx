@@ -1,6 +1,6 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { db } from '@/lib/db/db';
 import { getClockFormat, getTemperatureUnit } from '@/lib/format/preferences';
@@ -15,6 +15,11 @@ async function storedSettings(): Promise<Record<string, unknown>> {
 describe('SettingsPage', () => {
   beforeEach(async () => {
     await db.settings.clear();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   it('mengubah satuan suhu dan menyimpannya', async () => {
@@ -49,5 +54,11 @@ describe('SettingsPage', () => {
     await userEvent.selectOptions(screen.getByLabelText('Rumus berat ideal'), 'hamwi');
 
     await waitFor(async () => expect((await storedSettings()).idealWeightFormula).toBe('hamwi'));
+  });
+
+  it('menawarkan unduh APK Android di peramban', () => {
+    render(<SettingsPage />);
+
+    expect(screen.getByRole('heading', { name: 'Aplikasi Android' })).toBeInTheDocument();
   });
 });

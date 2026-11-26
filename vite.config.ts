@@ -1,12 +1,63 @@
+import { createReadStream, existsSync, statSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import type { Connect, Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
+// Berkas APK disajikan di akar situs supaya bisa diunduh dari aplikasi web.
+// Kandidat pertama adalah keluaran gradle, kandidat kedua salinan di akar repo.
+const APK_CANDIDATES = ['android/app/build/outputs/apk/debug/app-debug.apk', 'Nadi.apk'];
+
+function findApk(): string | null {
+  for (const candidate of APK_CANDIDATES) {
+    const full = resolve(candidate);
+    if (existsSync(full)) return full;
+  }
+  return null;
+}
+
+// Menyediakan /Nadi.apk di dev dan preview tanpa menaruh berkas di public,
+// supaya APK tidak ikut masuk ke bundel web maupun ke dalam APK native.
+function serveApk(): Plugin {
+  const handler: Connect.NextHandleFunction = (req, res, next) => {
+    if (!req.url || !req.url.startsWith('/Nadi.apk')) {
+      next();
+      return;
+    }
+
+    const apk = findApk();
+    if (!apk) {
+      res.statusCode = 404;
+      res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+      res.end('Berkas APK belum dibangun.');
+      return;
+    }
+
+    const { size } = statSync(apk);
+    res.setHeader('Content-Type', 'application/vnd.android.package-archive');
+    res.setHeader('Content-Disposition', 'attachment; filename="Nadi.apk"');
+    res.setHeader('Content-Length', size);
+    createReadStream(apk).pipe(res);
+  };
+
+  return {
+    name: 'nadi-serve-apk',
+    configureServer(server) {
+      server.middlewares.use(handler);
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(handler);
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
+    serveApk(),
     react(),
     tailwindcss(),
     VitePWA({
@@ -16,8 +67,7 @@ export default defineConfig({
       manifest: {
         name: 'Nadi',
         short_name: 'Nadi',
-        description:
-          'Jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.',
+        description: 'Jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.',
         start_url: '/',
         display: 'standalone',
         background_color: '#F7F4EE',
@@ -77,6 +127,13 @@ export default defineConfig({
       },
     }),
   ],
+  // host true supaya ponsel di Wi-Fi yang sama bisa membuka situs dan mengunduh APK.
+  server: {
+    host: true,
+  },
+  preview: {
+    host: true,
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

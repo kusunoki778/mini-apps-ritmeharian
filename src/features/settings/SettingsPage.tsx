@@ -4,6 +4,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { SegmentedControl, type SegmentOption } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
 import { ADULT_FORMULAS, type AdultFormula } from '@/features/growth/adult-formula';
+import { isNativeApp } from '@/features/install/apk';
+import { ApkDownload } from '@/features/install/ApkDownload';
 import { LocationSetting } from '@/features/location/LocationSetting';
 import type { ClockFormat, TemperatureUnit } from '@/lib/format/preferences';
 import { DataSection } from './DataSection';
@@ -122,6 +124,12 @@ export default function SettingsPage() {
         <Section title="Lokasi">
           <LocationSetting />
         </Section>
+
+        {!isNativeApp() ? (
+          <Section title="Aplikasi Android">
+            <ApkDownload />
+          </Section>
+        ) : null}
 
         <Section title="Data">
           <DataSection />

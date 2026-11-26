@@ -312,6 +312,25 @@ try {
       'true',
   );
 
+  check(
+    'pengaturan menawarkan aplikasi Android',
+    await page.getByRole('heading', { name: 'Aplikasi Android' }).isVisible(),
+  );
+  const apkLink = page.getByRole('link', { name: 'Unduh APK' });
+  await apkLink
+    .first()
+    .waitFor({ timeout: 5000 })
+    .catch(() => {});
+  check('tautan unduh APK tersedia', (await apkLink.count()) > 0);
+
+  const apkResponse = await context.request.get(`${BASE}/Nadi.apk`);
+  check(
+    'berkas APK disajikan',
+    apkResponse.status() === 200 &&
+      (apkResponse.headers()['content-type'] ?? '').includes('android.package-archive'),
+    `${apkResponse.status()} ${apkResponse.headers()['content-type'] ?? ''}`,
+  );
+
   await page.goto(`${BASE}/`, { waitUntil: 'load' });
   await page.locator('h1').first().waitFor();
   const clockText = await page
