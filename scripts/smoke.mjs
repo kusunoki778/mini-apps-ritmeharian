@@ -39,9 +39,8 @@ try {
   );
 
   check(
-    'prototipe dasbor tampil',
-    (await page.getByText('Kualitas udara (US AQI)').isVisible()) &&
-      (await page.getByRole('heading', { name: 'Agenda hari ini' }).isVisible()) &&
+    'modul agenda dan catatan contoh tampil',
+    (await page.getByRole('heading', { name: 'Agenda hari ini' }).isVisible()) &&
       (await page.getByRole('heading', { name: 'Catatan terakhir' }).isVisible()),
   );
   check(
@@ -72,6 +71,16 @@ try {
   await page.keyboard.press('Escape');
   await sheetTitle.waitFor({ state: 'hidden' });
   check('sheet tertutup dengan Escape', !(await sheetTitle.isVisible()));
+
+  const aqiLabel = page.getByText('Kualitas udara · US AQI');
+  await aqiLabel.waitFor({ timeout: 20000 });
+  check('kartu AQI tampil', await aqiLabel.isVisible());
+
+  const chartDetails = page.getByText('Lihat tabel 24 jam');
+  await chartDetails.waitFor({ timeout: 20000 });
+  check('grafik AQI dimuat malas', await chartDetails.isVisible());
+
+  check('atribusi CAMS tampil', await page.getByText(/Open-Meteo, berisi data CAMS/).isVisible());
 
   const manifestResponse = await context.request.get(`${BASE}/manifest.webmanifest`);
   check('manifest tersedia', manifestResponse.ok());

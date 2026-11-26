@@ -1,4 +1,8 @@
+import { currentHourIndex } from '@/lib/utils/hour-series';
+
 const TIME_PATTERN = /T(\d{2}):(\d{2})/;
+
+export { currentHourIndex };
 
 export function formatClock(iso: string): string {
   const match = TIME_PATTERN.exec(iso);
@@ -33,20 +37,4 @@ export function hourIsDaylight(timeIso: string, sunrise: string[], sunset: strin
   if (index === -1 || !sunrise[index] || !sunset[index]) return true;
 
   return timeIso >= sunrise[index] && timeIso < sunset[index];
-}
-
-function localHourIso(now: Date): string {
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  const hour = String(now.getHours()).padStart(2, '0');
-
-  return `${year}-${month}-${day}T${hour}:00`;
-}
-
-export function currentHourIndex(times: string[], now: Date): number {
-  const key = localHourIso(now);
-  const index = times.findIndex((time) => time >= key);
-
-  return index === -1 ? Math.max(0, times.length - 1) : index;
 }

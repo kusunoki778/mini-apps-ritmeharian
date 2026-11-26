@@ -1,14 +1,4 @@
-// Data contoh untuk modul yang belum aktif. Cuaca sudah nyata sejak M3, kualitas udara menyusul di M4.
-
-export interface AirQualitySample {
-  location: string;
-  usAqi: number;
-  category: string;
-  dominantPollutant: string;
-  pm25: number;
-  pm10: number;
-  updatedAt: string;
-}
+// Data contoh untuk modul yang belum aktif. Cuaca dan kualitas udara sudah nyata.
 
 export interface AgendaSample {
   id: string;
@@ -16,16 +6,6 @@ export interface AgendaSample {
   time: string;
   location?: string;
 }
-
-export const SAMPLE_AIR_QUALITY: AirQualitySample = {
-  location: 'Jakarta',
-  usAqi: 68,
-  category: 'Sedang',
-  dominantPollutant: 'PM2.5',
-  pm25: 18.4,
-  pm10: 32.1,
-  updatedAt: '5 menit lalu',
-};
 
 export const SAMPLE_AGENDA: AgendaSample[] = [
   { id: 'a1', title: 'Rapat tim produk', time: '09.30', location: 'Ruang Teduh' },

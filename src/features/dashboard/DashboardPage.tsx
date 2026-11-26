@@ -4,24 +4,19 @@ import { Link } from 'react-router-dom';
 
 import { Banner } from '@/components/ui/Banner';
 import { Card } from '@/components/ui/Card';
+import { AqiCard } from '@/features/air/AqiCard';
+import { useAirQuality } from '@/features/air/useAirQuality';
 import { useLocationStore } from '@/features/location/location-store';
-import { SOURCE_LABEL } from '@/features/location/types';
 import { ForecastSheet } from '@/features/weather/ForecastSheet';
 import { WeatherCard } from '@/features/weather/WeatherCard';
 import { useWeather } from '@/features/weather/useWeather';
 import { ClockPanel } from './ClockPanel';
-import { SAMPLE_AGENDA, SAMPLE_AIR_QUALITY, SAMPLE_NOTES } from './sample-data';
-
-function usAqiTone(value: number): string {
-  if (value <= 50) return 'text-emerald-600 dark:text-emerald-400';
-  if (value <= 100) return 'text-amber-600 dark:text-amber-400';
-  if (value <= 150) return 'text-orange-600 dark:text-orange-400';
-  return 'text-danger';
-}
+import { SAMPLE_AGENDA, SAMPLE_NOTES } from './sample-data';
 
 export default function DashboardPage() {
   const location = useLocationStore((state) => state.location);
   const weather = useWeather(location.lat, location.lon);
+  const air = useAirQuality(location.lat, location.lon);
   const [detailOpen, setDetailOpen] = useState(false);
 
   return (
@@ -36,8 +31,7 @@ export default function DashboardPage() {
           </Link>
         }
       >
-        Cuaca sudah data nyata Open-Meteo untuk {location.name} ({SOURCE_LABEL[location.source]}).
-        Kualitas udara masih data contoh sampai M4.
+        Cuaca dan kualitas udara sudah data nyata. Agenda dan catatan masih contoh sampai M5 dan M6.
       </Banner>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">
@@ -52,24 +46,14 @@ export default function DashboardPage() {
             onOpenDetail={() => setDetailOpen(true)}
           />
 
-          <Card className="mt-4 p-5">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <p className="text-[13px] font-medium text-ink-muted">Kualitas udara (US AQI)</p>
-                <p className={`tabular mt-1 text-3xl font-bold ${usAqiTone(SAMPLE_AIR_QUALITY.usAqi)}`}>
-                  {SAMPLE_AIR_QUALITY.usAqi}
-                </p>
-                <p className="mt-1 text-[13px] text-ink-muted">
-                  {SAMPLE_AIR_QUALITY.category} · dominan {SAMPLE_AIR_QUALITY.dominantPollutant}
-                </p>
-              </div>
-              <div className="text-right text-[12px] text-ink-muted">
-                <p>PM2.5 {SAMPLE_AIR_QUALITY.pm25}</p>
-                <p>PM10 {SAMPLE_AIR_QUALITY.pm10}</p>
-                <p className="mt-1">{SAMPLE_AIR_QUALITY.updatedAt}</p>
-              </div>
-            </div>
-          </Card>
+          <div className="mt-4">
+            <AqiCard
+              result={air.data}
+              isPending={air.isPending}
+              isError={air.isError}
+              onRetry={() => void air.refetch()}
+            />
+          </div>
         </section>
       </div>
 

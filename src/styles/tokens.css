@@ -10,6 +10,12 @@
   --focus: #b23a26;
   --danger: #b3261e;
   --danger-soft: #f6dad7;
+  --aqi-good: #2e7d32;
+  --aqi-moderate: #a16207;
+  --aqi-sensitive: #c05621;
+  --aqi-unhealthy: #b3261e;
+  --aqi-very-unhealthy: #7b3f8c;
+  --aqi-hazardous: #6e1b2a;
 }
 
 [data-theme='dark'] {
@@ -23,4 +29,10 @@
   --focus: #e8836f;
   --danger: #f07a72;
   --danger-soft: #3a211f;
+  --aqi-good: #7cc47f;
+  --aqi-moderate: #e0b44c;
+  --aqi-sensitive: #f09a5b;
+  --aqi-unhealthy: #f07a72;
+  --aqi-very-unhealthy: #c79ad6;
+  --aqi-hazardous: #e08a9a;
 }

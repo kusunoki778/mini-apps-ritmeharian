@@ -52,11 +52,17 @@ export default function SettingsPage() {
           </p>
         </Section>
 
+        <Section title="Atribusi data">
+          <p className="text-sm leading-relaxed text-ink-muted">
+            Cuaca, kualitas udara, dan nama kota berasal dari Open-Meteo. Data kualitas udara
+            berisi data CAMS (Copernicus Atmosphere Monitoring Service). Penggunaan non-komersial.
+          </p>
+        </Section>
+
         <Section title="Tentang">
-          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M2.</p>
+          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M4.</p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Nama kota berasal dari Open-Meteo Geocoding. Cuaca dan kualitas udara memakai
-            Open-Meteo dan CAMS. Atribusi lengkap ditampilkan saat modul data aktif.
+            Saran kualitas udara bersifat umum, bukan nasihat medis.
           </p>
         </Section>
       </div>

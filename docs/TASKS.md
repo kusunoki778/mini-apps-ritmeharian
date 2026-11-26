@@ -134,25 +134,24 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M4: Kualitas udara
 
-- [ ] T4.1 Klien API kualitas udara (M)
-  - Data saat ini dan per jam, cache, fallback, timeout.
-  - Penerimaan: unit test untuk kasus offline dan respons kosong.
+- [x] T4.1 Klien API kualitas udara (M)
+  - Data saat ini dan per jam, validasi manual, timeout 8 detik, cache Dexie, fallback cache.
+  - Penerimaan: unit test untuk offline dengan cache, offline tanpa cache, respons kosong, dan pembatalan pemanggil.
 
-- [ ] T4.2 Kartu AQI (M)
-  - Angka US AQI, kategori, PM2.5, saran, disclaimer.
-  - Penerimaan: enam kategori benar, selalu ada label teks, warna bukan satu-satunya petunjuk.
+- [x] T4.2 Kartu AQI (M)
+  - Angka US AQI berwarna kategori, label kategori, saran, PM2.5, PM10, disclaimer, dan atribusi.
+  - Penerimaan: enam kategori benar, label teks selalu ada, warna bukan satu-satunya petunjuk.
 
-- [ ] T4.3 Grafik 24 jam (M)
-  - Recharts dimuat malas, ringkasan teks, tabel alternatif.
-  - Penerimaan: tidak menambah bundle awal, tidak ada animasi saat reduced motion.
+- [x] T4.3 Grafik 24 jam (M)
+  - Recharts dimuat malas lewat `React.lazy`, ringkasan teks untuk pembaca layar, tabel alternatif di dalam elemen `details`.
+  - Penerimaan: grafik masuk chunk terpisah dan tidak menambah bundle awal. Animasi mati saat `prefers-reduced-motion`.
 
-- [ ] T4.4 Atribusi (S)
-  - Open-Meteo dan CAMS di kartu dan Pengaturan.
-  - Penerimaan: teks atribusi tidak terpotong di 320px.
+- [x] T4.4 Atribusi (S)
+  - Teks Open-Meteo dan CAMS di kartu AQI dan di bagian Atribusi pada Pengaturan.
+  - Penerimaan: teks atribusi membungkus tanpa terpotong di 320px, dicek lewat uji overflow halaman.
 
-- [ ] T4.5 Test batas kategori (S)
-  - 50/51, 100/101, 150/151, 200/201, 300/301.
-  - Penerimaan: semua batas diuji.
+- [x] T4.5 Test batas kategori (S)
+  - Batas 50/51, 100/101, 150/151, 200/201, dan 300/301 diuji, termasuk nilai di atas 301.
 
 ## M5: Catatan
 
