@@ -324,6 +324,7 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
 
 - [x] T10.7 Unduh APK dari aplikasi web (S)
   - Plugin kecil di `vite.config.ts` menyajikan `/Nadi.apk` dari keluaran gradle pada server dev dan pratinjau, jadi tidak perlu server kedua dan berkas tidak masuk ke bundel web atau APK native.
+  - Di hosting statis seperti Vercel berkas lokal tidak ada, jadi `useApkAvailability` jatuh ke aset rilis GitHub `Nadi.apk` setelah memeriksa tipe konten berkas lokal. Rilis GitHub `v1.0.0` memuat aset `Nadi.apk`.
   - Tawaran muncul di Beranda dan bagian **Aplikasi Android** di Pengaturan, hanya di peramban dan hanya bila berkas tersedia. Tawaran di Beranda bisa ditolak permanen.
   - Penerimaan: tautan unduh tampil di peramban, berkas tersaji dengan tipe paket Android, dan tidak muncul di aplikasi native. Diuji di unit dan uji asap.
 

@@ -1,6 +1,6 @@
 import { DownloadSimple } from '@phosphor-icons/react';
 
-import { APK_FILE_NAME, APK_URL } from './apk';
+import { APK_FILE_NAME } from './apk';
 import { useApkAvailability } from './useApkAvailability';
 
 export function ApkDownload() {
@@ -13,16 +13,16 @@ export function ApkDownload() {
         tertutup. Berkasnya berformat APK dan dipasang di luar Play Store.
       </p>
 
-      {availability === 'available' ? (
+      {availability.status === 'available' ? (
         <a
-          href={APK_URL}
+          href={availability.url}
           download={APK_FILE_NAME}
           className="inline-flex min-h-11 items-center gap-2 rounded-control bg-accent px-4 text-sm font-semibold text-paper"
         >
           <DownloadSimple size={18} aria-hidden="true" />
           Unduh APK
         </a>
-      ) : availability === 'checking' ? (
+      ) : availability.status === 'checking' ? (
         <p className="text-sm text-ink-muted">Memeriksa ketersediaan berkas.</p>
       ) : (
         <p className="text-sm text-ink-muted">

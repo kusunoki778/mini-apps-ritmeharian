@@ -3,15 +3,29 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { APK_RELEASE_URL } from './apk';
 import { ApkDownload } from './ApkDownload';
 import { ApkInstallBanner } from './ApkInstallBanner';
 
-function stubAvailable() {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true }));
+function stubLocal() {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'application/vnd.android.package-archive' }),
+    }),
+  );
 }
 
+// Hosting statis membalas halaman aplikasi untuk berkas yang tidak ada.
 function stubMissing() {
-  vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false }));
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      headers: new Headers({ 'content-type': 'text/html' }),
+    }),
+  );
 }
 
 afterEach(() => {
@@ -20,8 +34,8 @@ afterEach(() => {
 });
 
 describe('ApkDownload', () => {
-  it('menampilkan tautan unduh saat berkas tersedia', async () => {
-    stubAvailable();
+  it('memakai berkas lokal saat tersedia', async () => {
+    stubLocal();
     render(<ApkDownload />);
 
     const link = await screen.findByRole('link', { name: /Unduh APK/ });
@@ -29,12 +43,12 @@ describe('ApkDownload', () => {
     expect(link).toHaveAttribute('download', 'Nadi.apk');
   });
 
-  it('memberi tahu saat berkas belum tersedia', async () => {
+  it('jatuh ke aset rilis GitHub saat berkas lokal tidak ada', async () => {
     stubMissing();
     render(<ApkDownload />);
 
-    expect(await screen.findByText(/belum tersedia/)).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /Unduh APK/ })).not.toBeInTheDocument();
+    const link = await screen.findByRole('link', { name: /Unduh APK/ });
+    expect(link).toHaveAttribute('href', APK_RELEASE_URL);
   });
 });
 
@@ -44,7 +58,7 @@ describe('ApkInstallBanner', () => {
   });
 
   it('muncul di peramban dan bisa ditutup permanen', async () => {
-    stubAvailable();
+    stubLocal();
     render(<ApkInstallBanner />);
 
     expect(await screen.findByText(/tersedia sebagai aplikasi Android/)).toBeInTheDocument();
@@ -56,7 +70,7 @@ describe('ApkInstallBanner', () => {
   });
 
   it('tidak muncul saat sudah ditolak sebelumnya', async () => {
-    stubAvailable();
+    stubLocal();
     localStorage.setItem('nadi.apk-banner-dismissed', '1');
     render(<ApkInstallBanner />);
 
@@ -65,7 +79,7 @@ describe('ApkInstallBanner', () => {
   });
 
   it('tidak muncul di aplikasi native', async () => {
-    stubAvailable();
+    stubLocal();
     vi.spyOn(Capacitor, 'isNativePlatform').mockReturnValue(true);
     render(<ApkInstallBanner />);
 

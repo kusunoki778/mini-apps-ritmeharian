@@ -83,9 +83,20 @@ cd android
 .\gradlew.bat assembleDebug
 ```
 
-APK ada di `android/app/build/outputs/apk/debug/app-debug.apk`. Pasang lewat sideload (aktifkan "Instal dari sumber tidak dikenal"). Untuk hasil build, `android/` memerlukan JDK 17 sampai 21 dan Android SDK; JDK bawaan Android Studio bekerja.
+Membangun APK rilis bertanda tangan tetap:
 
-Unduh dari aplikasi web: server dev dan pratinjau menyajikan `/Nadi.apk` lewat plugin kecil di `vite.config.ts`, jadi berkas yang baru dibangun langsung bisa diunduh. Buka alamat Network komputer di peramban ponsel, lalu pakai tawaran di Beranda atau bagian **Aplikasi Android** di Pengaturan. Berkas tidak dibundel ke bundel web maupun ke dalam APK native, dan tawaran tidak muncul di dalam aplikasi native.
+```
+npm run build
+npx cap sync android
+cd android
+.\gradlew.bat assembleRelease
+```
+
+APK debug ada di `android/app/build/outputs/apk/debug/app-debug.apk`, APK rilis di `android/app/build/outputs/apk/release/app-release.apk`. Pasang lewat sideload (aktifkan "Instal dari sumber tidak dikenal"). Untuk hasil build, `android/` memerlukan JDK 17 sampai 21 dan Android SDK; JDK bawaan Android Studio bekerja.
+
+APK rilis ditandatangani memakai kunci `android/keystore/nadi-release.jks` dengan sandi dari `android/keystore.properties`. Keduanya di luar git. Jaga kunci dan sandinya, karena tanpa itu update tidak bisa dipasang menimpa aplikasi yang sudah ada. Tanda tangan rilis berbeda dari debug, jadi copot versi debug dulu sebelum memasang yang rilis.
+
+Unduh dari aplikasi web: server dev dan pratinjau menyajikan `/Nadi.apk` lewat plugin kecil di `vite.config.ts`, jadi berkas yang baru dibangun langsung bisa diunduh. Buka alamat Network komputer di peramban ponsel, lalu pakai tawaran di Beranda atau bagian **Aplikasi Android** di Pengaturan. Di hosting statis seperti Vercel berkas lokal tidak ada, jadi unduhan otomatis diarahkan ke aset rilis GitHub `Nadi.apk`. Unggah APK rilis ke rilis GitHub dengan nama aset `Nadi.apk` setiap kali membangun versi baru. Berkas tidak dibundel ke bundel web maupun ke dalam APK native, dan tawaran tidak muncul di dalam aplikasi native.
 
 Bunyi alarm ada di `android/app/src/main/res/raw/alarm.wav` dan bisa dibuat ulang dengan `node scripts/make-alarm-sound.mjs`.
 

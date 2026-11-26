@@ -663,7 +663,7 @@ Alur di aplikasi (lapisan web):
 Fitur install hanya untuk peramban, tidak untuk pembungkus native.
 
 - `vite.config.ts` menambahkan plugin kecil yang menyajikan `/Nadi.apk` dari keluaran gradle (`android/app/build/outputs/apk/release/app-release.apk` lebih dulu, lalu `debug/app-debug.apk`, lalu `Nadi.apk` di akar repo sebagai cadangan) pada server dev dan pratinjau. Berkas tidak ditaruh di `public`, jadi tidak masuk ke bundel web maupun ke dalam APK native, dan tidak di-precache service worker.
-- `src/features/install/apk.ts` menyimpan alamat unduh dan penanda aplikasi native. `useApkAvailability` mengirim permintaan `HEAD` supaya tawaran hanya muncul bila berkasnya benar-benar ada.
+- `src/features/install/apk.ts` menyimpan alamat berkas lokal `/Nadi.apk` dan alamat aset rilis GitHub. `useApkAvailability` mengirim `HEAD` ke berkas lokal, memeriksa tipe kontennya agar halaman aplikasi tidak ikut terunduh, lalu jatuh ke aset rilis GitHub bila berkas lokal tidak ada. Tawaran unduh hanya muncul bila salah satunya tersedia. Di Vercel, `vercel.json` mengecualikan jalur berberkas titik dari rewrite SPA supaya `/Nadi.apk` tidak dibalas halaman aplikasi.
 - `ApkInstallBanner` tampil sekali di Beranda dan bisa ditolak permanen lewat `localStorage`. `ApkDownload` tampil di Pengaturan bagian Aplikasi Android. Keduanya disembunyikan di aplikasi native.
 
 Perhitungan waktu berikutnya:
