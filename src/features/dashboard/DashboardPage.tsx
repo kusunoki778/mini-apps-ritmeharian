@@ -1,18 +1,16 @@
-import { ArrowRight } from '@phosphor-icons/react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Banner } from '@/components/ui/Banner';
-import { Card } from '@/components/ui/Card';
 import { AqiCard } from '@/features/air/AqiCard';
 import { useAirQuality } from '@/features/air/useAirQuality';
 import { useLocationStore } from '@/features/location/location-store';
 import { ForecastSheet } from '@/features/weather/ForecastSheet';
 import { WeatherCard } from '@/features/weather/WeatherCard';
 import { useWeather } from '@/features/weather/useWeather';
+import { AgendaCard } from './AgendaCard';
 import { ClockPanel } from './ClockPanel';
 import { NotesCard } from './NotesCard';
-import { SAMPLE_AGENDA } from './sample-data';
 
 export default function DashboardPage() {
   const location = useLocationStore((state) => state.location);
@@ -32,7 +30,7 @@ export default function DashboardPage() {
           </Link>
         }
       >
-        Cuaca, kualitas udara, dan catatan sudah data nyata. Agenda masih contoh sampai M6.
+        Cuaca, kualitas udara, catatan, dan agenda sudah data nyata. Alarm aktif di M7.
       </Banner>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">
@@ -59,32 +57,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2 lg:gap-8">
-        <section aria-labelledby="agenda-heading">
-          <div className="mb-3 flex items-center justify-between gap-4">
-            <h2 id="agenda-heading" className="text-base font-semibold">
-              Agenda hari ini
-            </h2>
-            <Link
-              to="/kalender"
-              className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:underline"
-            >
-              Kalender <ArrowRight size={14} aria-hidden="true" />
-            </Link>
-          </div>
-          <Card className="divide-y divide-line">
-            {SAMPLE_AGENDA.map((item) => (
-              <div key={item.id} className="flex items-center gap-4 px-5 py-4">
-                <span className="tabular w-14 text-sm font-medium">{item.time}</span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-medium">{item.title}</p>
-                  {item.location ? (
-                    <p className="truncate text-[12px] text-ink-muted">{item.location}</p>
-                  ) : null}
-                </div>
-              </div>
-            ))}
-          </Card>
-        </section>
+        <AgendaCard />
 
         <NotesCard />
       </div>

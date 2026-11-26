@@ -40,7 +40,7 @@ try {
 
   check(
     'modul agenda dan catatan tampil',
-    (await page.getByRole('heading', { name: 'Agenda hari ini' }).isVisible()) &&
+    (await page.getByRole('heading', { name: 'Agenda terdekat' }).isVisible()) &&
       (await page.getByRole('heading', { name: 'Catatan terakhir' }).isVisible()),
   );
   check(
@@ -92,6 +92,16 @@ try {
   await page.getByRole('button', { name: 'Simpan' }).click();
   await page.getByText('Catatan asap').first().waitFor({ timeout: 10000 });
   check('catatan cepat langsung tampil di dasbor', await page.getByText('Catatan asap').first().isVisible());
+
+  const agendaEmpty = page.getByText('Belum ada agenda terdekat. Tambah satu agar harimu lebih tenang.');
+  await agendaEmpty.waitFor({ timeout: 15000 });
+  check('kartu agenda kosong tampil', await agendaEmpty.isVisible());
+
+  await page.getByRole('button', { name: 'Tambah agenda' }).click();
+  await page.getByLabel('Judul').fill('Rapat asap');
+  await page.getByRole('button', { name: 'Simpan' }).click();
+  await page.getByText('Rapat asap').first().waitFor({ timeout: 10000 });
+  check('agenda cepat tampil di dasbor', await page.getByText('Rapat asap').first().isVisible());
 
   const manifestResponse = await context.request.get(`${BASE}/manifest.webmanifest`);
   check('manifest tersedia', manifestResponse.ok());
@@ -154,6 +164,32 @@ try {
   await page.getByRole('button', { name: 'Hapus', exact: true }).click();
   await page.getByText('Belum ada catatan').waitFor();
   check('catatan terhapus', await page.getByText('Belum ada catatan').isVisible());
+
+  await page.goto(`${BASE}/kalender`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Kalender', exact: true }).waitFor();
+  const monthHeading = page.getByRole('heading', { level: 2 });
+  const beforeMonth = (await monthHeading.textContent()) ?? '';
+  await page.getByRole('button', { name: 'Bulan berikutnya' }).click();
+  await page.waitForFunction((previous) => document.querySelector('h2')?.textContent !== previous, beforeMonth);
+  check('navigasi bulan berikutnya', (await monthHeading.textContent()) !== beforeMonth);
+  await page.getByRole('button', { name: 'Hari ini' }).click();
+
+  const todayLabel = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).format(new Date());
+
+  await page.getByRole('button', { name: todayLabel }).click();
+  await page.getByText('Rapat asap').waitFor();
+  check('panel hari menampilkan agenda', await page.getByText('Rapat asap').isVisible());
+
+  await page.getByRole('button', { name: 'Hapus Rapat asap' }).click();
+  await page.getByRole('heading', { name: 'Hapus agenda?' }).waitFor();
+  await page.getByRole('button', { name: 'Hapus', exact: true }).click();
+  await page.getByText('Belum ada agenda di hari ini.').first().waitFor();
+  check('agenda terhapus dari panel hari', await page.getByText('Belum ada agenda di hari ini.').first().isVisible());
 
   await page.goto(`${BASE}/pengaturan`, { waitUntil: 'load' });
   await page.getByRole('heading', { level: 1, name: 'Pengaturan', exact: true }).waitFor();

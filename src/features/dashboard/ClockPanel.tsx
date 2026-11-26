@@ -1,6 +1,8 @@
 import { MapPin } from '@phosphor-icons/react';
 
 import { PageHeader } from '@/components/ui/PageHeader';
+import { dayEnd, dayStart, formatTime } from '@/features/calendar/calendar-utils';
+import { useEventsBetween } from '@/features/calendar/useEvents';
 import { useLocationStore } from '@/features/location/location-store';
 import { SOURCE_LABEL } from '@/features/location/types';
 import { useWeather } from '@/features/weather/useWeather';
@@ -8,14 +10,13 @@ import { formatClock } from '@/features/weather/weather-utils';
 import { useNow } from '@/lib/hooks/useNow';
 import { getGreeting } from '@/lib/utils/greeting';
 import { DayLine } from './DayLine';
-import { clockMinutes } from './day-line';
-import { SAMPLE_AGENDA } from './sample-data';
 import { Stat } from './Stat';
 
 export function ClockPanel() {
   const now = useNow();
   const location = useLocationStore((state) => state.location);
   const weather = useWeather(location.lat, location.lon);
+  const dayEvents = useEventsBetween(dayStart(now), dayEnd(now));
 
   const time = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
@@ -34,11 +35,8 @@ export function ClockPanel() {
   const sunrise = today?.sunrise[0] ? formatClock(today.sunrise[0]) : null;
   const sunset = today?.sunset[0] ? formatClock(today.sunset[0]) : null;
 
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const nextEvent =
-    SAMPLE_AGENDA.map((item) => ({ ...item, minutes: clockMinutes(item.time) })).find(
-      (item) => item.minutes !== null && item.minutes > nowMinutes,
-    ) ?? null;
+    (dayEvents ?? []).find((event) => !event.allDay && event.start >= now.getTime()) ?? null;
 
   return (
     <section className="min-w-0 lg:col-span-7" aria-label="Jam dan garis hari">
@@ -62,7 +60,7 @@ export function ClockPanel() {
           now={now}
           sunrise={sunrise}
           sunset={sunset}
-          nextEvent={nextEvent ? { title: nextEvent.title, time: nextEvent.time } : null}
+          nextEvent={nextEvent ? { title: nextEvent.title, time: formatTime(nextEvent.start) } : null}
         />
       </div>
     </section>

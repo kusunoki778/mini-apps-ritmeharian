@@ -181,29 +181,29 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M6: Kalender dan agenda
 
-- [ ] T6.1 Grid bulanan (M)
-  - Tujuh kolom, awal minggu mengikuti pengaturan, hari ini ditandai.
-  - Penerimaan: benar untuk bulan dengan 28, 29, 30, dan 31 hari, serta pergantian tahun.
+- [x] T6.1 Grid bulanan (M)
+  - Tujuh kolom, awal minggu mengikuti `readWeekStart`, hari ini ditandai lingkaran aksen.
+  - Penerimaan: unit test untuk 28, 29, 30, dan 31 hari serta pergantian tahun.
 
-- [ ] T6.2 Panel hari (M)
-  - Daftar agenda, tombol tambah, state kosong.
-  - Penerimaan: buka dari tanggal mana pun, fokus terkunci.
+- [x] T6.2 Panel hari (M)
+  - Sheet daftar agenda, tombol tambah, state kosong "Belum ada agenda di hari ini.".
+  - Penerimaan: terbuka dari tanggal mana pun, fokus terkunci oleh elemen `dialog` modal.
 
-- [ ] T6.3 Form agenda (M)
-  - Judul, tanggal, mulai, selesai, sepanjang hari, catatan.
-  - Penerimaan: validasi waktu selesai setelah mulai, field wajib ditandai.
+- [x] T6.3 Form agenda (M)
+  - Judul, tanggal, sepanjang hari, mulai, selesai, catatan.
+  - Penerimaan: judul dan tanggal wajib ditandai, waktu selesai harus setelah mulai.
 
-- [ ] T6.4 Repositori agenda (M)
-  - CRUD, sorting berdasarkan waktu mulai.
-  - Penerimaan: unit test CRUD dan sorting.
+- [x] T6.4 Repositori agenda (M)
+  - CRUD pada tabel `events`, penyaringan rentang lewat indeks `start`, sorting menaik.
+  - Penerimaan: unit test CRUD, sorting, dan batas rentang inklusif atau eksklusif.
 
-- [ ] T6.5 Kartu agenda di dasbor (S)
-  - Maksimal tiga agenda terdekat hari ini dan besok.
+- [x] T6.5 Kartu agenda di dasbor (S)
+  - Maksimal tiga agenda terdekat hari ini dan besok lewat `useLiveQuery`, tombol tambah cepat.
   - Penerimaan: agenda yang sudah lewat tidak ditampilkan sebagai berikutnya.
 
-- [ ] T6.6 Test kalender (M)
-  - Navigasi bulan, buka panel hari, tambah dan hapus agenda.
-  - Penerimaan: lulus di jsdom, tidak ada warning React.
+- [x] T6.6 Test kalender (M)
+  - Navigasi bulan, buka panel hari, tambah, dan hapus agenda.
+  - Penerimaan: lulus di jsdom tanpa warning React.
 
 ## M7: Alarm
 

@@ -27,9 +27,9 @@ export default function SettingsPage() {
   return (
     <div>
       <PageHeader
-        eyebrow="M2"
+        eyebrow="Pengaturan"
         title="Pengaturan"
-        description="Tema dan lokasi aktif sekarang. Data dan preferensi lain menyusul."
+        description="Tema dan lokasi aktif sekarang. Data dan preferensi lain menyusul di M8."
       />
 
       <div className="space-y-4">
@@ -60,7 +60,7 @@ export default function SettingsPage() {
         </Section>
 
         <Section title="Tentang">
-          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M4.</p>
+          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M6.</p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
             Saran kualitas udara bersifat umum, bukan nasihat medis.
           </p>
