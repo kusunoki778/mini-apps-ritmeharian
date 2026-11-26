@@ -30,7 +30,8 @@ export default function DashboardPage() {
           </Link>
         }
       >
-        Cuaca, kualitas udara, catatan, dan agenda sudah data nyata. Alarm aktif di M7.
+        Cuaca, kualitas udara, catatan, agenda, dan alarm sudah berjalan. Semua tersimpan di
+        perangkat.
       </Banner>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">

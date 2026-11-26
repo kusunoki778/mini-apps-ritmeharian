@@ -207,33 +207,33 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M7: Alarm
 
-- [ ] T7.1 Repositori dan form alarm (M)
-  - Label, waktu, ulangi, aktif, tunda.
+- [x] T7.1 Repositori dan form alarm (M)
+  - Label, waktu, ulangi (sekali, harian, hari tertentu), menit tunda, aktif. Tabel `alarms` satu-satunya yang disentuh lapisan ini.
   - Penerimaan: validasi waktu dan hari, toggle langsung tersimpan.
 
-- [ ] T7.2 Perhitungan waktu berikutnya (M)
-  - Sekali, harian, hari tertentu, tengah malam, DST.
-  - Penerimaan: unit test semua kasus.
+- [x] T7.2 Perhitungan waktu berikutnya (M)
+  - Waktu lokal dibangun dari komponen tanggal, jadi pergantian hari, tengah malam, dan DST tidak menggeser jam dinding.
+  - Penerimaan: unit test untuk sekali, harian, hari tertentu, tengah malam, pergantian tahun, dan pergantian waktu musiman.
 
-- [ ] T7.3 Mesin alarm (L)
-  - Interval, layar berbunyi, nada Web Audio, tunda, matikan.
+- [x] T7.3 Mesin alarm (L)
+  - Interval satu detik, layar berbunyi, nada Web Audio berulang, tunda, dan matikan. Dipasang di `AppShell` supaya jalan di semua rute.
   - Penerimaan: alarm berbunyi dalam 1 detik dari waktu yang dijadwalkan saat aplikasi terbuka.
 
-- [ ] T7.4 Notifikasi browser (S)
-  - Permintaan izin saat membuat alarm, fallback saat ditolak.
+- [x] T7.4 Notifikasi browser (S)
+  - Permintaan izin saat menyimpan alarm, langsung jatuh ke mode dalam aplikasi saat ditolak atau tidak didukung.
   - Penerimaan: tidak meminta izin saat aplikasi pertama dibuka.
 
-- [ ] T7.5 Banner batasan (S)
-  - Teks bahwa alarm hanya berbunyi saat aplikasi terbuka.
-  - Penerimaan: tampil di layar Alarm dan di Tentang.
+- [x] T7.5 Banner batasan (S)
+  - Teks "Alarm berbunyi selama Nadi terbuka.".
+  - Penerimaan: tampil di layar Alarm dan di bagian Tentang Pengaturan.
 
-- [ ] T7.6 Alarm terlewat (S)
-  - Dalam 60 detik terakhir ditampilkan, lebih lama ditandai terlewat.
-  - Penerimaan: tidak ada alarm berbunyi berulang.
+- [x] T7.6 Alarm terlewat (S)
+  - Terlewat dalam 60 detik tetap berbunyi, lebih lama ditandai lewat `lastTriggeredAt` tanpa dibunyikan.
+  - Penerimaan: tidak ada alarm berbunyi berulang untuk waktu pemicu yang sama.
 
-- [ ] T7.7 Test alarm (M)
-  - Form, perhitungan, trigger, tunda.
-  - Penerimaan: lulus, tidak memakai timer nyata di test.
+- [x] T7.7 Test alarm (M)
+  - Form, perhitungan, pemicu, dan tunda.
+  - Penerimaan: lulus memakai fake timer, tanpa timer nyata.
 
 ## M8: Pengaturan, offline, aksesibilitas, performa
 

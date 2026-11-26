@@ -4,13 +4,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { LocationSetting } from '@/features/location/LocationSetting';
 import { ThemeToggle } from './ThemeToggle';
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   const id = title.toLowerCase().replace(/\s+/g, '-');
 
   return (
@@ -47,20 +41,23 @@ export default function SettingsPage() {
 
         <Section title="Data">
           <p className="text-sm leading-relaxed text-ink-muted">
-            Ekspor, impor, dan hapus data aktif di M8. Semua data akan tersimpan di perangkat,
-            tanpa akun dan tanpa server.
+            Ekspor, impor, dan hapus data aktif di M8. Semua data akan tersimpan di perangkat, tanpa
+            akun dan tanpa server.
           </p>
         </Section>
 
         <Section title="Atribusi data">
           <p className="text-sm leading-relaxed text-ink-muted">
-            Cuaca, kualitas udara, dan nama kota berasal dari Open-Meteo. Data kualitas udara
-            berisi data CAMS (Copernicus Atmosphere Monitoring Service). Penggunaan non-komersial.
+            Cuaca, kualitas udara, dan nama kota berasal dari Open-Meteo. Data kualitas udara berisi
+            data CAMS (Copernicus Atmosphere Monitoring Service). Penggunaan non-komersial.
           </p>
         </Section>
 
         <Section title="Tentang">
-          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M6.</p>
+          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M7.</p>
+          <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+            Alarm berbunyi selama Nadi terbuka. Alarm latar belakang memerlukan versi native.
+          </p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
             Saran kualitas udara bersifat umum, bukan nasihat medis.
           </p>

@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M6 selesai. Kalender dan agenda berjalan dengan grid bulanan, panel hari, dan form agenda. Alarm menyusul di M7.
+Status: M7 selesai. Alarm berjalan dengan pengulangan, tunda, layar berbunyi, dan batas bahwa alarm hanya aktif saat aplikasi terbuka. Pengaturan lengkap, ekspor data, dan audit menyusul di M8.
 
 ## Dokumen
 

@@ -1,18 +1,17 @@
+import { lazy, Suspense } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import {
-  Alarm,
-  CalendarBlank,
-  GearSix,
-  House,
-  NotePencil,
-  type Icon,
-} from '@phosphor-icons/react';
+import { Alarm, CalendarBlank, GearSix, House, NotePencil, type Icon } from '@phosphor-icons/react';
 
 import { Banner } from '@/components/ui/Banner';
 import { Toaster } from '@/components/ui/Toaster';
 import { useOnline } from '@/lib/hooks/useOnline';
 import { cn } from '@/lib/utils/cn';
 import { PwaUpdater } from './PwaUpdater';
+
+// Mesin alarm dimuat malas supaya Dexie dan Web Audio tidak masuk bundel awal.
+const AlarmEngine = lazy(() =>
+  import('@/features/alarms/AlarmEngine').then((module) => ({ default: module.AlarmEngine })),
+);
 
 interface NavItem {
   to: string;
@@ -81,7 +80,7 @@ export function AppShell() {
           </ul>
         </nav>
 
-        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M6</div>
+        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M7</div>
       </aside>
 
       <div className="md:pl-60">
@@ -131,6 +130,9 @@ export function AppShell() {
       </nav>
 
       <PwaUpdater />
+      <Suspense fallback={null}>
+        <AlarmEngine />
+      </Suspense>
       <Toaster />
     </div>
   );

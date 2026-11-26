@@ -29,6 +29,7 @@ export interface Alarm {
   enabled: boolean;
   snoozeMinutes: number;
   lastTriggeredAt?: number;
+  createdAt?: number;
 }
 
 export interface SettingRow {

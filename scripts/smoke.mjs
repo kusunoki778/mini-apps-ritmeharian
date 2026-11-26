@@ -26,10 +26,7 @@ try {
   await page.locator('h1').first().waitFor();
 
   check('judul dokumen', (await page.title()) === 'Nadi');
-  check(
-    'heading beranda',
-    (await page.locator('h1').first().innerText()).trim() === 'Beranda',
-  );
+  check('heading beranda', (await page.locator('h1').first().innerText()).trim() === 'Beranda');
 
   const timeText = (await page.locator('p.tabular').first().innerText()).trim();
   check('jam tampil', /^\d{2}[.:]\d{2}$/.test(timeText), timeText);
@@ -57,7 +54,10 @@ try {
   check('kartu cuaca memuat data nyata', await detailButton.isVisible());
   check(
     'label waktu pembaruan tampil',
-    await page.getByText(/^Diperbarui \d{2}\.\d{2}$/).first().isVisible(),
+    await page
+      .getByText(/^Diperbarui \d{2}\.\d{2}$/)
+      .first()
+      .isVisible(),
   );
   check(
     'strip per jam tampil',
@@ -91,9 +91,14 @@ try {
   await page.getByLabel('Isi').fill('Dibuat oleh uji asap.');
   await page.getByRole('button', { name: 'Simpan' }).click();
   await page.getByText('Catatan asap').first().waitFor({ timeout: 10000 });
-  check('catatan cepat langsung tampil di dasbor', await page.getByText('Catatan asap').first().isVisible());
+  check(
+    'catatan cepat langsung tampil di dasbor',
+    await page.getByText('Catatan asap').first().isVisible(),
+  );
 
-  const agendaEmpty = page.getByText('Belum ada agenda terdekat. Tambah satu agar harimu lebih tenang.');
+  const agendaEmpty = page.getByText(
+    'Belum ada agenda terdekat. Tambah satu agar harimu lebih tenang.',
+  );
   await agendaEmpty.waitFor({ timeout: 15000 });
   check('kartu agenda kosong tampil', await agendaEmpty.isVisible());
 
@@ -123,7 +128,10 @@ try {
   ];
 
   for (const [label, path, heading] of routes) {
-    await page.getByRole('navigation', { name: 'Navigasi bawah' }).getByRole('link', { name: label }).click();
+    await page
+      .getByRole('navigation', { name: 'Navigasi bawah' })
+      .getByRole('link', { name: label })
+      .click();
     await page.waitForURL(`**${path}`);
     const headingLocator = page.getByRole('heading', { level: 1, name: heading, exact: true });
     await headingLocator.waitFor();
@@ -170,7 +178,10 @@ try {
   const monthHeading = page.getByRole('heading', { level: 2 });
   const beforeMonth = (await monthHeading.textContent()) ?? '';
   await page.getByRole('button', { name: 'Bulan berikutnya' }).click();
-  await page.waitForFunction((previous) => document.querySelector('h2')?.textContent !== previous, beforeMonth);
+  await page.waitForFunction(
+    (previous) => document.querySelector('h2')?.textContent !== previous,
+    beforeMonth,
+  );
   check('navigasi bulan berikutnya', (await monthHeading.textContent()) !== beforeMonth);
   await page.getByRole('button', { name: 'Hari ini' }).click();
 
@@ -189,7 +200,38 @@ try {
   await page.getByRole('heading', { name: 'Hapus agenda?' }).waitFor();
   await page.getByRole('button', { name: 'Hapus', exact: true }).click();
   await page.getByText('Belum ada agenda di hari ini.').first().waitFor();
-  check('agenda terhapus dari panel hari', await page.getByText('Belum ada agenda di hari ini.').first().isVisible());
+  check(
+    'agenda terhapus dari panel hari',
+    await page.getByText('Belum ada agenda di hari ini.').first().isVisible(),
+  );
+
+  await page.goto(`${BASE}/alarm`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Alarm', exact: true }).waitFor();
+  await page.getByText('Belum ada alarm').waitFor();
+  check('state kosong alarm tampil', await page.getByText('Belum ada alarm').isVisible());
+  check(
+    'batas alarm tampil',
+    await page.getByText(/Alarm berbunyi selama Nadi terbuka/).isVisible(),
+  );
+
+  await page.getByRole('button', { name: 'Alarm baru' }).first().click();
+  await page.getByLabel('Label').fill('Cek asap');
+  await page.getByRole('button', { name: 'Simpan' }).click();
+  await page.getByText('Cek asap').waitFor();
+  check('alarm tersimpan tampil', await page.getByText('Cek asap').isVisible());
+
+  await page.getByRole('switch', { name: 'Nonaktifkan Cek asap' }).click();
+  await page.getByRole('switch', { name: 'Aktifkan Cek asap' }).waitFor();
+  check(
+    'sakelar alarm bekerja',
+    await page.getByRole('switch', { name: 'Aktifkan Cek asap' }).isVisible(),
+  );
+
+  await page.getByRole('button', { name: 'Hapus Cek asap' }).click();
+  await page.getByRole('heading', { name: 'Hapus alarm?' }).waitFor();
+  await page.getByRole('button', { name: 'Hapus', exact: true }).click();
+  await page.getByText('Belum ada alarm').waitFor();
+  check('alarm terhapus', await page.getByText('Belum ada alarm').isVisible());
 
   await page.goto(`${BASE}/pengaturan`, { waitUntil: 'load' });
   await page.getByRole('heading', { level: 1, name: 'Pengaturan', exact: true }).waitFor();
@@ -235,8 +277,14 @@ try {
   const desktop = await browser.newPage({ viewport: { width: 1280, height: 900 } });
   await desktop.goto(`${BASE}/`, { waitUntil: 'load' });
   await desktop.locator('h1').first().waitFor();
-  check('rail desktop terlihat', await desktop.getByRole('navigation', { name: 'Navigasi utama' }).isVisible());
-  await desktop.getByRole('navigation', { name: 'Navigasi utama' }).getByRole('link', { name: 'Catatan' }).click();
+  check(
+    'rail desktop terlihat',
+    await desktop.getByRole('navigation', { name: 'Navigasi utama' }).isVisible(),
+  );
+  await desktop
+    .getByRole('navigation', { name: 'Navigasi utama' })
+    .getByRole('link', { name: 'Catatan' })
+    .click();
   await desktop.waitForURL('**/catatan');
   check('navigasi desktop', desktop.url().endsWith('/catatan'));
 

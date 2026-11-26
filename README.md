@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M6, kalender dan agenda nyata dengan panel hari. Alarm menyusul.
+Status: M7, alarm nyata dengan pengulangan, tunda, dan layar berbunyi. Pengaturan lengkap menyusul.
 
 ## Menjalankan
 
