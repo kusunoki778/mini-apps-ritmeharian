@@ -3,12 +3,13 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS, sanitizeSettings } from './settings';
 
 describe('DEFAULT_SETTINGS', () => {
-  it('memakai Senin, Celsius, 24 jam, dan tema sistem', () => {
+  it('memakai Senin, Celsius, 24 jam, tema sistem, dan rumus Devine', () => {
     expect(DEFAULT_SETTINGS).toEqual({
       theme: 'system',
       temperatureUnit: 'celsius',
       clockFormat: '24h',
       weekStart: 1,
+      idealWeightFormula: 'devine',
     });
   });
 });
@@ -21,12 +22,14 @@ describe('sanitizeSettings', () => {
         clockFormat: '12h',
         weekStart: 0,
         temperatureUnit: 'fahrenheit',
+        idealWeightFormula: 'hamwi',
       }),
     ).toEqual({
       theme: 'dark',
       clockFormat: '12h',
       weekStart: 0,
       temperatureUnit: 'fahrenheit',
+      idealWeightFormula: 'hamwi',
     });
   });
 
@@ -37,6 +40,7 @@ describe('sanitizeSettings', () => {
         clockFormat: '13h',
         weekStart: 2,
         temperatureUnit: 'kelvin',
+        idealWeightFormula: 'watson',
       }),
     ).toEqual({});
   });

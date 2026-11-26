@@ -6,7 +6,9 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
+import { useSettings } from '@/features/settings/useSettings';
 import { cn } from '@/lib/utils/cn';
+import { adultFormulaLabel } from './adult-formula';
 import {
   ADULT_AGE_YEARS,
   computeGrowth,
@@ -89,7 +91,11 @@ function AgeResult({ result }: { result: GrowthResult }) {
           label="Berat ideal"
           value={formatNumber(result.idealWeightKg)}
           unit="kg"
-          hint={result.mode === 'child' ? 'Dari IMT median untuk umur.' : 'Rumus Devine.'}
+          hint={
+            result.mode === 'child'
+              ? 'Dari IMT median untuk umur.'
+              : `Rumus ${adultFormulaLabel(result.formula ?? 'devine')}.`
+          }
         />
       </div>
 
@@ -132,6 +138,8 @@ export default function GrowthPage() {
   const [ageText, setAgeText] = useState('30');
   const [heightText, setHeightText] = useState('');
   const [weightText, setWeightText] = useState('');
+  const { settings } = useSettings();
+  const formula = settings.idealWeightFormula;
 
   const ageYears = parseNumber(ageText);
   const heightCm = parseNumber(heightText);
@@ -158,8 +166,9 @@ export default function GrowthPage() {
       ageYears,
       heightCm,
       weightKg: weightKg ?? undefined,
+      formula,
     });
-  }, [ageYears, sex, heightCm, weightKg]);
+  }, [ageYears, sex, heightCm, weightKg, formula]);
 
   const isChild = ageYears !== null && ageYears < ADULT_AGE_YEARS;
   const needsHeight = ageYears !== null && ageYears >= ADULT_AGE_YEARS && heightCm === null;
@@ -240,8 +249,9 @@ export default function GrowthPage() {
           <Ruler size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
           <p>
             Anak dan remaja 0 sampai 19 tahun memakai WHO Child Growth Standards dan WHO Growth
-            Reference, dengan ambang status sesuai Permenkes No. 2 Tahun 2020. Dewasa memakai rumus
-            Devine dan rentang IMT sehat WHO. Hasil ini panduan umum, bukan nasihat medis.
+            Reference, dengan ambang status sesuai Permenkes No. 2 Tahun 2020. Dewasa memakai rumus{' '}
+            {adultFormulaLabel(formula)} dan rentang IMT sehat WHO. Hasil ini panduan umum, bukan
+            nasihat medis.
           </p>
         </div>
 

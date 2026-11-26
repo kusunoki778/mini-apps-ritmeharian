@@ -1,5 +1,7 @@
+import { adultIdealWeight, type AdultFormula } from './adult-formula';
 import { GROWTH_DATA, type GrowthRow, type GrowthSex } from './growth-data';
 
+export type { AdultFormula };
 export type { GrowthSex };
 
 export const MAX_CHILD_MONTHS = 228; // 19 tahun
@@ -19,6 +21,7 @@ export interface AdultProfile {
   ageYears: number;
   heightCm: number;
   weightKg?: number;
+  formula?: AdultFormula;
 }
 
 export type GrowthProfile = ChildProfile | AdultProfile;
@@ -42,6 +45,8 @@ export interface GrowthResult {
   weightStatus?: StatusBand;
   heightZ?: number;
   weightZ?: number;
+  /** Rumus yang dipakai untuk berat ideal dewasa. */
+  formula?: AdultFormula;
   /** Umur di luar jangkauan tabel LMS. */
   outOfRange?: boolean;
 }
@@ -121,10 +126,8 @@ export function classifyAdultBmi(bmi: number): StatusBand {
   return { label: 'Obesitas II', tone: 'warn' };
 }
 
-// Berat badan ideal dewasa dengan rumus Devine (1974).
-export function devineIdealWeight(heightCm: number, sex: GrowthSex): number {
-  return (sex === 'male' ? 50 : 45.5) + 0.9 * (heightCm - 152);
-}
+// Berat badan ideal dewasa ada di adult-formula.ts supaya tabel WHO tidak ikut
+// terbawa ke halaman lain.
 
 export function computeGrowth(profile: GrowthProfile): GrowthResult {
   if (profile.mode === 'child') {
@@ -166,9 +169,10 @@ export function computeGrowth(profile: GrowthProfile): GrowthResult {
   const heightM = profile.heightCm / 100;
   const result: GrowthResult = {
     mode: 'adult',
-    idealWeightKg: devineIdealWeight(profile.heightCm, profile.sex),
+    idealWeightKg: adultIdealWeight(profile.heightCm, profile.sex, profile.formula),
     healthyMinKg: 18.5 * heightM * heightM,
     healthyMaxKg: 24.9 * heightM * heightM,
+    formula: profile.formula ?? 'devine',
   };
 
   if (profile.weightKg !== undefined) {

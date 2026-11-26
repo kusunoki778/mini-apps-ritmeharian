@@ -1,3 +1,4 @@
+import type { AdultFormula } from '@/features/growth/adult-formula';
 import type { ClockFormat, TemperatureUnit } from '@/lib/format/preferences';
 import type { ThemePreference } from './theme';
 import type { WeekStart } from './week-start';
@@ -7,6 +8,7 @@ export interface Settings {
   temperatureUnit: TemperatureUnit;
   clockFormat: ClockFormat;
   weekStart: WeekStart;
+  idealWeightFormula: AdultFormula;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -14,6 +16,7 @@ export const DEFAULT_SETTINGS: Settings = {
   temperatureUnit: 'celsius',
   clockFormat: '24h',
   weekStart: 1,
+  idealWeightFormula: 'devine',
 };
 
 // Menyaring nilai yang tidak dikenal dari penyimpanan atau impor tanpa melempar.
@@ -34,6 +37,14 @@ export function sanitizeSettings(value: unknown): Partial<Settings> {
   }
   if (record.weekStart === 0 || record.weekStart === 1) {
     result.weekStart = record.weekStart;
+  }
+  if (
+    record.idealWeightFormula === 'devine' ||
+    record.idealWeightFormula === 'robinson' ||
+    record.idealWeightFormula === 'miller' ||
+    record.idealWeightFormula === 'hamwi'
+  ) {
+    result.idealWeightFormula = record.idealWeightFormula;
   }
 
   return result;

@@ -1,18 +1,19 @@
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 
+import { renderWithProviders } from '@/test/render';
 import GrowthPage from './GrowthPage';
 
 describe('GrowthPage', () => {
   it('meminta tinggi badan untuk dewasa tanpa tinggi', () => {
-    render(<GrowthPage />);
+    renderWithProviders(<GrowthPage />);
     expect(screen.getByText(/Isi tinggi badan untuk menghitung berat ideal/)).toBeInTheDocument();
   });
 
   it('menampilkan tinggi ideal saat umur anak diisi', async () => {
     const user = userEvent.setup();
-    render(<GrowthPage />);
+    renderWithProviders(<GrowthPage />);
 
     const age = screen.getByLabelText('Umur (tahun)');
     await user.clear(age);
@@ -25,17 +26,18 @@ describe('GrowthPage', () => {
 
   it('menghitung berat ideal dewasa dengan rumus Devine', async () => {
     const user = userEvent.setup();
-    render(<GrowthPage />);
+    renderWithProviders(<GrowthPage />);
 
     await user.type(screen.getByLabelText('Tinggi badan (cm)'), '170');
 
     expect(screen.getByText('Berat ideal')).toBeInTheDocument();
-    expect(screen.getByText('66,2')).toBeInTheDocument();
+    expect(screen.getByText('65,9')).toBeInTheDocument();
+    expect(screen.getByText('Rumus Devine.')).toBeInTheDocument();
   });
 
   it('menampilkan status gizi saat berat diisi', async () => {
     const user = userEvent.setup();
-    render(<GrowthPage />);
+    renderWithProviders(<GrowthPage />);
 
     const age = screen.getByLabelText('Umur (tahun)');
     await user.clear(age);

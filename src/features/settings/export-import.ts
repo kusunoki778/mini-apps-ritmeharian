@@ -50,6 +50,7 @@ const settingsSchema = z.object({
   temperatureUnit: z.enum(['celsius', 'fahrenheit']),
   clockFormat: z.enum(['24h', '12h']),
   weekStart: z.union([z.literal(0), z.literal(1)]),
+  idealWeightFormula: z.enum(['devine', 'robinson', 'miller', 'hamwi']).default('devine'),
 });
 
 const locationSchema = z.object({

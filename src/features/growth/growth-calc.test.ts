@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import { GROWTH_DATA } from './growth-data';
+import { adultFormulaLabel, adultIdealWeight } from './adult-formula';
 import {
   classifyAdultBmi,
   classifyChildBmi,
   classifyHeight,
   computeGrowth,
-  devineIdealWeight,
   interpolateRow,
   valueAtZ,
   zScore,
@@ -75,13 +75,26 @@ describe('klasifikasi', () => {
   });
 });
 
-describe('devineIdealWeight', () => {
-  it('pria', () => {
-    expect(devineIdealWeight(170, 'male')).toBeCloseTo(66.2, 5);
+describe('adultIdealWeight', () => {
+  it('Devine untuk pria dan wanita', () => {
+    expect(adultIdealWeight(170, 'male', 'devine')).toBeCloseTo(65.937, 3);
+    expect(adultIdealWeight(160, 'female', 'devine')).toBeCloseTo(52.382, 3);
   });
 
-  it('wanita', () => {
-    expect(devineIdealWeight(160, 'female')).toBeCloseTo(52.7, 5);
+  it('Robinson, Miller, dan Hamwi memberi hasil berbeda', () => {
+    expect(adultIdealWeight(170, 'male', 'robinson')).toBeCloseTo(65.165, 3);
+    expect(adultIdealWeight(170, 'male', 'miller')).toBeCloseTo(65.97, 3);
+    expect(adultIdealWeight(170, 'male', 'hamwi')).toBeCloseTo(66.709, 3);
+    expect(adultIdealWeight(160, 'female', 'hamwi')).toBeCloseTo(52.083, 3);
+  });
+
+  it('memakai Devine bila rumus tidak diberikan', () => {
+    expect(adultIdealWeight(170, 'male')).toBeCloseTo(65.937, 3);
+  });
+
+  it('memberi label yang terbaca', () => {
+    expect(adultFormulaLabel('miller')).toBe('Miller');
+    expect(adultFormulaLabel('hamwi')).toBe('Hamwi');
   });
 });
 
@@ -122,11 +135,24 @@ describe('computeGrowth', () => {
       heightCm: 170,
       weightKg: 80,
     });
-    expect(result.idealWeightKg).toBeCloseTo(66.2, 5);
+    expect(result.idealWeightKg).toBeCloseTo(65.937, 3);
+    expect(result.formula).toBe('devine');
     expect(result.healthyMinKg).toBeCloseTo(18.5 * 2.89, 2);
     expect(result.healthyMaxKg).toBeCloseTo(24.9 * 2.89, 2);
     expect(result.bmi).toBeCloseTo(80 / 2.89, 4);
     expect(result.weightStatus?.label).toBe('Obesitas I');
     expect(result.idealHeightCm).toBeUndefined();
+  });
+
+  it('dewasa memakai rumus yang dipilih', () => {
+    const result = computeGrowth({
+      mode: 'adult',
+      sex: 'male',
+      ageYears: 30,
+      heightCm: 170,
+      formula: 'hamwi',
+    });
+    expect(result.idealWeightKg).toBeCloseTo(66.709, 3);
+    expect(result.formula).toBe('hamwi');
   });
 });

@@ -64,7 +64,7 @@ Atur `SMOKE_BASE_URL` bila pratinjau berjalan di port lain.
 - Tanpa backend. Cuaca, kualitas udara, dan geocoding memakai Open-Meteo. Semua data pengguna tersimpan di perangkat lewat IndexedDB (Dexie).
 - Sumber kebenaran pengaturan adalah `settings.app` di Dexie. Tema dan awal minggu dicerminkan ke `localStorage` agar bisa dipakai sebelum render pertama.
 - Warna kategori AQI memakai skala adaptif, bukan warna resmi mentah, agar tetap lolos kontras di layar terang.
-- Tumbuh kembang dihitung dari tabel LMS WHO yang dibundel, jadi berjalan offline. Anak dan remaja 0 sampai 19 tahun memakai standar WHO dengan ambang Permenkes No. 2 Tahun 2020. Dewasa memakai rumus Devine dan titik potong IMT Asia-Pasifik. Halaman ada di rute `/tumbuh-kembang`, dimuat malas agar tabelnya tidak masuk bundel awal.
+- Tumbuh kembang dihitung dari tabel LMS WHO yang dibundel, jadi berjalan offline. Anak dan remaja 0 sampai 19 tahun memakai standar WHO dengan ambang Permenkes No. 2 Tahun 2020. Dewasa memakai rumus Devine, Robinson, Miller, atau Hamwi (pilih di Pengaturan) dengan titik potong IMT Asia-Pasifik. Halaman ada di rute `/tumbuh-kembang`, dimuat malas agar tabelnya tidak masuk bundel awal.
 
 ## Versi native (Android)
 

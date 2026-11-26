@@ -337,9 +337,10 @@ Tujuan: menghitung tinggi dan berat badan ideal menurut umur, jenis kelamin, dan
   - `GrowthPage.tsx` di rute `/tumbuh-kembang`, dimuat malas agar tabel tidak masuk bundel awal. Kartu masuk di dasbor.
   - Penerimaan: hasil tampil tanpa internet, dan uji asap serta tangkapan layar menutup alurnya.
 
-- [ ] T11.4 Rumus dewasa alternatif (S)
-  - Pilihan rumus Robinson, Miller, dan Hamwi di samping Devine.
-  - Penerimaan: pilihan rumus tersimpan di pengaturan.
+- [x] T11.4 Rumus dewasa alternatif (S)
+  - Rumus Devine, Robinson, Miller, dan Hamwi di `adult-formula.ts`, terpisah dari tabel WHO agar halaman Pengaturan tidak membawa data pertumbuhan.
+  - Pilihan rumus memakai `settings.idealWeightFormula` dan diubah dari halaman Pengaturan.
+  - Penerimaan: pilihan tersimpan di pengaturan dan dipakai halaman Tumbuh kembang. Diuji di unit dan di halaman Pengaturan.
 
 ## Backlog setelah v1
 

@@ -42,4 +42,12 @@ describe('SettingsPage', () => {
 
     await waitFor(async () => expect((await storedSettings()).weekStart).toBe(0));
   });
+
+  it('mengubah rumus berat ideal dan menyimpannya', async () => {
+    render(<SettingsPage />);
+
+    await userEvent.selectOptions(screen.getByLabelText('Rumus berat ideal'), 'hamwi');
+
+    await waitFor(async () => expect((await storedSettings()).idealWeightFormula).toBe('hamwi'));
+  });
 });

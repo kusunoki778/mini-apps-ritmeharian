@@ -118,6 +118,7 @@ nadi/
 │  │  └─ growth/
 │  │     ├─ GrowthPage.tsx
 │  │     ├─ growth-calc.ts
+│  │     ├─ adult-formula.ts
 │  │     └─ growth-data.ts
 │  ├─ components/
 │  │  └─ ui/
@@ -688,7 +689,7 @@ Rumus:
 - Interpolasi linear antar bulan agar umur pecahan tetap wajar.
 - Status tinggi menurut umur dan status gizi memakai ambang Permenkes No. 2 Tahun 2020, dengan batas IMT/U dibedakan pada 60 bulan.
 - Berat ideal anak adalah IMT median dikali tinggi kuadrat. Bila tinggi belum diisi, tinggi median menurut umur dipakai.
-- Dewasa memakai rumus Devine, dengan rentang sehat dari IMT 18,5 sampai 24,9. Klasifikasi IMT memakai titik potong Asia-Pasifik (23 dan 25).
+- Dewasa memakai rumus yang dipilih pengguna: Devine, Robinson, Miller, atau Hamwi. Keempatnya ada di `adult-formula.ts`, terpisah dari tabel WHO agar halaman Pengaturan tidak ikut memuat data pertumbuhan. Pilihan disimpan di `settings.idealWeightFormula` dengan bawaan Devine, dan diubah dari halaman Pengaturan. Rentang sehat memakai IMT 18,5 sampai 24,9, dengan klasifikasi titik potong Asia-Pasifik (23 dan 25).
 
 Catatan produk: hasil adalah panduan umum, bukan nasihat medis. Tabel yang dibundel berarti fitur berjalan tanpa internet, sesuai prinsip privasi dan offline.
 

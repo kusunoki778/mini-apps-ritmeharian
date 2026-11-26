@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 
 import { PageHeader } from '@/components/ui/PageHeader';
 import { SegmentedControl, type SegmentOption } from '@/components/ui/SegmentedControl';
+import { Select } from '@/components/ui/Select';
+import { ADULT_FORMULAS, type AdultFormula } from '@/features/growth/adult-formula';
 import { LocationSetting } from '@/features/location/LocationSetting';
 import type { ClockFormat, TemperatureUnit } from '@/lib/format/preferences';
 import { DataSection } from './DataSection';
@@ -95,6 +97,28 @@ export default function SettingsPage() {
           </div>
         </Section>
 
+        <Section title="Tumbuh kembang">
+          <div className="space-y-3">
+            <p className="text-sm leading-relaxed text-ink-muted">
+              Rumus untuk menghitung berat badan ideal orang dewasa di halaman Tumbuh kembang.
+            </p>
+            <Select
+              label="Rumus berat ideal"
+              value={settings.idealWeightFormula}
+              hint="Devine paling umum dipakai. Rumus lain memberi hasil sedikit berbeda."
+              onChange={(event) =>
+                updateSettings({ idealWeightFormula: event.target.value as AdultFormula })
+              }
+            >
+              {ADULT_FORMULAS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </Section>
+
         <Section title="Lokasi">
           <LocationSetting />
         </Section>
@@ -111,12 +135,13 @@ export default function SettingsPage() {
         </Section>
 
         <Section title="Tentang">
-          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M8.</p>
+          <p className="text-sm leading-relaxed text-ink-muted">Nadi versi 0.1.0, milestone M11.</p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Alarm berbunyi selama Nadi terbuka. Alarm latar belakang memerlukan versi native.
+            Di web, alarm berbunyi selama Nadi terbuka. Di versi native, alarm dijadwalkan ke sistem
+            dan berbunyi saat aplikasi tertutup.
           </p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Saran kualitas udara bersifat umum, bukan nasihat medis.
+            Saran kualitas udara dan hasil tumbuh kembang bersifat umum, bukan nasihat medis.
           </p>
         </Section>
       </div>
