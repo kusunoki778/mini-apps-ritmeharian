@@ -292,9 +292,36 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 - [ ] T9.3 Deploy produksi dan domain (S)
 - [ ] T9.4 Tag rilis v1.0 dan catatan rilis (S)
 
+## M10: Pembungkus Capacitor dan alarm native
+
+Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup dan ponsel terkunci. Android jadi target utama. Distribusi lewat APK sideload, tanpa Play Store.
+
+- [x] T10.1 Proyek Capacitor (M)
+  - `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`, dan `@capacitor/local-notifications`. Proyek `android/` dibuat dengan `npx cap add android`, appId `id.nadi.app`, webDir `dist`.
+  - Penerimaan: `npx cap sync android` menyalin bundel web dan mengenali plugin.
+
+- [x] T10.2 Penjadwal alarm native Tier 1 (M)
+  - `alarm-scheduler.ts` menyelaraskan daftar alarm Dexie ke `AlarmManager` lewat notifikasi lokal pasti. Tujuh kemunculan berikutnya per alarm berulang. Diselaraskan saat boot dan setiap daftar berubah lewat `NativeAlarmSync`.
+  - Penerimaan: `buildNativeNotifications` dan `upcomingOccurrences` diuji di unit. HP tetap berbunyi saat aplikasi tertutup.
+
+- [x] T10.3 Perizinan dan kanal notifikasi (S)
+  - `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, `RECEIVE_BOOT_COMPLETED`, `WAKE_LOCK`, `VIBRATE`. Kanal `nadi-alarm` dengan importance maksimum.
+  - Penerimaan: izin diminta saat membuat atau mengaktifkan alarm, bukan saat boot.
+
+- [x] T10.4 Bunyi alarm dan APK debug (S)
+  - Bunyi bundel `res/raw/alarm.wav` dibuat lewat `scripts/make-alarm-sound.mjs`. APK debug dibangun dengan Gradle.
+  - Penerimaan: `android/app/build/outputs/apk/debug/app-debug.apk` terpasang lewat sideload dan alarm berbunyi.
+
+- [ ] T10.5 Tier 2: alarm layar penuh (L)
+  - Plugin native khusus dengan full-screen intent dan foreground service, tombol Tunda dan Matikan, bunyi berulang sampai dimatikan.
+  - Penerimaan: alarm membangunkan layar dan berbunyi seperti alarm bawaan.
+
+- [ ] T10.6 Uji di perangkat nyata (M)
+  - Uji alarm saat ponsel terkunci, setelah reboot, dan pada OEM yang agresif mematikan latar belakang (Xiaomi, Oppo, Vivo).
+  - Penerimaan: catatan hasil per perangkat.
+
 ## Backlog setelah v1
 
-- Pembungkus Capacitor dan notifikasi lokal native.
 - Sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot untuk menekan LCP di bawah 2.5 s pada throttle mobile.
 - Sinkronisasi Google Calendar.
 - Jam dunia.

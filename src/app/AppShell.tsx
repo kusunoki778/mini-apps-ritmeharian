@@ -13,6 +13,13 @@ const AlarmEngine = lazy(() =>
   import('@/features/alarms/AlarmEngine').then((module) => ({ default: module.AlarmEngine })),
 );
 
+// Penjadwal native hanya dibutuhkan di dalam pembungkus Capacitor, jadi dimuat malas.
+const NativeAlarmSync = lazy(() =>
+  import('@/features/alarms/NativeAlarmSync').then((module) => ({
+    default: module.NativeAlarmSync,
+  })),
+);
+
 interface NavItem {
   to: string;
   label: string;
@@ -80,7 +87,7 @@ export function AppShell() {
           </ul>
         </nav>
 
-        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M8</div>
+        <div className="px-6 py-5 text-[12px] text-ink-muted">v0.1.0, M10</div>
       </aside>
 
       <div className="md:pl-60">
@@ -132,6 +139,7 @@ export function AppShell() {
       <PwaUpdater />
       <Suspense fallback={null}>
         <AlarmEngine />
+        <NativeAlarmSync />
       </Suspense>
       <Toaster />
     </div>

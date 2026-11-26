@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+
 export type PermissionState = NotificationPermission | 'unsupported';
 
 export function notificationsSupported(): boolean {
@@ -21,6 +23,9 @@ export async function requestNotificationPermission(): Promise<PermissionState> 
 }
 
 export function showAlarmNotification(label: string, time: string): void {
+  // Di dalam pembungkus native, notifikasi sistem sudah dijadwalkan terpisah,
+  // jadi jangan tampilkan notifikasi web agar tidak dobel.
+  if (Capacitor.isNativePlatform()) return;
   if (!notificationsSupported() || Notification.permission !== 'granted') return;
 
   try {

@@ -14,9 +14,14 @@
     "typecheck": "tsc --noEmit",
     "smoke": "node scripts/smoke.mjs",
     "smoke:engines": "node scripts/smoke-engines.mjs",
-    "screenshots": "node scripts/screenshots.mjs"
+    "screenshots": "node scripts/screenshots.mjs",
+    "cap:sync": "cap sync android",
+    "sound": "node scripts/make-alarm-sound.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "^8.6.3",
+    "@capacitor/core": "^8.6.3",
+    "@capacitor/local-notifications": "^8.3.1",
     "@fontsource-variable/plus-jakarta-sans": "^5.3.0",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-query": "^5.108.4",
@@ -31,6 +36,7 @@
     "zustand": "^5.1.0"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.6.3",
     "@eslint/js": "^10.0.1",
     "@tailwindcss/vite": "^4.3.5",
     "@testing-library/jest-dom": "^8.0.0",

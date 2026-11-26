@@ -8,6 +8,7 @@ import { Toggle } from '@/components/ui/Toggle';
 import { toast } from '@/components/ui/toast-store';
 import type { Alarm } from '@/lib/db/db';
 import { cn } from '@/lib/utils/cn';
+import { nativeAlarmsSupported, requestNativeAlarmPermissions } from './alarm-scheduler';
 import { allDays, DAY_LABELS, DAY_ORDER, repeatModeFromDays, type RepeatMode } from './alarm-utils';
 import { hasAlarmErrors, validateAlarm, type AlarmErrors } from './alarm-validation';
 import {
@@ -89,6 +90,9 @@ export function AlarmFormSheet({ alarm, onClose, onSaved }: AlarmFormSheetProps)
     setSaving(true);
     try {
       void requestNotificationPermission();
+      if (input.enabled && nativeAlarmsSupported()) {
+        void requestNativeAlarmPermissions();
+      }
       if (alarm) {
         await updateAlarm(alarm.id, input);
         onSaved?.(alarm.id);

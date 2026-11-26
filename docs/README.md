@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M8 selesai. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, dan uji lintas mesin sudah berjalan. Berikutnya M9 rilis.
+Status: M8 selesai dan pembungkus Capacitor (M10) sudah berjalan. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, uji lintas mesin, dan alarm native Tier 1 sudah ada. Berikutnya M9 rilis dan Tier 2 alarm layar penuh.
 
 ## Hasil audit M8
 
@@ -30,13 +30,13 @@ Baca berurutan:
 | -------------------- | ------------------------------------------------- |
 | Nama                 | Nadi                                              |
 | Bahasa UI            | Indonesia                                         |
-| Platform             | PWA web dulu, Capacitor menyusul                  |
+| Platform             | PWA web, dibungkus Capacitor untuk Android        |
 | Stack                | React + TypeScript + Vite + Tailwind CSS          |
 | Backend              | Tidak ada                                         |
 | Sumber data          | Open-Meteo (cuaca, kualitas udara, geocoding)     |
 | Penyimpanan          | IndexedDB lewat Dexie                             |
 | Tema                 | Terang dan gelap, mengikuti sistem secara default |
-| Target rilis pertama | Enam modul, alarm terbatas saat aplikasi terbuka  |
+| Target rilis pertama | Enam modul, alarm native lewat Capacitor          |
 
 ## Struktur folder yang direncanakan
 

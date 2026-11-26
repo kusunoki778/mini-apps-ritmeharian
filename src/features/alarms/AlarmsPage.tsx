@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { toast } from '@/components/ui/toast-store';
 import type { Alarm } from '@/lib/db/db';
 import { AlarmFormSheet } from './AlarmFormSheet';
+import { nativeAlarmsSupported, requestNativeAlarmPermissions } from './alarm-scheduler';
 import { nextTrigger } from './alarm-utils';
 import { AlarmListItem } from './AlarmListItem';
 import { deleteAlarm, setAlarmEnabled } from './alarms-repo';
@@ -48,6 +49,9 @@ export default function AlarmsPage() {
   };
 
   const handleToggle = async (alarm: Alarm, enabled: boolean) => {
+    if (enabled && nativeAlarmsSupported()) {
+      await requestNativeAlarmPermissions().catch(() => {});
+    }
     await setAlarmEnabled(alarm.id, enabled);
   };
 
@@ -75,7 +79,9 @@ export default function AlarmsPage() {
 
       <div className="mb-5">
         <Banner>
-          Alarm berbunyi selama Nadi terbuka. Untuk alarm latar belakang, diperlukan versi native.
+          {nativeAlarmsSupported()
+            ? 'Alarm berbunyi tepat waktu lewat notifikasi sistem, bahkan saat Nadi tertutup.'
+            : 'Alarm berbunyi selama Nadi terbuka. Versi native menjadwalkan alarm lewat sistem.'}
         </Banner>
       </div>
 
@@ -88,7 +94,11 @@ export default function AlarmsPage() {
         <EmptyState
           icon={<AlarmIcon size={24} aria-hidden="true" />}
           title="Belum ada alarm"
-          description="Buat alarm untuk mengingatkan waktu penting. Nadi akan berbunyi selama aplikasi terbuka."
+          description={
+            nativeAlarmsSupported()
+              ? 'Buat alarm untuk mengingatkan waktu penting. Alarm berbunyi lewat notifikasi sistem.'
+              : 'Buat alarm untuk mengingatkan waktu penting. Nadi akan berbunyi selama aplikasi terbuka.'
+          }
           action={<Button onClick={openCreate}>Alarm baru</Button>}
         />
       ) : (

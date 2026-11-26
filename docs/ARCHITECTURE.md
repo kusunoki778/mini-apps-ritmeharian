@@ -594,9 +594,9 @@ Aturan:
 
 ## 12. Alarm
 
-Batasan produk: alarm hanya berbunyi saat aplikasi terbuka. Ini bukan bug yang bisa ditutup dengan kode frontend. Alarm latar belakang memerlukan Capacitor dan `@capacitor/local-notifications`.
+Ada dua lapis. Di web, alarm hanya berbunyi saat aplikasi terbuka. Di dalam pembungkus Capacitor, alarm dijadwalkan ke sistem lewat `@capacitor/local-notifications` sehingga tetap berbunyi saat aplikasi tertutup dan ponsel terkunci.
 
-Alur:
+Alur di aplikasi (lapisan web):
 
 1. Saat aplikasi mount, muat alarm aktif.
 2. Hitung waktu berbunyi berikutnya untuk setiap alarm.
@@ -604,6 +604,18 @@ Alur:
 4. Saat jatuh tempo, tampilkan layar Alarm Berbunyi, mainkan nada, kirim notifikasi jika diizinkan.
 5. Alarm sekali pakai dinonaktifkan setelah berbunyi.
 6. Tunda menambah 5 menit ke waktu berbunyi berikutnya.
+
+### 12.1 Penjadwal native (Capacitor)
+
+`alarm-scheduler.ts` menyelaraskan daftar alarm Dexie ke `AlarmManager` Android.
+
+- Setiap alarm berulang dijadwalkan sebagai beberapa notifikasi pasti satu per satu (tujuh kemunculan berikutnya), karena `AlarmManager` hanya menerima satu waktu pasti per notifikasi. Daftar diselaraskan ulang setiap aplikasi dibuka dan setiap daftar alarm berubah, lewat `NativeAlarmSync`.
+- Notifikasi memakai `schedule.at` dengan `allowWhileIdle`, sehingga plugin memanggil `setExactAndAllowWhileIdle`.
+- Kanal `nadi-alarm` dibuat dengan importance maksimum dan bunyi bundel `res/raw/alarm.wav`. Di Android 8+ bunyi melekat pada kanal, bukan pada notifikasi.
+- Izin: `POST_NOTIFICATIONS` diminta saat pengguna membuat atau mengaktifkan alarm. `SCHEDULE_EXACT_ALARM` dan `USE_EXACT_ALARM` dideklarasikan; plugin membuka layar pengaturan "Alarm & pengingat" bila izin alarm pasti belum diberikan.
+- Pemicu yang tertunda dijadwalkan ulang otomatis setelah reboot oleh `LocalNotificationRestoreReceiver` milik plugin, ditambah penyelarasan ulang saat boot aplikasi.
+- Di web, penjadwal ini tidak aktif (`Capacitor.isNativePlatform()` bernilai salah), jadi bundel web tidak membawa logika native.
+- Tier 2 (alarm layar penuh dengan tombol Tunda dan Matikan lewat plugin native khusus) belum dikerjakan. Saat ini alarm native adalah notifikasi bersuara yang tepat waktu.
 
 Perhitungan waktu berikutnya:
 
