@@ -4,6 +4,7 @@ import type { Alarm } from '@/lib/db/db';
 import {
   ALARM_CHANNEL_ID,
   ALARM_EXTRA_KIND,
+  buildNativeAlarms,
   buildNativeNotifications,
   notificationId,
   OCCURRENCES_PER_ALARM,
@@ -60,6 +61,23 @@ describe('upcomingOccurrences', () => {
 
   it('satu kemunculan untuk alarm sekali pakai', () => {
     expect(upcomingOccurrences(makeAlarm({ days: [] }), FROM, 7)).toHaveLength(1);
+  });
+});
+
+describe('buildNativeAlarms', () => {
+  it('membuat satu item per kemunculan dengan penanda alarm', () => {
+    const alarms = buildNativeAlarms([makeAlarm()], FROM);
+    expect(alarms).toHaveLength(OCCURRENCES_PER_ALARM);
+
+    const first = alarms[0];
+    expect(first.label).toBe('Bangun pagi');
+    expect(first.alarmId).toBe('alarm-1');
+    expect(first.snoozeMinutes).toBe(5);
+    expect(new Date(first.at).getHours()).toBe(7);
+  });
+
+  it('melewati alarm nonaktif', () => {
+    expect(buildNativeAlarms([makeAlarm({ enabled: false })], FROM)).toEqual([]);
   });
 });
 

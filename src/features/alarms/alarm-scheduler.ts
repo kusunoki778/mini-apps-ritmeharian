@@ -3,6 +3,7 @@ import type { LocalNotificationSchema } from '@capacitor/local-notifications';
 
 import type { Alarm } from '@/lib/db/db';
 import { formatAlarmTime, isOnce, nextTrigger } from './alarm-utils';
+import { fullAlarm, fullAlarmSupported, type NativeAlarmItem } from './native-alarm';
 
 export const ALARM_CHANNEL_ID = 'nadi-alarm';
 export const ALARM_SOUND = 'alarm.wav';
@@ -48,26 +49,41 @@ export function upcomingOccurrences(alarm: Alarm, from: Date, count: number): nu
   return occurrences;
 }
 
-// Bangun daftar notifikasi native untuk seluruh alarm. Murni supaya bisa diuji
-// tanpa runtime native.
-export function buildNativeNotifications(alarms: Alarm[], from: Date): LocalNotificationSchema[] {
-  const notifications: LocalNotificationSchema[] = [];
+// Kumpulkan kemunculan berikutnya sebagai item alarm native. Murni supaya bisa
+// diuji tanpa runtime native.
+export function buildNativeAlarms(alarms: Alarm[], from: Date): NativeAlarmItem[] {
+  const items: NativeAlarmItem[] = [];
 
   for (const alarm of alarms) {
     for (const at of upcomingOccurrences(alarm, from, OCCURRENCES_PER_ALARM)) {
-      notifications.push({
+      items.push({
         id: notificationId(`${alarm.id}:${at}`),
-        title: alarm.label || 'Alarm',
-        body: `Alarm ${formatAlarmTime(alarm.hour, alarm.minute)}`,
-        channelId: ALARM_CHANNEL_ID,
-        isExactNotification: true,
-        extra: { kind: ALARM_EXTRA_KIND, alarmId: alarm.id, at },
-        schedule: { at: new Date(at), allowWhileIdle: true },
+        at,
+        label: alarm.label || 'Alarm',
+        alarmId: alarm.id,
+        snoozeMinutes: alarm.snoozeMinutes,
       });
     }
   }
 
-  return notifications;
+  return items;
+}
+
+// Bangun daftar notifikasi native untuk seluruh alarm. Murni supaya bisa diuji
+// tanpa runtime native.
+export function buildNativeNotifications(alarms: Alarm[], from: Date): LocalNotificationSchema[] {
+  return buildNativeAlarms(alarms, from).map((item) => {
+    const at = new Date(item.at);
+    return {
+      id: item.id,
+      title: item.label,
+      body: `Alarm ${formatAlarmTime(at.getHours(), at.getMinutes())}`,
+      channelId: ALARM_CHANNEL_ID,
+      isExactNotification: true,
+      extra: { kind: ALARM_EXTRA_KIND, alarmId: item.alarmId, at: item.at },
+      schedule: { at, allowWhileIdle: true },
+    };
+  });
 }
 
 async function plugin() {
@@ -105,11 +121,22 @@ export async function requestNativeAlarmPermissions(): Promise<NativeAlarmPermis
   return 'granted';
 }
 
-// Selaraskan notifikasi native dengan daftar alarm saat ini. Dipanggil saat boot dan
-// setiap daftar alarm berubah. Mengembalikan jumlah notifikasi yang dijadwalkan.
+// Selaraskan alarm native dengan daftar saat ini. Dipanggil saat boot dan setiap
+// daftar alarm berubah. Mengembalikan jumlah kemunculan yang dijadwalkan.
 export async function syncNativeAlarms(alarms: Alarm[], from: Date = new Date()): Promise<number> {
   if (!nativeAlarmsSupported()) return 0;
 
+  const items = buildNativeAlarms(alarms, from);
+
+  // Tier 2: plugin native dengan alarm layar penuh, bunyi berulang, dan tombol tunda.
+  if (fullAlarmSupported()) {
+    const bridge = fullAlarm();
+    await bridge.cancelAll();
+    if (items.length > 0) await bridge.schedule({ alarms: items });
+    return items.length;
+  }
+
+  // Tier 1: notifikasi lokal pasti dari @capacitor/local-notifications.
   const LocalNotifications = await plugin();
   await ensureAlarmChannel();
 

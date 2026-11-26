@@ -312,12 +312,13 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
   - Bunyi bundel `res/raw/alarm.wav` dibuat lewat `scripts/make-alarm-sound.mjs`. APK debug dibangun dengan Gradle.
   - Penerimaan: `android/app/build/outputs/apk/debug/app-debug.apk` terpasang lewat sideload dan alarm berbunyi.
 
-- [ ] T10.5 Tier 2: alarm layar penuh (L)
-  - Plugin native khusus dengan full-screen intent dan foreground service, tombol Tunda dan Matikan, bunyi berulang sampai dimatikan.
-  - Penerimaan: alarm membangunkan layar dan berbunyi seperti alarm bawaan.
+- [x] T10.5 Tier 2: alarm layar penuh (L)
+  - Plugin native `NativeAlarm` (Java) dengan penjadwalan `AlarmManager`, layanan latar depan `mediaPlayback`, full-screen intent, bunyi berulang lewat `MediaPlayer`, dan tombol Tunda serta Matikan di notifikasi dan di `AlarmActivity`. `BootReceiver` memasang ulang alarm setelah reboot.
+  - Lapisan web memilih Tier 2 bila plugin terdaftar, dengan `@capacitor/local-notifications` sebagai cadangan.
+  - Penerimaan: kode terkompilasi dan APK terbangun. Verifikasi di perangkat ada di T10.6.
 
 - [ ] T10.6 Uji di perangkat nyata (M)
-  - Uji alarm saat ponsel terkunci, setelah reboot, dan pada OEM yang agresif mematikan latar belakang (Xiaomi, Oppo, Vivo).
+  - Uji alarm saat ponsel terkunci, setelah reboot, dan pada OEM yang agresif mematikan latar belakang (Xiaomi, Oppo, Vivo). Pastikan izin layar penuh dan alarm pasti diberikan.
   - Penerimaan: catatan hasil per perangkat.
 
 ## M11: Tinggi dan berat badan ideal

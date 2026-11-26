@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M8 selesai dan pembungkus Capacitor (M10) sudah berjalan. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, uji lintas mesin, dan alarm native Tier 1 sudah ada. Berikutnya M9 rilis dan Tier 2 alarm layar penuh.
+Status: M8 selesai, pembungkus Capacitor (M10) dengan alarm layar penuh, dan fitur tumbuh kembang (M11) sudah berjalan. Berikutnya M9 rilis dan uji perangkat nyata.
 
 ## Hasil audit M8
 

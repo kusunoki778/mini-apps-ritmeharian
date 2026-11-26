@@ -612,15 +612,30 @@ Alur di aplikasi (lapisan web):
 
 ### 12.1 Penjadwal native (Capacitor)
 
-`alarm-scheduler.ts` menyelaraskan daftar alarm Dexie ke `AlarmManager` Android.
+`alarm-scheduler.ts` menyelaraskan daftar alarm Dexie ke `AlarmManager` Android lewat dua lapis. `NativeAlarmSync` menyelaraskan ulang setiap daftar alarm berubah dan setiap aplikasi dibuka.
 
-- Setiap alarm berulang dijadwalkan sebagai beberapa notifikasi pasti satu per satu (tujuh kemunculan berikutnya), karena `AlarmManager` hanya menerima satu waktu pasti per notifikasi. Daftar diselaraskan ulang setiap aplikasi dibuka dan setiap daftar alarm berubah, lewat `NativeAlarmSync`.
+**Tier 2, plugin `NativeAlarm` (layar penuh).** Dipakai bila plugin terdaftar (`Capacitor.isPluginAvailable('NativeAlarm')`), yaitu di pembungkus native.
+
+- `alarm-scheduler.ts` menyusun item alarm murni lewat `buildNativeAlarms`, lalu memanggil `cancelAll` dan `schedule`. Setiap alarm berulang dijadwalkan sebagai tujuh kemunculan pasti satu per satu.
+- Plugin Java menjadwalkan ke `AlarmManager` dengan `setExactAndAllowWhileIdle` dan menyimpan daftar di `SharedPreferences` agar bisa dipasang ulang.
+- Saat jatuh tempo, `AlarmReceiver` menyalakan `AlarmService`, sebuah layanan latar depan tipe `mediaPlayback`.
+- `AlarmService` menampilkan notifikasi dengan `setFullScreenIntent` dan memainkan `res/raw/alarm.wav` berulang lewat `MediaPlayer` dengan `USAGE_ALARM`, lalu menahan `PARTIAL_WAKE_LOCK`.
+- `AlarmActivity` muncul di atas kunci layar (`setShowWhenLocked`, `setTurnScreenOn`) dengan tombol Tunda dan Matikan. Tombol notifikasi memakai `AlarmActionReceiver`. Tunda menjadwalkan ulang dan menghentikan layanan.
+- Kanal `nadi-alarm-full` importance maksimum dengan bunyi dan getaran.
+- `BootReceiver` memasang ulang alarm yang tersimpan setelah reboot.
+- `MainActivity` mendaftarkan plugin ini lewat `registerPlugin(NativeAlarmPlugin.class)`.
+
+**Tier 1, `@capacitor/local-notifications` (cadangan).** Dipakai bila plugin Tier 2 tidak ada.
+
 - Notifikasi memakai `schedule.at` dengan `allowWhileIdle`, sehingga plugin memanggil `setExactAndAllowWhileIdle`.
 - Kanal `nadi-alarm` dibuat dengan importance maksimum dan bunyi bundel `res/raw/alarm.wav`. Di Android 8+ bunyi melekat pada kanal, bukan pada notifikasi.
-- Izin: `POST_NOTIFICATIONS` diminta saat pengguna membuat atau mengaktifkan alarm. `SCHEDULE_EXACT_ALARM` dan `USE_EXACT_ALARM` dideklarasikan; plugin membuka layar pengaturan "Alarm & pengingat" bila izin alarm pasti belum diberikan.
-- Pemicu yang tertunda dijadwalkan ulang otomatis setelah reboot oleh `LocalNotificationRestoreReceiver` milik plugin, ditambah penyelarasan ulang saat boot aplikasi.
-- Di web, penjadwal ini tidak aktif (`Capacitor.isNativePlatform()` bernilai salah), jadi bundel web tidak membawa logika native.
-- Tier 2 (alarm layar penuh dengan tombol Tunda dan Matikan lewat plugin native khusus) belum dikerjakan. Saat ini alarm native adalah notifikasi bersuara yang tepat waktu.
+- Pemicu yang tertunda dipasang ulang otomatis setelah reboot oleh `LocalNotificationRestoreReceiver` milik plugin.
+
+**Bersama.**
+
+- Izin: `POST_NOTIFICATIONS` diminta saat pengguna membuat atau mengaktifkan alarm. `SCHEDULE_EXACT_ALARM`, `USE_EXACT_ALARM`, dan `USE_FULL_SCREEN_INTENT` dideklarasikan. Plugin membuka layar pengaturan "Alarm & pengingat" bila izin alarm pasti belum diberikan.
+- Di web, penjadwal ini tidak aktif (`Capacitor.isNativePlatform()` bernilai salah), jadi bundel web tidak membawa logika native. Lapisan web tetap memakai `AlarmEngine` selama aplikasi terbuka.
+- Belum diverifikasi di perangkat nyata. Android menjadi target utama.
 
 Perhitungan waktu berikutnya:
 

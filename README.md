@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M8 selesai, pembungkus Capacitor (M10) dan fitur tumbuh kembang (M11) sudah berjalan. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, uji lintas mesin, alarm native Tier 1, serta kalkulator tinggi dan berat badan ideal sudah ada. Berikutnya M9 rilis dan Tier 2 alarm layar penuh.
+Status: M8 selesai, pembungkus Capacitor (M10) termasuk alarm layar penuh Tier 2, dan fitur tumbuh kembang (M11) sudah berjalan. Berikutnya M9 rilis dan uji di perangkat nyata.
 
 ## Tangkapan layar
 
@@ -68,7 +68,9 @@ Atur `SMOKE_BASE_URL` bila pratinjau berjalan di port lain.
 
 ## Versi native (Android)
 
-Web dan PWA berjalan tanpa langkah tambahan. Untuk alarm yang berbunyi tepat waktu saat aplikasi tertutup, aplikasi dibungkus Capacitor dan notifikasi dijadwalkan ke sistem.
+Web dan PWA berjalan tanpa langkah tambahan. Untuk alarm yang berbunyi tepat waktu saat aplikasi tertutup, aplikasi dibungkus Capacitor dan alarm dijadwalkan ke sistem.
+
+Alarm native punya dua lapis. Tier 2 memakai plugin `NativeAlarm` (Java) yang menampilkan layar alarm penuh dengan tombol Tunda dan Matikan, memainkan bunyi berulang lewat layanan latar depan, dan memasang ulang alarm setelah reboot. Bila plugin itu tidak ada, aplikasi jatuh ke Tier 1 lewat `@capacitor/local-notifications` berupa notifikasi bersuara yang tepat waktu.
 
 Membangun APK debug:
 
@@ -85,7 +87,7 @@ Bunyi alarm ada di `android/app/src/main/res/raw/alarm.wav` dan bisa dibuat ulan
 
 ## Batasan
 
-- Di web, alarm berbunyi selama aplikasi terbuka. Di pembungkus native, alarm dijadwalkan ke sistem dan berbunyi saat aplikasi tertutup. Alarm layar penuh seperti alarm bawaan (Tier 2) belum dikerjakan.
+- Di web, alarm berbunyi selama aplikasi terbuka. Di pembungkus native, alarm dijadwalkan ke sistem dan berbunyi saat aplikasi tertutup, dengan layar alarm penuh (Tier 2) atau notifikasi bersuara (Tier 1). Semua ini belum diuji di perangkat nyata.
 - Sinkronisasi antar perangkat belum ada. Pakai ekspor dan impor JSON untuk memindahkan data.
 - iOS tidak mengizinkan alarm pihak ketiga menembus mode senyap tanpa entitlement Critical Alerts. Android menjadi target utama.
 - Instalasi PWA di perangkat nyata menunggu hosting HTTPS (T0.5).
