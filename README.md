@@ -2,7 +2,7 @@
 
 Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M2, jam, garis hari, dan lokasi sudah berjalan. Data cuaca nyata menyusul.
+Status: M3, cuaca nyata Open-Meteo dengan cache offline. Kualitas udara menyusul.
 
 ## Menjalankan
 

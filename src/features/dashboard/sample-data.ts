@@ -1,24 +1,4 @@
-// Data contoh untuk prototipe dasbor M1. Diganti data nyata Open-Meteo di M3 dan M4.
-
-export interface HourSample {
-  time: string;
-  temperature: number;
-  precipitation: number;
-}
-
-export interface WeatherSample {
-  location: string;
-  temperature: number;
-  feelsLike: number;
-  condition: string;
-  high: number;
-  low: number;
-  humidity: number;
-  windSpeed: number;
-  sunrise: string;
-  sunset: string;
-  hours: HourSample[];
-}
+// Data contoh untuk modul yang belum aktif. Cuaca sudah nyata sejak M3, kualitas udara menyusul di M4.
 
 export interface AirQualitySample {
   location: string;
@@ -36,29 +16,6 @@ export interface AgendaSample {
   time: string;
   location?: string;
 }
-
-export const SAMPLE_WEATHER: WeatherSample = {
-  location: 'Jakarta',
-  temperature: 31,
-  feelsLike: 34,
-  condition: 'Berawan sebagian',
-  high: 33,
-  low: 25,
-  humidity: 72,
-  windSpeed: 11,
-  sunrise: '05.42',
-  sunset: '18.03',
-  hours: [
-    { time: '09.00', temperature: 29, precipitation: 0 },
-    { time: '10.00', temperature: 30, precipitation: 0 },
-    { time: '11.00', temperature: 31, precipitation: 10 },
-    { time: '12.00', temperature: 32, precipitation: 20 },
-    { time: '13.00', temperature: 33, precipitation: 35 },
-    { time: '14.00', temperature: 32, precipitation: 40 },
-    { time: '15.00', temperature: 31, precipitation: 30 },
-    { time: '16.00', temperature: 30, precipitation: 15 },
-  ],
-};
 
 export const SAMPLE_AIR_QUALITY: AirQualitySample = {
   location: 'Jakarta',

@@ -2,7 +2,7 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M2 selesai. Jam, garis hari, dan pengaturan lokasi berjalan. Data cuaca nyata menyusul di M3.
+Status: M3 selesai. Cuaca nyata dari Open-Meteo tampil di Beranda, dengan cache offline. Kualitas udara menyusul di M4.
 
 ## Dokumen
 

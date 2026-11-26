@@ -53,6 +53,26 @@ try {
     await page.getByRole('img', { name: /hari berjalan/ }).isVisible(),
   );
 
+  const detailButton = page.getByRole('button', { name: 'Detail 7 hari' });
+  await detailButton.waitFor({ timeout: 15000 });
+  check('kartu cuaca memuat data nyata', await detailButton.isVisible());
+  check(
+    'label waktu pembaruan tampil',
+    await page.getByText(/^Diperbarui \d{2}\.\d{2}$/).first().isVisible(),
+  );
+  check(
+    'strip per jam tampil',
+    await page.getByRole('region', { name: 'Prakiraan per jam' }).isVisible(),
+  );
+
+  await detailButton.click();
+  const sheetTitle = page.getByRole('heading', { name: 'Prakiraan 7 hari' });
+  await sheetTitle.waitFor();
+  check('sheet 7 hari terbuka', await sheetTitle.isVisible());
+  await page.keyboard.press('Escape');
+  await sheetTitle.waitFor({ state: 'hidden' });
+  check('sheet tertutup dengan Escape', !(await sheetTitle.isVisible()));
+
   const manifestResponse = await context.request.get(`${BASE}/manifest.webmanifest`);
   check('manifest tersedia', manifestResponse.ok());
 

@@ -108,29 +108,29 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 
 ## M3: Cuaca
 
-- [ ] T3.1 Klien API cuaca (M)
-  - Tipe, timeout 8 detik, penulisan cache Dexie, fallback cache.
-  - Penerimaan: unit test untuk sukses, timeout, offline dengan cache, offline tanpa cache.
+- [x] T3.1 Klien API cuaca (M)
+  - Validasi manual, bukan Zod, agar bundle awal tidak membengkak. Timeout 8 detik lewat `AbortController`. Cache Dexie dan fallback saat gagal.
+  - Penerimaan: unit test untuk sukses, timeout, offline dengan cache, offline tanpa cache, dan pembatalan pemanggil.
 
-- [ ] T3.2 Kartu cuaca saat ini (M)
-  - Suhu, kondisi, terasa, kelembapan, angin, tombol detail.
-  - Penerimaan: loading, error dengan retry, data basi dengan label waktu.
+- [x] T3.2 Kartu cuaca saat ini (M)
+  - Suhu, kondisi, terasa, tinggi dan rendah, kelembapan, angin, tombol `Detail 7 hari`.
+  - Penerimaan: skeleton saat memuat, ErrorState dengan coba lagi, label waktu segar atau tersimpan.
 
-- [ ] T3.3 Strip per jam (M)
-  - Minimal 12 jam, scroll horizontal, penanda jam sekarang.
-  - Penerimaan: bisa di-scroll dengan keyboard, tidak ada overflow halaman.
+- [x] T3.3 Strip per jam (M)
+  - 12 jam mulai jam sekarang, penanda "Kini", gulir horizontal.
+  - Penerimaan: wadah bisa difokus dengan keyboard, tidak menambah overflow halaman (dipakai `min-w-0`).
 
-- [ ] T3.4 Sheet 7 hari (S)
-  - Suhu minimum dan maksimum, kondisi, terbit dan terbenam.
-  - Penerimaan: buka, tutup, Escape, fokus kembali.
+- [x] T3.4 Sheet 7 hari (S)
+  - Suhu minimum dan maksimum, kondisi, terbit dan terbenam per hari.
+  - Penerimaan: buka, tutup, Escape menutup, fokus kembali ke pemicu.
 
-- [ ] T3.5 Pemetaan WMO (S)
-  - Label Indonesia, ikon siang dan malam, fallback kode tidak dikenal.
-  - Penerimaan: semua kode di tabel punya test.
+- [x] T3.5 Pemetaan WMO (S)
+  - Label Indonesia per kode, ikon siang dan malam lewat `WeatherGlyph`, fallback untuk kode tak dikenal.
+  - Penerimaan: semua kode di tabel punya test, termasuk kode 999.
 
-- [ ] T3.6 Perilaku data basi dan offline (S)
-  - Label "Diperbarui HH.mm", banner offline.
-  - Penerimaan: data tetap tampil saat offline, tidak ada klaim data segar.
+- [x] T3.6 Perilaku data basi dan offline (S)
+  - Label "Diperbarui HH.mm" dan "Data tersimpan · Diperbarui HH.mm", plus banner offline di shell.
+  - Penerimaan: uji offline dengan reload memakai service worker dan cache Dexie, data tetap tampil tanpa klaim segar.
 
 ## M4: Kualitas udara
 

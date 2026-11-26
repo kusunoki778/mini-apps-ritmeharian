@@ -1,13 +1,16 @@
-import { ArrowRight, Drop, NotePencil, PushPin, Wind } from '@phosphor-icons/react';
+import { ArrowRight, NotePencil, PushPin } from '@phosphor-icons/react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { Banner } from '@/components/ui/Banner';
 import { Card } from '@/components/ui/Card';
 import { useLocationStore } from '@/features/location/location-store';
 import { SOURCE_LABEL } from '@/features/location/types';
+import { ForecastSheet } from '@/features/weather/ForecastSheet';
+import { WeatherCard } from '@/features/weather/WeatherCard';
+import { useWeather } from '@/features/weather/useWeather';
 import { ClockPanel } from './ClockPanel';
-import { SAMPLE_AGENDA, SAMPLE_AIR_QUALITY, SAMPLE_NOTES, SAMPLE_WEATHER } from './sample-data';
-import { Stat } from './Stat';
+import { SAMPLE_AGENDA, SAMPLE_AIR_QUALITY, SAMPLE_NOTES } from './sample-data';
 
 function usAqiTone(value: number): string {
   if (value <= 50) return 'text-emerald-600 dark:text-emerald-400';
@@ -18,6 +21,8 @@ function usAqiTone(value: number): string {
 
 export default function DashboardPage() {
   const location = useLocationStore((state) => state.location);
+  const weather = useWeather(location.lat, location.lon);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   return (
     <div>
@@ -31,42 +36,21 @@ export default function DashboardPage() {
           </Link>
         }
       >
-        Cuaca dan kualitas udara di halaman ini masih data contoh sampai M3. Lokasi aktif:{' '}
-        {location.name} ({SOURCE_LABEL[location.source]}).
+        Cuaca sudah data nyata Open-Meteo untuk {location.name} ({SOURCE_LABEL[location.source]}).
+        Kualitas udara masih data contoh sampai M4.
       </Banner>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-12 lg:gap-8">
         <ClockPanel />
 
-        <section className="lg:col-span-5" aria-label="Cuaca dan kualitas udara">
-          <Card className="p-5">
-            <div>
-              <p className="text-[13px] font-medium text-ink-muted">{SAMPLE_WEATHER.condition}</p>
-              <p className="tabular mt-1 text-4xl font-bold">{SAMPLE_WEATHER.temperature}°</p>
-              <p className="mt-1 text-[13px] text-ink-muted">
-                Terasa {SAMPLE_WEATHER.feelsLike}° · Tinggi {SAMPLE_WEATHER.high}° · Rendah{' '}
-                {SAMPLE_WEATHER.low}°
-              </p>
-            </div>
-
-            <ul className="mt-5 grid grid-cols-4 gap-1">
-              {SAMPLE_WEATHER.hours.slice(0, 4).map((hour) => (
-                <li
-                  key={hour.time}
-                  className="rounded-control bg-paper px-2 py-3 text-center text-[12px]"
-                >
-                  <p className="text-ink-muted">{hour.time}</p>
-                  <p className="tabular mt-1 text-sm font-medium">{hour.temperature}°</p>
-                  <p className="mt-0.5 text-[11px] text-ink-muted">{hour.precipitation}%</p>
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3">
-              <Stat icon={<Drop size={18} />} label="Kelembapan" value={`${SAMPLE_WEATHER.humidity}%`} />
-              <Stat icon={<Wind size={18} />} label="Angin" value={`${SAMPLE_WEATHER.windSpeed} km/j`} />
-            </div>
-          </Card>
+        <section className="min-w-0 lg:col-span-5" aria-label="Cuaca dan kualitas udara">
+          <WeatherCard
+            result={weather.data}
+            isPending={weather.isPending}
+            isError={weather.isError}
+            onRetry={() => void weather.refetch()}
+            onOpenDetail={() => setDetailOpen(true)}
+          />
 
           <Card className="mt-4 p-5">
             <div className="flex items-center justify-between gap-4">
@@ -148,6 +132,14 @@ export default function DashboardPage() {
           </Card>
         </section>
       </div>
+
+      {weather.data ? (
+        <ForecastSheet
+          open={detailOpen}
+          onClose={() => setDetailOpen(false)}
+          daily={weather.data.data.daily}
+        />
+      ) : null}
     </div>
   );
 }

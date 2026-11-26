@@ -1,18 +1,21 @@
-import { MapPin, SunHorizon } from '@phosphor-icons/react';
+import { MapPin } from '@phosphor-icons/react';
 
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useLocationStore } from '@/features/location/location-store';
 import { SOURCE_LABEL } from '@/features/location/types';
+import { useWeather } from '@/features/weather/useWeather';
+import { formatClock } from '@/features/weather/weather-utils';
 import { useNow } from '@/lib/hooks/useNow';
 import { getGreeting } from '@/lib/utils/greeting';
 import { DayLine } from './DayLine';
 import { clockMinutes } from './day-line';
-import { SAMPLE_AGENDA, SAMPLE_WEATHER } from './sample-data';
+import { SAMPLE_AGENDA } from './sample-data';
 import { Stat } from './Stat';
 
 export function ClockPanel() {
   const now = useNow();
   const location = useLocationStore((state) => state.location);
+  const weather = useWeather(location.lat, location.lon);
 
   const time = new Intl.DateTimeFormat('id-ID', {
     hour: '2-digit',
@@ -27,6 +30,10 @@ export function ClockPanel() {
   }).format(now);
   const greeting = getGreeting(now.getHours());
 
+  const today = weather.data?.data.daily;
+  const sunrise = today?.sunrise[0] ? formatClock(today.sunrise[0]) : null;
+  const sunset = today?.sunset[0] ? formatClock(today.sunset[0]) : null;
+
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
   const nextEvent =
     SAMPLE_AGENDA.map((item) => ({ ...item, minutes: clockMinutes(item.time) })).find(
@@ -34,7 +41,7 @@ export function ClockPanel() {
     ) ?? null;
 
   return (
-    <section className="lg:col-span-7" aria-label="Jam dan garis hari">
+    <section className="min-w-0 lg:col-span-7" aria-label="Jam dan garis hari">
       <PageHeader eyebrow={`${greeting}, ini ${location.name}`} title="Beranda" />
 
       <p className="tabular text-[clamp(4rem,17vw,8rem)] font-bold leading-none tracking-[-0.05em]">
@@ -48,15 +55,13 @@ export function ClockPanel() {
           label={SOURCE_LABEL[location.source]}
           value={location.name}
         />
-        <Stat icon={<SunHorizon size={18} />} label="Matahari terbit" value={SAMPLE_WEATHER.sunrise} />
-        <Stat icon={<SunHorizon size={18} />} label="Matahari terbenam" value={SAMPLE_WEATHER.sunset} />
       </div>
 
       <div className="mt-6">
         <DayLine
           now={now}
-          sunrise={SAMPLE_WEATHER.sunrise}
-          sunset={SAMPLE_WEATHER.sunset}
+          sunrise={sunrise}
+          sunset={sunset}
           nextEvent={nextEvent ? { title: nextEvent.title, time: nextEvent.time } : null}
         />
       </div>

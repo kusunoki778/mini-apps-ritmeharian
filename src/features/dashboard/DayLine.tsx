@@ -2,8 +2,8 @@ import { clockFraction, dayFraction } from './day-line';
 
 interface DayLineProps {
   now: Date;
-  sunrise: string;
-  sunset: string;
+  sunrise?: string | null;
+  sunset?: string | null;
   nextEvent?: { title: string; time: string } | null;
 }
 
@@ -14,16 +14,18 @@ function percent(fraction: number): string {
 export function DayLine({ now, sunrise, sunset, nextEvent }: DayLineProps) {
   const fraction = dayFraction(now);
   const visibleFraction = Math.min(0.995, Math.max(0.005, fraction));
-  const sunriseFraction = clockFraction(sunrise);
-  const sunsetFraction = clockFraction(sunset);
+  const sunriseFraction = sunrise ? clockFraction(sunrise) : null;
+  const sunsetFraction = sunset ? clockFraction(sunset) : null;
 
   const summary = [
     `${Math.round(fraction * 100)} persen hari berjalan.`,
-    `Matahari terbit ${sunrise}, terbenam ${sunset}.`,
+    sunrise && sunset ? `Matahari terbit ${sunrise}, terbenam ${sunset}.` : '',
     nextEvent
       ? `Agenda berikutnya ${nextEvent.title} pukul ${nextEvent.time}.`
       : 'Tidak ada agenda lagi hari ini.',
-  ].join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <section aria-label="Garis hari">
@@ -59,11 +61,11 @@ export function DayLine({ now, sunrise, sunset, nextEvent }: DayLineProps) {
         aria-hidden="true"
         className="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[12px] text-ink-muted"
       >
-        <span>Terbit {sunrise}</span>
+        {sunrise ? <span>Terbit {sunrise}</span> : <span />}
         <span className="text-ink">
           {nextEvent ? `Berikutnya ${nextEvent.time} · ${nextEvent.title}` : 'Tidak ada agenda lagi'}
         </span>
-        <span>Terbenam {sunset}</span>
+        {sunset ? <span>Terbenam {sunset}</span> : <span />}
       </div>
     </section>
   );
