@@ -9,8 +9,12 @@ import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
 
 // Berkas APK disajikan di akar situs supaya bisa diunduh dari aplikasi web.
-// Kandidat pertama adalah keluaran gradle, kandidat kedua salinan di akar repo.
-const APK_CANDIDATES = ['android/app/build/outputs/apk/debug/app-debug.apk', 'Nadi.apk'];
+// Kandidat pertama adalah APK rilis bertanda tangan, lalu debug, lalu salinan di akar repo.
+const APK_CANDIDATES = [
+  'android/app/build/outputs/apk/release/app-release.apk',
+  'android/app/build/outputs/apk/debug/app-debug.apk',
+  'Nadi.apk',
+];
 
 function findApk(): string | null {
   for (const candidate of APK_CANDIDATES) {

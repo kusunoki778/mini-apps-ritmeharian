@@ -8,3 +8,7 @@ lighthouse-report*.json
 Nadi.apk
 *.apk
 *.log
+
+# Kunci rilis dan sandinya tidak ikut git.
+android/keystore/
+android/keystore.properties
