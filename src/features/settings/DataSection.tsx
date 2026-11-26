@@ -93,6 +93,7 @@ export function DataSection() {
           ref={fileRef}
           type="file"
           accept="application/json,.json"
+          aria-label="Berkas JSON untuk impor"
           className="sr-only"
           onChange={(event) => void handleFile(event)}
         />

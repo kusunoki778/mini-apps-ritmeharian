@@ -254,25 +254,36 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
   - Banner versi baru dengan tombol muat ulang, tanpa reload paksa.
   - Penerimaan: pembaruan menunggu tindakan pengguna.
 
-- [ ] T8.5 Uji offline (M)
+- [x] T8.5 Uji offline (M)
   - Matriks: cold start offline, offline setelah data segar, offline tanpa cache.
   - Penerimaan: perilaku sesuai PRD, label waktu benar.
+  - Hasil: tiga skenario diperiksa di `scripts/smoke.mjs`. Offline setelah data segar tetap memuat shell, menampilkan banner "Kamu sedang offline", dan label `Data tersimpan` dari cache. Cold start offline pada konteks yang sama tetap memuat shell. Konteks baru tanpa cache tidak bisa memuat aplikasi, sesuai ekspektasi.
 
-- [ ] T8.6 Audit aksesibilitas (M)
+- [x] T8.6 Audit aksesibilitas (M)
   - axe, keyboard, kontras, reduced motion.
   - Penerimaan: tidak ada pelanggaran kritis, semua alur bisa diselesaikan dengan keyboard.
+  - Hasil: axe pada Beranda dan Pengaturan bersih dari pelanggaran critical dan serious. Skip link "Lewati ke konten" fokus lebih dulu dan targetnya ada. `prefers-reduced-motion` memangkas transisi ke 0.01ms. Kontras token diuji di unit lewat pemeriksa rasio. Temuan diperbaiki: input berkas impor kini punya `aria-label`. Lighthouse Accessibility 96.
 
-- [ ] T8.7 Audit performa (M)
+- [x] T8.7 Audit performa (M)
   - Lighthouse mobile, ukuran bundle, LCP.
   - Penerimaan: target terpenuhi atau selisihnya ditulis beserta alasannya.
+  - Hasil Lighthouse mobile (Chrome headless, throttle 4x): Performance 93 sampai 94, Accessibility 96, Best Practices 100, CLS 0, TBT 100 sampai 110 ms, FCP 2.2 s.
+  - Bundle awal: `index` 123 kB gzip, plus `jsx-runtime` 3 kB dan CSS 8.9 kB gzip. Di bawah target PRD 200 kB. Grafik AQI tetap di chunk terpisah 117 kB gzip dan hanya dimuat malas.
+  - Selisih: LCP 2.6 sampai 2.8 s, sedikit di atas target 2.5 s. Alasannya aplikasi ini SPA yang dirender di klien: HTML datang lebih dulu, lalu JS memasang jam yang menjadi elemen LCP. Di bawah throttle CPU 4x, render delay menyumbang sekitar 82 persen LCP. Di perangkat nyata shell tampil jauh lebih cepat (smoke mengukur 112 sampai 128 ms). Kandidat perbaikan dicatat di backlog: sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot.
 
-- [ ] T8.8 Uji lintas perangkat (M)
+- [x] T8.8 Uji lintas perangkat (M)
   - Chrome, Firefox, Safari, Android, iOS.
   - Penerimaan: catatan hasil uji per perangkat.
+  - Hasil otomatis:
+    - Chrome (mesin Blink) di `scripts/smoke.mjs`: 69 dari 69 pemeriksaan lulus, termasuk offline, axe, keyboard, reduced motion, dan LCP.
+    - Firefox (mesin Gecko) di `scripts/smoke-engines.mjs`: lulus alur inti, tanpa overflow 320px, tanpa error konsol.
+    - WebKit (mesin Safari) di `scripts/smoke-engines.mjs`: lulus alur inti, tanpa overflow 320px, tanpa error konsol.
+  - Catatan manual yang belum diuji di perangkat nyata: instalasi Android dan iOS (T9.2), menunggu hosting HTTPS (T0.5). Alarm native juga menunggu milestone Capacitor.
 
-- [ ] T8.9 Dokumentasi dan studi kasus (M)
+- [x] T8.9 Dokumentasi dan studi kasus (M)
   - README dengan cara jalan, tangkapan layar, keputusan desain, batasan.
   - Penerimaan: orang lain bisa menjalankan proyek dari nol.
+  - Hasil: `README.md` memuat cara jalan, tabel skrip, tangkapan layar, keputusan, dan batasan. Tangkapan layar dihasilkan ulang dengan `npm run screenshots`. Tabel keputusan dan batasan diperbarui di `docs/README.md`.
 
 ## M9: Rilis
 
@@ -284,6 +295,7 @@ Alasan prototipe lebih dulu: mengunci arah visual sebelum biaya integrasi API da
 ## Backlog setelah v1
 
 - Pembungkus Capacitor dan notifikasi lokal native.
+- Sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot untuk menekan LCP di bawah 2.5 s pada throttle mobile.
 - Sinkronisasi Google Calendar.
 - Jam dunia.
 - Konversi ISPU Indonesia.

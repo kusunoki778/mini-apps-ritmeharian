@@ -4,3 +4,4 @@ dev-dist
 coverage
 .env
 .DS_Store
+lighthouse-report*.json

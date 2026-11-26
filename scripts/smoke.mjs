@@ -1,4 +1,8 @@
+import { createRequire } from 'node:module';
 import { chromium } from 'playwright-core';
+
+const require = createRequire(import.meta.url);
+const AXE_PATH = require.resolve('axe-core/axe.min.js');
 
 const BASE = process.env.SMOKE_BASE_URL ?? 'http://localhost:4173';
 const CHROME =
@@ -8,6 +12,19 @@ const results = [];
 
 function check(name, ok, detail = '') {
   results.push({ name, ok, detail });
+}
+
+async function axeViolations(targetPage, url) {
+  await targetPage.goto(url, { waitUntil: 'load' });
+  await targetPage.locator('h1').first().waitFor();
+  await targetPage.addScriptTag({ path: AXE_PATH });
+
+  return targetPage.evaluate(async () => {
+    const outcome = await window.axe.run(document, { resultTypes: ['violations'] });
+    return outcome.violations
+      .filter((violation) => violation.impact === 'critical' || violation.impact === 'serious')
+      .map((violation) => `${violation.id}:${violation.impact}`);
+  });
 }
 
 const browser = await chromium.launch({ executablePath: CHROME, headless: true });
@@ -333,6 +350,118 @@ try {
     .click();
   await desktop.waitForURL('**/catatan');
   check('navigasi desktop', desktop.url().endsWith('/catatan'));
+  await desktop.close();
+
+  // Aksesibilitas: hanya pelanggaran critical dan serious yang menggagalkan.
+  const a11yBeranda = await axeViolations(page, `${BASE}/`);
+  check('a11y beranda bersih', a11yBeranda.length === 0, a11yBeranda.join(', '));
+  const a11yPengaturan = await axeViolations(page, `${BASE}/pengaturan`);
+  check('a11y pengaturan bersih', a11yPengaturan.length === 0, a11yPengaturan.join(', '));
+
+  // Performa: Largest Contentful Paint pada muat pertama.
+  await page.goto(`${BASE}/`, { waitUntil: 'load' });
+  await page.locator('h1').first().waitFor();
+  const lcp = await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let value = 0;
+        const observer = new PerformanceObserver((list) => {
+          for (const entry of list.getEntries()) value = entry.startTime;
+        });
+        observer.observe({ type: 'largest-contentful-paint', buffered: true });
+        window.setTimeout(() => {
+          observer.disconnect();
+          resolve(Math.round(value));
+        }, 1200);
+      }),
+  );
+  check('LCP di bawah 2500 ms', lcp > 0 && lcp < 2500, `${lcp} ms`);
+
+  // Keyboard: skip link lebih dulu dan mengarah ke konten utama.
+  await page.keyboard.press('Tab');
+  check(
+    'keyboard: skip link fokus lebih dulu',
+    (await page.evaluate(() => document.activeElement?.textContent?.trim())) === 'Lewati ke konten',
+  );
+  check('keyboard: target skip link ada', (await page.locator('#konten').count()) === 1);
+
+  // Reduced motion: animasi dan transisi dipangkas agar aman bagi yang sensitif gerak.
+  const reducedContext = await browser.newContext({
+    viewport: { width: 320, height: 800 },
+    reducedMotion: 'reduce',
+  });
+  const reducedPage = await reducedContext.newPage();
+  await reducedPage.goto(`${BASE}/`, { waitUntil: 'load' });
+  await reducedPage.locator('h1').first().waitFor();
+  const reducedTransition = await reducedPage.evaluate(() => {
+    const probe = document.createElement('div');
+    document.body.append(probe);
+    const value = getComputedStyle(probe).transitionDuration;
+    probe.remove();
+    return value;
+  });
+  check(
+    'reduced motion: transisi dipangkas',
+    Number.parseFloat(reducedTransition) > 0 && Number.parseFloat(reducedTransition) < 0.001,
+    reducedTransition,
+  );
+  await reducedContext.close();
+
+  // Offline: setelah data segar, shell dan cache tetap tampil.
+  await page.goto(`${BASE}/`, { waitUntil: 'load' });
+  await page.locator('h1').first().waitFor();
+  await context.setOffline(true);
+
+  await page.reload({ waitUntil: 'load' });
+  await page.locator('h1').first().waitFor();
+  await page
+    .getByText(/Data tersimpan|Diperbarui/)
+    .first()
+    .waitFor({ timeout: 10000 });
+  check(
+    'offline: shell tetap tampil',
+    (await page.locator('h1').first().innerText()).includes('Beranda'),
+  );
+  check('offline: banner tampil', await page.getByText(/Kamu sedang offline/).isVisible());
+  check(
+    'offline: label waktu pengambilan tampil',
+    await page
+      .getByText(/Data tersimpan|Diperbarui/)
+      .first()
+      .isVisible(),
+  );
+
+  const coldPage = await context.newPage();
+  await coldPage.goto(`${BASE}/`, { waitUntil: 'load' });
+  await coldPage.locator('h1').first().waitFor();
+  check(
+    'offline: cold start memuat shell',
+    (await coldPage.locator('h1').first().innerText()).includes('Beranda'),
+  );
+  await coldPage.close();
+
+  await context.setOffline(false);
+  await page.reload({ waitUntil: 'load' });
+  check(
+    'online: banner offline hilang',
+    (await page.getByText(/Kamu sedang offline/).count()) === 0,
+  );
+
+  // Offline tanpa cache: konteks baru tanpa service worker tidak bisa memuat aplikasi.
+  const freshContext = await browser.newContext({ viewport: { width: 320, height: 800 } });
+  await freshContext.setOffline(true);
+  const freshPage = await freshContext.newPage();
+  let blocked = false;
+  try {
+    await freshPage.goto(`${BASE}/`, { waitUntil: 'load', timeout: 5000 });
+  } catch {
+    blocked = true;
+  }
+  check(
+    'offline tanpa cache: tidak memuat aplikasi',
+    blocked || (await freshPage.locator('h1').count()) === 0,
+  );
+  await freshContext.close();
 
   await context.close();
 } finally {

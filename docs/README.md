@@ -2,7 +2,18 @@
 
 Aplikasi web progresif (PWA) yang menyatukan jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
 
-Status: M8 sedang berjalan. Pengaturan lengkap, ekspor dan impor JSON, serta hapus data sudah ada. Audit offline, aksesibilitas, performa, dan uji lintas perangkat menyusul.
+Status: M8 selesai. Pengaturan lengkap, ekspor dan impor JSON, hapus data, audit offline, aksesibilitas, performa, dan uji lintas mesin sudah berjalan. Berikutnya M9 rilis.
+
+## Hasil audit M8
+
+| Audit             | Hasil                                                                        |
+| ----------------- | ---------------------------------------------------------------------------- |
+| Lighthouse mobile | Performance 93-94, Accessibility 96, Best Practices 100, CLS 0               |
+| Bundle awal       | `index` 123 kB gzip, CSS 8.9 kB gzip, grafis AQI terpisah 117 kB gzip        |
+| LCP               | 2.6-2.8 s pada throttle mobile, sedikit di atas target 2.5 s                 |
+| Aksesibilitas     | axe bersih dari pelanggaran critical dan serious pada Beranda dan Pengaturan |
+| Uji asap Chrome   | 69 dari 69 lulus                                                             |
+| Uji lintas mesin  | Firefox dan WebKit lulus alur inti tanpa error konsol                        |
 
 ## Dokumen
 

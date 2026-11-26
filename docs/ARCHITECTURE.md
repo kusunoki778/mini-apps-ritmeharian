@@ -666,6 +666,13 @@ Teknik:
 
 Target terukur saat rilis: Lighthouse Performance minimal 90 mobile, LCP di bawah 2.5 detik pada 4G kelas menengah. Angka ini diverifikasi, bukan diklaim sebelum diukur.
 
+Hasil ukur M8 (Chrome headless, throttle mobile default Lighthouse, pratinjau produksi):
+
+- Performance 93 sampai 94, Accessibility 96, Best Practices 100, CLS 0, TBT 100 sampai 110 ms, FCP 2.2 s.
+- Bundle awal 123 kB gzip untuk `index`, 3 kB untuk `jsx-runtime`, 8.9 kB untuk CSS. Di bawah anggaran 200 kB. Grafik AQI tetap di chunk terpisah 117 kB gzip.
+- LCP 2.6 sampai 2.8 s, sedikit di atas target. Penyebab utama adalah render delay SPA di klien: jam besar yang menjadi elemen LCP baru bisa dilukis setelah bundel awal dieksekusi. Di bawah throttle CPU 4x, render delay sekitar 82 persen dari LCP. Di perangkat tanpa throttle, shell tampil di bawah 130 ms menurut uji asap.
+- Kandidat perbaikan dicatat di backlog: sebariskan CSS kritis dan pindahkan pembacaan Dexie dari jalur boot.
+
 ## 15. Testing
 
 Unit:
