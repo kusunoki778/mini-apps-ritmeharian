@@ -1,8 +1,9 @@
 import { Capacitor } from '@capacitor/core';
 import type { LocalNotificationSchema } from '@capacitor/local-notifications';
 
-import type { Alarm } from '@/lib/db/db';
+import type { Alarm, CalendarEvent } from '@/lib/db/db';
 import { formatAlarmTime, isOnce, nextTrigger } from './alarm-utils';
+import { DEFAULT_ALARM_SOUND, type AlarmSoundId } from './alarm-sounds';
 import { fullAlarm, fullAlarmSupported, type NativeAlarmItem } from './native-alarm';
 
 export const ALARM_CHANNEL_ID = 'nadi-alarm';
@@ -50,8 +51,12 @@ export function upcomingOccurrences(alarm: Alarm, from: Date, count: number): nu
 }
 
 // Kumpulkan kemunculan berikutnya sebagai item alarm native. Murni supaya bisa
-// diuji tanpa runtime native.
-export function buildNativeAlarms(alarms: Alarm[], from: Date): NativeAlarmItem[] {
+// diuji tanpa runtime native. Nada dipilih global, jadi disalin ke tiap kemunculan.
+export function buildNativeAlarms(
+  alarms: Alarm[],
+  from: Date,
+  soundId: AlarmSoundId = DEFAULT_ALARM_SOUND,
+): NativeAlarmItem[] {
   const items: NativeAlarmItem[] = [];
 
   for (const alarm of alarms) {
@@ -62,8 +67,37 @@ export function buildNativeAlarms(alarms: Alarm[], from: Date): NativeAlarmItem[
         label: alarm.label || 'Alarm',
         alarmId: alarm.id,
         snoozeMinutes: alarm.snoozeMinutes,
+        soundId,
       });
     }
+  }
+
+  return items;
+}
+
+// Kumpulkan pengingat agenda sebagai item alarm native. Agenda bersifat sekali
+// jalan (bukan harian), jadi satu item per agenda yang punya nada dering.
+export function buildNativeEventItems(
+  events: CalendarEvent[],
+  from: Date,
+  soundId: AlarmSoundId = DEFAULT_ALARM_SOUND,
+): NativeAlarmItem[] {
+  const items: NativeAlarmItem[] = [];
+  const fromMs = from.getTime();
+
+  for (const event of events) {
+    if (event.reminderMinutes == null) continue;
+    const at = event.start - event.reminderMinutes * 60_000;
+    if (at <= fromMs) continue;
+
+    items.push({
+      id: notificationId(`event:${event.id}:${at}`),
+      at,
+      label: event.title || 'Agenda',
+      alarmId: `event:${event.id}`,
+      snoozeMinutes: 5,
+      soundId,
+    });
   }
 
   return items;
@@ -122,11 +156,19 @@ export async function requestNativeAlarmPermissions(): Promise<NativeAlarmPermis
 }
 
 // Selaraskan alarm native dengan daftar saat ini. Dipanggil saat boot dan setiap
-// daftar alarm berubah. Mengembalikan jumlah kemunculan yang dijadwalkan.
-export async function syncNativeAlarms(alarms: Alarm[], from: Date = new Date()): Promise<number> {
+// daftar alarm, agenda, atau pilihan nada berubah. Mengembalikan jumlah kemunculan.
+export async function syncNativeAlarms(
+  alarms: Alarm[],
+  from: Date = new Date(),
+  soundId: AlarmSoundId = DEFAULT_ALARM_SOUND,
+  events: CalendarEvent[] = [],
+): Promise<number> {
   if (!nativeAlarmsSupported()) return 0;
 
-  const items = buildNativeAlarms(alarms, from);
+  const items = [
+    ...buildNativeAlarms(alarms, from, soundId),
+    ...buildNativeEventItems(events, from, soundId),
+  ];
 
   // Tier 2: plugin native dengan alarm layar penuh, bunyi berulang, dan tombol tunda.
   if (fullAlarmSupported()) {

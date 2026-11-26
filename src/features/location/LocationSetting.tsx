@@ -63,7 +63,12 @@ export function LocationSetting() {
   return (
     <div className="space-y-5">
       <div className="flex items-start gap-3 rounded-control bg-paper p-3">
-        <MapPin size={20} weight="fill" aria-hidden="true" className="mt-0.5 shrink-0 text-accent" />
+        <MapPin
+          size={20}
+          weight="fill"
+          aria-hidden="true"
+          className="mt-0.5 shrink-0 text-accent"
+        />
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{location.name}</p>
           <p className="text-[13px] text-ink-muted">

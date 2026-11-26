@@ -69,9 +69,7 @@ export function parseAirQualityResponse(payload: unknown): AirQualityResponse | 
     isNumber(current.european_aqi);
 
   const hourlyValid =
-    isStringArray(hourly.time) &&
-    isNumberArray(hourly.us_aqi) &&
-    isNumberArray(hourly.pm2_5);
+    isStringArray(hourly.time) && isNumberArray(hourly.us_aqi) && isNumberArray(hourly.pm2_5);
 
   if (!currentValid || !hourlyValid) return null;
 

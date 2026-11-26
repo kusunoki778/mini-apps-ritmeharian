@@ -1,10 +1,5 @@
 export type AqiCategoryKey =
-  | 'good'
-  | 'moderate'
-  | 'sensitive'
-  | 'unhealthy'
-  | 'very-unhealthy'
-  | 'hazardous';
+  'good' | 'moderate' | 'sensitive' | 'unhealthy' | 'very-unhealthy' | 'hazardous';
 
 export interface AqiCategory {
   key: AqiCategoryKey;

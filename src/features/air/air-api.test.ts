@@ -23,9 +23,7 @@ describe('buildAirUrl', () => {
   it('memuat parameter wajib', () => {
     const url = new URL(buildAirUrl(-6.2088, 106.8456));
 
-    expect(url.origin + url.pathname).toBe(
-      'https://air-quality-api.open-meteo.com/v1/air-quality',
-    );
+    expect(url.origin + url.pathname).toBe('https://air-quality-api.open-meteo.com/v1/air-quality');
     expect(url.searchParams.get('current')).toContain('us_aqi');
     expect(url.searchParams.get('hourly')).toBe('us_aqi,pm2_5');
     expect(url.searchParams.get('timezone')).toBe('auto');

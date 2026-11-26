@@ -22,8 +22,7 @@ export function filterNotes(notes: Note[], query: string): Note[] {
   if (!needle) return notes;
 
   return notes.filter(
-    (note) =>
-      note.title.toLowerCase().includes(needle) || note.body.toLowerCase().includes(needle),
+    (note) => note.title.toLowerCase().includes(needle) || note.body.toLowerCase().includes(needle),
   );
 }
 

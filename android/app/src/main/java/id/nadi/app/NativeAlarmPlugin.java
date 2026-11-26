@@ -37,7 +37,8 @@ public class NativeAlarmPlugin extends Plugin {
                         item.optLong("at", 0),
                         item.optString(AlarmScheduler.EXTRA_LABEL, "Alarm"),
                         item.optString(AlarmScheduler.EXTRA_ALARM_ID, ""),
-                        item.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5));
+                        item.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5),
+                        item.optString(AlarmScheduler.EXTRA_SOUND_ID, AlarmScheduler.DEFAULT_SOUND_ID));
             }
             call.resolve();
         } catch (JSONException error) {
@@ -55,6 +56,25 @@ public class NativeAlarmPlugin extends Plugin {
     @PluginMethod
     public void cancelAll(PluginCall call) {
         AlarmScheduler.cancelAll(getContext());
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void scheduleTimer(PluginCall call) {
+        Long at = call.getLong("at");
+        if (at == null) {
+            call.reject("Waktu timer tidak ada");
+            return;
+        }
+        AlarmScheduler.schedule(getContext(), AlarmScheduler.TIMER_ID, at,
+                call.getString("label", "Timer"), "timer", 0,
+                call.getString("soundId", AlarmScheduler.DEFAULT_SOUND_ID));
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void cancelTimer(PluginCall call) {
+        AlarmScheduler.cancel(getContext(), AlarmScheduler.TIMER_ID);
         call.resolve();
     }
 

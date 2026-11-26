@@ -7,9 +7,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.media.AudioAttributes;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -24,10 +22,10 @@ public class AlarmService extends Service {
     static final String ACTION_SNOOZE = "id.nadi.app.action.ALARM_SNOOZE";
     static final String ACTION_STOP = "id.nadi.app.action.ALARM_STOP";
 
-    static final String CHANNEL_ID = "nadi-alarm-full";
+    static final String CHANNEL_ID = "nadi-alarm-full-v2";
     private static final int FALLBACK_NOTIFICATION_ID = 7001;
 
-    private MediaPlayer player;
+    private AlarmSound sound;
     private PowerManager.WakeLock wakeLock;
 
     static void stop(Context context) {
@@ -45,13 +43,9 @@ public class AlarmService extends Service {
         channel.setDescription("Alarm Nadi yang membangunkan layar dan berbunyi berulang.");
         channel.enableVibration(true);
         channel.setVibrationPattern(new long[] {0, 800, 400, 800, 400, 800});
-
-        Uri sound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.alarm);
-        AudioAttributes attributes = new AudioAttributes.Builder()
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                .setUsage(AudioAttributes.USAGE_ALARM)
-                .build();
-        channel.setSound(sound, attributes);
+        // Nada diputar sendiri oleh AlarmSound agar bisa berganti dan berulang. Kanal
+        // sengaja tanpa suara supaya tidak dobel dengan pemutar alarm.
+        channel.setSound(null, null);
 
         manager.createNotificationChannel(channel);
     }
@@ -80,18 +74,26 @@ public class AlarmService extends Service {
         int snoozeMinutes = intent != null
                 ? intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5)
                 : 5;
+        String soundId = intent != null ? intent.getStringExtra(AlarmScheduler.EXTRA_SOUND_ID) : null;
+        if (soundId == null) soundId = AlarmScheduler.DEFAULT_SOUND_ID;
 
         acquireWakeLock();
-        startPlayer();
-        startForeground(notificationId,
-                buildNotification(label, triggerAt, alarmId, snoozeMinutes, notificationId));
+        startSound(soundId);
+        Notification notification =
+                buildNotification(label, triggerAt, alarmId, snoozeMinutes, notificationId, soundId);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(notificationId, notification,
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
+        } else {
+            startForeground(notificationId, notification);
+        }
 
         return START_NOT_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        releasePlayer();
+        releaseSound();
         releaseWakeLock();
         super.onDestroy();
     }
@@ -102,7 +104,7 @@ public class AlarmService extends Service {
     }
 
     private Notification buildNotification(String label, long triggerAt, String alarmId,
-                                           int snoozeMinutes, int notificationId) {
+                                           int snoozeMinutes, int notificationId, String soundId) {
         Intent fullScreen = new Intent(this, AlarmActivity.class);
         fullScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         fullScreen.putExtra(AlarmScheduler.EXTRA_NOTIFICATION_ID, notificationId);
@@ -110,6 +112,7 @@ public class AlarmService extends Service {
         fullScreen.putExtra(AlarmScheduler.EXTRA_LABEL, label);
         fullScreen.putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId);
         fullScreen.putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, snoozeMinutes);
+        fullScreen.putExtra(AlarmScheduler.EXTRA_SOUND_ID, soundId);
         PendingIntent fullScreenIntent = PendingIntent.getActivity(this, notificationId, fullScreen,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -134,50 +137,36 @@ public class AlarmService extends Service {
                 .setWhen(triggerAt)
                 .setShowWhen(true)
                 .addAction(0, "Tunda", actionIntent(notificationId, ACTION_SNOOZE, label, alarmId,
-                        snoozeMinutes))
+                        snoozeMinutes, soundId))
                 .addAction(0, "Matikan", actionIntent(notificationId, ACTION_STOP, label, alarmId,
-                        snoozeMinutes))
+                        snoozeMinutes, soundId))
                 .build();
     }
 
     private PendingIntent actionIntent(int notificationId, String action, String label,
-                                       String alarmId, int snoozeMinutes) {
+                                       String alarmId, int snoozeMinutes, String soundId) {
         Intent intent = new Intent(this, AlarmActionReceiver.class);
         intent.setAction(action);
         intent.putExtra(AlarmScheduler.EXTRA_NOTIFICATION_ID, notificationId);
         intent.putExtra(AlarmScheduler.EXTRA_LABEL, label);
         intent.putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId);
         intent.putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, snoozeMinutes);
+        intent.putExtra(AlarmScheduler.EXTRA_SOUND_ID, soundId);
         int requestCode = notificationId * 10 + (ACTION_SNOOZE.equals(action) ? 1 : 2);
         return PendingIntent.getBroadcast(this, requestCode, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
-    private void startPlayer() {
-        if (player != null) return;
-        try {
-            player = MediaPlayer.create(this, R.raw.alarm);
-            if (player == null) return;
-            player.setLooping(true);
-            player.setAudioAttributes(new AudioAttributes.Builder()
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .build());
-            player.start();
-        } catch (Exception ignored) {
-            player = null;
-        }
+    private void startSound(String soundId) {
+        if (sound != null) return;
+        sound = new AlarmSound(this);
+        sound.start(soundId);
     }
 
-    private void releasePlayer() {
-        if (player == null) return;
-        try {
-            if (player.isPlaying()) player.stop();
-        } catch (IllegalStateException ignored) {
-            // Sudah berhenti.
-        }
-        player.release();
-        player = null;
+    private void releaseSound() {
+        if (sound == null) return;
+        sound.stop();
+        sound = null;
     }
 
     private void acquireWakeLock() {

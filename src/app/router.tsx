@@ -1,11 +1,17 @@
 import { lazy, Suspense, type ReactNode } from 'react';
-import { createBrowserRouter, Link, isRouteErrorResponse, useRouteError } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  Link,
+  Navigate,
+  isRouteErrorResponse,
+  useRouteError,
+} from 'react-router-dom';
 
 import { AppShell } from './AppShell';
 
 const DashboardPage = lazy(() => import('@/features/dashboard/DashboardPage'));
-const CalendarPage = lazy(() => import('@/features/calendar/CalendarPage'));
-const NotesPage = lazy(() => import('@/features/notes/NotesPage'));
+const JournalPage = lazy(() => import('@/features/journal/JournalPage'));
+const CalculatorPage = lazy(() => import('@/features/calculator/CalculatorPage'));
 const AlarmsPage = lazy(() => import('@/features/alarms/AlarmsPage'));
 const GrowthPage = lazy(() => import('@/features/growth/GrowthPage'));
 const SettingsPage = lazy(() => import('@/features/settings/SettingsPage'));
@@ -53,8 +59,9 @@ export const router = createBrowserRouter([
     errorElement: <RouteError />,
     children: [
       { index: true, element: withSuspense(<DashboardPage />) },
-      { path: 'kalender', element: withSuspense(<CalendarPage />) },
-      { path: 'catatan', element: withSuspense(<NotesPage />) },
+      { path: 'catatan', element: withSuspense(<JournalPage />) },
+      { path: 'kalender', element: <Navigate to="/catatan" replace /> },
+      { path: 'kalkulator', element: withSuspense(<CalculatorPage />) },
       { path: 'alarm', element: withSuspense(<AlarmsPage />) },
       { path: 'tumbuh-kembang', element: withSuspense(<GrowthPage />) },
       { path: 'pengaturan', element: withSuspense(<SettingsPage />) },

@@ -3,13 +3,14 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS, sanitizeSettings } from './settings';
 
 describe('DEFAULT_SETTINGS', () => {
-  it('memakai Senin, Celsius, 24 jam, tema sistem, dan rumus Devine', () => {
+  it('memakai Senin, Celsius, 24 jam, tema sistem, rumus Devine, dan nada Nadi', () => {
     expect(DEFAULT_SETTINGS).toEqual({
       theme: 'system',
       temperatureUnit: 'celsius',
       clockFormat: '24h',
       weekStart: 1,
       idealWeightFormula: 'devine',
+      alarmSoundId: 'nadi',
     });
   });
 });
@@ -23,6 +24,7 @@ describe('sanitizeSettings', () => {
         weekStart: 0,
         temperatureUnit: 'fahrenheit',
         idealWeightFormula: 'hamwi',
+        alarmSoundId: 'lonceng',
       }),
     ).toEqual({
       theme: 'dark',
@@ -30,6 +32,7 @@ describe('sanitizeSettings', () => {
       weekStart: 0,
       temperatureUnit: 'fahrenheit',
       idealWeightFormula: 'hamwi',
+      alarmSoundId: 'lonceng',
     });
   });
 
@@ -41,6 +44,7 @@ describe('sanitizeSettings', () => {
         weekStart: 2,
         temperatureUnit: 'kelvin',
         idealWeightFormula: 'watson',
+        alarmSoundId: 'tidak-ada',
       }),
     ).toEqual({});
   });

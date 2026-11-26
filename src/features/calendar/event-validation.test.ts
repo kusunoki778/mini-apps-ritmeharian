@@ -11,6 +11,8 @@ function input(overrides: Partial<EventInput> = {}): EventInput {
     startTime: '09:00',
     endTime: '10:00',
     note: '',
+    reminderMinutes: null,
+    reminderSoundId: 'nadi',
     ...overrides,
   };
 }

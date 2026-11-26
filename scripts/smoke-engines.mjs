@@ -45,8 +45,8 @@ for (const [name, launcher] of engines) {
     );
 
     const routes = [
-      ['Kalender', '/kalender', 'Kalender'],
-      ['Catatan', '/catatan', 'Catatan'],
+      ['Catatan', '/catatan', 'Agenda dan catatan'],
+      ['Kalkulator', '/kalkulator', 'Kalkulator'],
       ['Alarm', '/alarm', 'Alarm'],
       ['Pengaturan', '/pengaturan', 'Pengaturan'],
     ];
@@ -69,7 +69,9 @@ for (const [name, launcher] of engines) {
     );
 
     await page.goto(`${BASE}/catatan`, { waitUntil: 'load' });
-    await page.getByRole('heading', { level: 1, name: 'Catatan', exact: true }).waitFor();
+    await page
+      .getByRole('heading', { level: 1, name: 'Agenda dan catatan', exact: true })
+      .waitFor();
     await page.getByRole('button', { name: 'Catatan baru' }).first().click();
     await page.getByLabel('Judul').fill('Lintas mesin');
     await page.getByLabel('Isi').fill('Uji Firefox dan WebKit.');

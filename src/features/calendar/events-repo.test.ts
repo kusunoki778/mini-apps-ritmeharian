@@ -7,6 +7,9 @@ import {
   createEvent,
   deleteEvent,
   listEventsBetween,
+  listUpcomingReminders,
+  markReminderFired,
+  reminderTimeOf,
   sortEvents,
   updateEvent,
   type EventInput,
@@ -30,6 +33,8 @@ function input(overrides: Partial<EventInput> = {}): EventInput {
     startTime: '09:00',
     endTime: '10:00',
     note: '',
+    reminderMinutes: null,
+    reminderSoundId: 'nadi',
     ...overrides,
   };
 }
@@ -55,6 +60,21 @@ describe('buildEventFields', () => {
 
     expect(fields.title).toBe('Rapat');
     expect(fields.note).toBeUndefined();
+  });
+
+  it('menyertakan pengingat bila diatur dan melewatkannya bila null', () => {
+    const withReminder = buildEventFields(input({ reminderMinutes: 10, reminderSoundId: 'tegas' }));
+    expect(withReminder.reminderMinutes).toBe(10);
+    expect(withReminder.reminderSoundId).toBe('tegas');
+
+    const without = buildEventFields(input({ reminderMinutes: null }));
+    expect(without.reminderMinutes).toBeUndefined();
+    expect(without.reminderSoundId).toBeUndefined();
+  });
+
+  it('tetap menyertakan pengingat untuk agenda sepanjang hari', () => {
+    const fields = buildEventFields(input({ allDay: true, reminderMinutes: 30 }));
+    expect(fields.reminderMinutes).toBe(30);
   });
 });
 
@@ -105,5 +125,35 @@ describe('repositori events', () => {
     const to = dayStart(parseDateKey('2026-11-27'));
     expect(await listEventsBetween(dayStart(parseDateKey('2026-11-26')), to)).toHaveLength(0);
     expect(await listEventsBetween(to, to + 1)).toHaveLength(1);
+  });
+
+  it('menghitung waktu pengingat dari menit sebelum mulai', () => {
+    const event: CalendarEvent = { ...base, start: 1_000_000, reminderMinutes: 10 };
+    expect(reminderTimeOf(event)).toBe(1_000_000 - 600_000);
+  });
+
+  it('tidak punya waktu pengingat bila tidak diatur', () => {
+    expect(reminderTimeOf({ ...base, reminderMinutes: null })).toBeNull();
+    expect(reminderTimeOf(base)).toBeNull();
+  });
+
+  it('menyaring hanya agenda berpengingat dalam rentang', async () => {
+    await createEvent(input({ date: '2026-11-26', reminderMinutes: 5, reminderSoundId: 'nadi' }));
+    await createEvent(input({ date: '2026-11-27', reminderMinutes: null }));
+
+    const from = dayStart(parseDateKey('2026-11-26'));
+    const to = dayStart(parseDateKey('2026-11-28'));
+    const reminders = await listUpcomingReminders(from, to);
+
+    expect(reminders).toHaveLength(1);
+    expect(reminders[0].reminderMinutes).toBe(5);
+  });
+
+  it('menandai pengingat sudah berbunyi', async () => {
+    const id = await createEvent(input({ reminderMinutes: 0 }));
+
+    await markReminderFired(id, 12345);
+
+    expect((await db.events.get(id))?.reminderFiredAt).toBe(12345);
   });
 });

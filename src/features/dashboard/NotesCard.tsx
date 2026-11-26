@@ -95,9 +95,7 @@ export function NotesCard() {
         </Card>
       )}
 
-      {editorOpen ? (
-        <NoteEditorSheet note={editing} onClose={() => setEditorOpen(false)} />
-      ) : null}
+      {editorOpen ? <NoteEditorSheet note={editing} onClose={() => setEditorOpen(false)} /> : null}
     </section>
   );
 }

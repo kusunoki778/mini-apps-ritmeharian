@@ -6,6 +6,7 @@ import { Banner } from '@/components/ui/Banner';
 import { AqiCard } from '@/features/air/AqiCard';
 import { useAirQuality } from '@/features/air/useAirQuality';
 import { ApkInstallBanner } from '@/features/install/ApkInstallBanner';
+import { CompassCard } from './CompassCard';
 import { useLocationStore } from '@/features/location/location-store';
 import { ForecastSheet } from '@/features/weather/ForecastSheet';
 import { WeatherCard } from '@/features/weather/WeatherCard';
@@ -68,6 +69,8 @@ export default function DashboardPage() {
 
         <NotesCard />
       </div>
+
+      <CompassCard />
 
       <Link
         to="/tumbuh-kembang"

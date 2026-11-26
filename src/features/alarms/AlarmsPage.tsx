@@ -13,6 +13,7 @@ import { AlarmFormSheet } from './AlarmFormSheet';
 import { nativeAlarmsSupported, requestNativeAlarmPermissions } from './alarm-scheduler';
 import { nextTrigger } from './alarm-utils';
 import { AlarmListItem } from './AlarmListItem';
+import { AlarmTools } from './AlarmTools';
 import { deleteAlarm, setAlarmEnabled } from './alarms-repo';
 import { DeleteAlarmDialog } from './DeleteAlarmDialog';
 import { useAlarms } from './useAlarms';
@@ -84,6 +85,8 @@ export default function AlarmsPage() {
             : 'Alarm berbunyi selama Nadi terbuka. Versi native menjadwalkan alarm lewat sistem.'}
         </Banner>
       </div>
+
+      <AlarmTools />
 
       {alarms === undefined ? (
         <Card className="space-y-3 p-5">

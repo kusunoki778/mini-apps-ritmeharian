@@ -1,5 +1,7 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 
+import type { AlarmSoundId } from './alarm-sounds';
+
 // Satu kemunculan alarm yang dijadwalkan ke AlarmManager lewat plugin native.
 export interface NativeAlarmItem {
   id: number;
@@ -7,6 +9,7 @@ export interface NativeAlarmItem {
   label: string;
   alarmId: string;
   snoozeMinutes: number;
+  soundId: AlarmSoundId;
 }
 
 interface NativeAlarmBridge {
@@ -14,6 +17,8 @@ interface NativeAlarmBridge {
   cancel(options: { id: number }): Promise<void>;
   cancelAll(): Promise<void>;
   canScheduleExactAlarms(): Promise<{ granted: boolean }>;
+  scheduleTimer(options: { at: number; label?: string; soundId?: string }): Promise<void>;
+  cancelTimer(): Promise<void>;
 }
 
 const NativeAlarm = registerPlugin<NativeAlarmBridge>('NativeAlarm');
@@ -25,4 +30,18 @@ export function fullAlarmSupported(): boolean {
 
 export function fullAlarm() {
   return NativeAlarm;
+}
+
+export async function scheduleNativeTimer(
+  triggerAt: number,
+  label = 'Timer',
+  soundId = 'nadi',
+): Promise<void> {
+  if (!fullAlarmSupported()) return;
+  await NativeAlarm.scheduleTimer({ at: triggerAt, label, soundId });
+}
+
+export async function cancelNativeTimer(): Promise<void> {
+  if (!fullAlarmSupported()) return;
+  await NativeAlarm.cancelTimer();
 }

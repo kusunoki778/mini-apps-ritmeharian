@@ -115,7 +115,10 @@ export function AlarmEngine({
 
   return (
     <RingScreen
-      alarm={ringing.alarm}
+      kind="Alarm"
+      time={formatAlarmTime(ringing.alarm.hour, ringing.alarm.minute)}
+      title={ringing.alarm.label}
+      snoozeLabel={`Tunda ${ringing.alarm.snoozeMinutes} menit`}
       onSnooze={() => void snooze()}
       onDismiss={() => void dismiss()}
     />

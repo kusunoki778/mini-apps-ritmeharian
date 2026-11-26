@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { Alarm, CalendarBlank, GearSix, House, NotePencil, type Icon } from '@phosphor-icons/react';
+import { Alarm, Calculator, GearSix, House, NotePencil, type Icon } from '@phosphor-icons/react';
 
 import { Banner } from '@/components/ui/Banner';
 import { Toaster } from '@/components/ui/Toaster';
@@ -20,6 +20,13 @@ const NativeAlarmSync = lazy(() =>
   })),
 );
 
+// Pengingat agenda memakai Dexie dan Web Audio, jadi juga dimuat malas.
+const CalendarReminderEngine = lazy(() =>
+  import('@/features/calendar/CalendarReminderEngine').then((module) => ({
+    default: module.CalendarReminderEngine,
+  })),
+);
+
 interface NavItem {
   to: string;
   label: string;
@@ -29,8 +36,8 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/', label: 'Beranda', icon: House, end: true },
-  { to: '/kalender', label: 'Kalender', icon: CalendarBlank },
   { to: '/catatan', label: 'Catatan', icon: NotePencil },
+  { to: '/kalkulator', label: 'Kalkulator', icon: Calculator },
   { to: '/alarm', label: 'Alarm', icon: Alarm },
   { to: '/pengaturan', label: 'Pengaturan', icon: GearSix },
 ];
@@ -139,6 +146,7 @@ export function AppShell() {
       <PwaUpdater />
       <Suspense fallback={null}>
         <AlarmEngine />
+        <CalendarReminderEngine />
         <NativeAlarmSync />
       </Suspense>
       <Toaster />

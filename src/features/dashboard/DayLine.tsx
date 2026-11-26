@@ -63,7 +63,9 @@ export function DayLine({ now, sunrise, sunset, nextEvent }: DayLineProps) {
       >
         {sunrise ? <span>Terbit {sunrise}</span> : <span />}
         <span className="text-ink">
-          {nextEvent ? `Berikutnya ${nextEvent.time} · ${nextEvent.title}` : 'Tidak ada agenda lagi'}
+          {nextEvent
+            ? `Berikutnya ${nextEvent.time} · ${nextEvent.title}`
+            : 'Tidak ada agenda lagi'}
         </span>
         {sunset ? <span>Terbenam {sunset}</span> : <span />}
       </div>

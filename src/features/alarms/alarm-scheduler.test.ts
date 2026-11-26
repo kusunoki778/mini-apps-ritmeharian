@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Alarm } from '@/lib/db/db';
+import type { Alarm, CalendarEvent } from '@/lib/db/db';
 import {
   ALARM_CHANNEL_ID,
   ALARM_EXTRA_KIND,
   buildNativeAlarms,
+  buildNativeEventItems,
   buildNativeNotifications,
   notificationId,
   OCCURRENCES_PER_ALARM,
@@ -25,6 +26,21 @@ function makeAlarm(overrides: Partial<Alarm> = {}): Alarm {
 }
 
 const FROM = new Date(2026, 0, 15, 6, 0, 0);
+
+function makeEvent(overrides: Partial<CalendarEvent> = {}): CalendarEvent {
+  return {
+    id: 'event-1',
+    title: 'Rapat',
+    start: new Date(2026, 0, 15, 9, 0, 0).getTime(),
+    end: null,
+    allDay: false,
+    reminderMinutes: 0,
+    reminderSoundId: 'nadi',
+    createdAt: 0,
+    updatedAt: 0,
+    ...overrides,
+  };
+}
 
 describe('notificationId', () => {
   it('deterministik untuk kunci yang sama', () => {
@@ -73,7 +89,13 @@ describe('buildNativeAlarms', () => {
     expect(first.label).toBe('Bangun pagi');
     expect(first.alarmId).toBe('alarm-1');
     expect(first.snoozeMinutes).toBe(5);
+    expect(first.soundId).toBe('nadi');
     expect(new Date(first.at).getHours()).toBe(7);
+  });
+
+  it('menyalin pilihan nada ke tiap kemunculan', () => {
+    const alarms = buildNativeAlarms([makeAlarm()], FROM, 'lonceng');
+    expect(alarms.every((item) => item.soundId === 'lonceng')).toBe(true);
   });
 
   it('melewati alarm nonaktif', () => {
@@ -104,5 +126,40 @@ describe('buildNativeNotifications', () => {
     const notifications = buildNativeNotifications([makeAlarm()], FROM);
     const ids = new Set(notifications.map((item) => item.id));
     expect(ids.size).toBe(notifications.length);
+  });
+});
+
+describe('buildNativeEventItems', () => {
+  it('membuat satu item tepat di waktu agenda', () => {
+    const items = buildNativeEventItems([makeEvent()], FROM);
+    expect(items).toHaveLength(1);
+    expect(new Date(items[0].at).getHours()).toBe(9);
+    expect(items[0].label).toBe('Rapat');
+    expect(items[0].alarmId).toBe('event:event-1');
+  });
+
+  it('memajukan waktu sesuai menit pengingat', () => {
+    const items = buildNativeEventItems([makeEvent({ reminderMinutes: 15 })], FROM);
+    expect(new Date(items[0].at).getHours()).toBe(8);
+    expect(new Date(items[0].at).getMinutes()).toBe(45);
+  });
+
+  it('melewati agenda tanpa pengingat', () => {
+    expect(buildNativeEventItems([makeEvent({ reminderMinutes: null })], FROM)).toEqual([]);
+  });
+
+  it('melewati agenda yang pengingatnya sudah lewat', () => {
+    const past = new Date(2026, 0, 15, 5, 0, 0).getTime();
+    expect(buildNativeEventItems([makeEvent({ start: past })], FROM)).toEqual([]);
+  });
+
+  it('menyalin pilihan nada ke item agenda', () => {
+    const items = buildNativeEventItems([makeEvent()], FROM, 'fajar');
+    expect(items[0].soundId).toBe('fajar');
+  });
+
+  it('memberi label cadangan untuk agenda tanpa judul', () => {
+    const items = buildNativeEventItems([makeEvent({ title: '' })], FROM);
+    expect(items[0].label).toBe('Agenda');
   });
 });

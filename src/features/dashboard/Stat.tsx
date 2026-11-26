@@ -1,14 +1,6 @@
 import type { ReactNode } from 'react';
 
-export function Stat({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
+export function Stat({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-ink-muted" aria-hidden="true">

@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { SegmentedControl, type SegmentOption } from '@/components/ui/SegmentedControl';
 import { Select } from '@/components/ui/Select';
 import { ADULT_FORMULAS, type AdultFormula } from '@/features/growth/adult-formula';
+import { ALARM_SOUNDS, type AlarmSoundId } from '@/features/alarms/alarm-sounds';
 import { isNativeApp } from '@/features/install/apk';
 import { ApkDownload } from '@/features/install/ApkDownload';
 import { LocationSetting } from '@/features/location/LocationSetting';
@@ -114,6 +115,33 @@ export default function SettingsPage() {
             >
               {ADULT_FORMULAS.map((option) => (
                 <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+        </Section>
+
+        <Section title="Alarm">
+          <div className="space-y-3">
+            <p className="text-sm leading-relaxed text-ink-muted">
+              Nada yang berbunyi saat alarm dan timer berbunyi. Semua nada dibundel di aplikasi,
+              jadi tetap berbunyi tanpa internet.
+            </p>
+            <Select
+              label="Nada alarm"
+              value={settings.alarmSoundId}
+              hint={
+                isNativeApp()
+                  ? 'Pilihan berlaku untuk alarm dan timer di aplikasi Android.'
+                  : 'Pilihan ini berlaku di aplikasi Android. Di web alarm memakai nada bawaan browser.'
+              }
+              onChange={(event) =>
+                updateSettings({ alarmSoundId: event.target.value as AlarmSoundId })
+              }
+            >
+              {ALARM_SOUNDS.map((option) => (
+                <option key={option.id} value={option.id}>
                   {option.label}
                 </option>
               ))}

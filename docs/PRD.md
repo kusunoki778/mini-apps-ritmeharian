@@ -7,7 +7,7 @@ Pemilik: Muhamad Fadhlurr
 
 ## 1. Ringkasan
 
-Nadi adalah aplikasi web progresif (PWA) yang menampilkan informasi harian dalam satu dasbor: jam, tanggal, cuaca, kualitas udara, agenda, catatan, dan alarm. Aplikasi berjalan tanpa akun dan tanpa backend. Data pribadi disimpan di perangkat pengguna. Data cuaca dan kualitas udara diambil dari Open-Meteo.
+Nadi adalah aplikasi web progresif (PWA) yang menampilkan informasi harian dalam satu dasbor: jam, tanggal, cuaca, kualitas udara, agenda, catatan, alarm, dan kalkulator. Aplikasi berjalan tanpa akun dan tanpa backend. Data pribadi disimpan di perangkat pengguna. Data cuaca dan kualitas udara diambil dari Open-Meteo.
 
 Kalimat posisi: satu layar untuk tahu keadaan hari ini.
 
@@ -57,27 +57,29 @@ Rina, 31, reviewer portofolio. Membuka aplikasi sekali untuk menilai kualitas te
 
 ## 7. Lingkup
 
-| Prioritas | Item |
-|---|---|
-| Must | Dasbor, jam dan tanggal, cuaca saat ini, prakiraan per jam, prakiraan 7 hari, kualitas udara saat ini, catatan (buat, baca, ubah, hapus, cari, pin), kalender bulanan dengan agenda lokal, alarm dalam aplikasi, pengaturan lokasi, tema terang dan gelap, PWA installable, offline shell, responsif 320px ke atas, aksesibilitas dasar |
-| Should | Jam dunia, grafik AQI 24 jam, pengingat agenda dalam aplikasi, pintasan keyboard, ekspor dan impor data JSON, indikator data basi |
-| Could | Pembungkus Capacitor, integrasi Google Calendar, peringatan cuaca ekstrem, beberapa lokasi tersimpan, konversi ISPU |
-| Won't (v1) | Akun, backend sendiri, sinkronisasi cloud, kolaborasi, widget sistem operasi, alarm latar belakang native |
+| Prioritas  | Item                                                                                                                                                                                                                                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Must       | Dasbor, jam dan tanggal, cuaca saat ini, prakiraan per jam, prakiraan 7 hari, kualitas udara saat ini, catatan (buat, baca, ubah, hapus, cari, pin), kalender bulanan dengan agenda lokal, alarm dalam aplikasi, kalkulator ilmiah dan BMI, pengaturan lokasi, tema terang dan gelap, PWA installable, offline shell, responsif 320px ke atas, aksesibilitas dasar |
+| Should     | Jam dunia, grafik AQI 24 jam, pengingat agenda dalam aplikasi, stopwatch dan timer, kompas, pintasan keyboard, ekspor dan impor data JSON, indikator data basi                                                                                                                                                                                                     |
+| Could      | Integrasi Google Calendar, peringatan cuaca ekstrem, beberapa lokasi tersimpan, konversi ISPU                                                                                                                                                                                                                                                                      |
+| Won't (v1) | Akun, backend sendiri, sinkronisasi cloud, kolaborasi, widget sistem operasi                                                                                                                                                                                                                                                                                       |
 
 ## 8. User story dan kriteria penerimaan
 
-| ID | User story | Kriteria penerimaan |
-|---|---|---|
-| US-01 | Sebagai pengguna, saya ingin melihat jam, tanggal, dan lokasi saat ini begitu aplikasi dibuka. | Jam diperbarui tiap detik. Tanggal mengikuti lokal perangkat. Nama lokasi tampil. Tidak ada layout shift saat jam berganti digit. |
-| US-02 | Sebagai pengguna, saya ingin tahu cuaca saat ini dan beberapa jam ke depan. | Suhu, kondisi, suhu terasa, kelembapan, dan angin tampil. Strip per jam menampilkan minimal 12 jam ke depan. Prakiraan 7 hari tersedia. Ada state loading, error, dan data basi. |
-| US-03 | Sebagai pengguna, saya ingin tahu kualitas udara sekarang. | Nilai AQI, kategori, polutan dominan, dan saran singkat tampil. Sumber dan standar AQI disebut. Warna tidak menjadi satu-satunya penanda kategori. |
-| US-04 | Sebagai pengguna, saya ingin mencatat hal cepat. | Catatan bisa dibuat, dibaca, diubah, dihapus, dicari, dan dipin. Data bertahan setelah reload. Ada state kosong dan konfirmasi hapus. |
-| US-05 | Sebagai pengguna, saya ingin melihat agenda bulan ini. | Kalender bulanan tampil. Agenda bisa dibuat, diubah, dan dihapus. Agenda hari ini muncul di dasbor. |
-| US-06 | Sebagai pengguna, saya ingin memasang alarm. | Alarm bisa dibuat, diubah, dihapus, dan diaktifkan. Alarm berbunyi saat aplikasi terbuka. Batasan ini dijelaskan di layar alarm. |
-| US-07 | Sebagai pengguna, saya ingin memilih tema terang atau gelap. | Pilihan Sistem, Terang, dan Gelap tersedia. Pilihan bertahan setelah reload. Kedua tema lolos pemeriksaan kontras. |
-| US-08 | Sebagai pengguna, saya ingin tetap melihat data saat offline. | Dasbor tetap terbuka. Data cache tampil dengan label waktu. Data lokal tetap bisa diubah. |
-| US-09 | Sebagai pengguna, saya ingin memasang aplikasi ke layar utama. | Manifest valid, ikon tersedia, dan aplikasi terbuka dalam mode standalone setelah dipasang. |
-| US-10 | Sebagai pengguna, saya ingin mengganti lokasi. | Pencarian kota berjalan. Izin lokasi bisa ditolak tanpa memblokir aplikasi. Lokasi pilihan bertahan setelah reload. |
+| ID    | User story                                                                                     | Kriteria penerimaan                                                                                                                                                                                             |
+| ----- | ---------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| US-01 | Sebagai pengguna, saya ingin melihat jam, tanggal, dan lokasi saat ini begitu aplikasi dibuka. | Jam diperbarui tiap detik. Tanggal mengikuti lokal perangkat. Nama lokasi tampil. Tidak ada layout shift saat jam berganti digit.                                                                               |
+| US-02 | Sebagai pengguna, saya ingin tahu cuaca saat ini dan beberapa jam ke depan.                    | Suhu, kondisi, suhu terasa, kelembapan, dan angin tampil. Strip per jam menampilkan minimal 12 jam ke depan. Prakiraan 7 hari tersedia. Ada state loading, error, dan data basi.                                |
+| US-03 | Sebagai pengguna, saya ingin tahu kualitas udara sekarang.                                     | Nilai AQI, kategori, polutan dominan, dan saran singkat tampil. Sumber dan standar AQI disebut. Warna tidak menjadi satu-satunya penanda kategori.                                                              |
+| US-04 | Sebagai pengguna, saya ingin mencatat hal cepat.                                               | Catatan bisa dibuat, dibaca, diubah, dihapus, dicari, dan dipin. Data bertahan setelah reload. Ada state kosong dan konfirmasi hapus.                                                                           |
+| US-05 | Sebagai pengguna, saya ingin melihat agenda bulan ini.                                         | Kalender bulanan tampil bersama catatan dalam satu halaman. Agenda bisa dibuat, diubah, dan dihapus, dan bisa dipasangi nada dering. Agenda hari ini muncul di dasbor.                                          |
+| US-06 | Sebagai pengguna, saya ingin memasang alarm.                                                   | Alarm bisa dibuat, diubah, dihapus, dan diaktifkan. Alarm berbunyi saat aplikasi terbuka, dan di Android tetap berbunyi saat aplikasi tertutup. Nada alarm bisa dipilih. Batasan web dijelaskan di layar alarm. |
+| US-07 | Sebagai pengguna, saya ingin memilih tema terang atau gelap.                                   | Pilihan Sistem, Terang, dan Gelap tersedia. Pilihan bertahan setelah reload. Kedua tema lolos pemeriksaan kontras.                                                                                              |
+| US-08 | Sebagai pengguna, saya ingin tetap melihat data saat offline.                                  | Dasbor tetap terbuka. Data cache tampil dengan label waktu. Data lokal tetap bisa diubah.                                                                                                                       |
+| US-09 | Sebagai pengguna, saya ingin memasang aplikasi ke layar utama.                                 | Manifest valid, ikon tersedia, dan aplikasi terbuka dalam mode standalone setelah dipasang.                                                                                                                     |
+| US-10 | Sebagai pengguna, saya ingin mengganti lokasi.                                                 | Pencarian kota berjalan. Izin lokasi bisa ditolak tanpa memblokir aplikasi. Lokasi pilihan bertahan setelah reload.                                                                                             |
+| US-11 | Sebagai pengguna, saya ingin menghitung cepat.                                                 | Kalkulator ilmiah lengkap dan kalkulator BMI tersedia dalam satu halaman. Hasil menghormati urutan operasi.                                                                                                     |
+| US-12 | Sebagai pengguna, saya ingin stopwatch, timer, dan kompas.                                     | Stopwatch dan timer berjalan dan bisa direset. Timer tetap berbunyi saat aplikasi tertutup di Android. Kompas menampilkan arah dari sensor perangkat, atau ajakan mengaktifkan sensor di desktop.               |
 
 ## 9. Kebutuhan fungsional
 
@@ -126,19 +128,22 @@ Rina, 31, reviewer portofolio. Membuka aplikasi sekali untuk menilai kualitas te
 ### FR-06 Kalender dan agenda
 
 - Tampilan bulanan dengan navigasi bulan sebelumnya dan berikutnya, serta tombol kembali ke hari ini.
-- Agenda: judul (wajib), tanggal (wajib), waktu mulai dan selesai (opsional), sepanjang hari (opsional), catatan (opsional).
-- Agenda bisa dibuat, diubah, dan dihapus dari panel hari.
+- Agenda: judul (wajib), tanggal (wajib), waktu mulai dan selesai (opsional), sepanjang hari (opsional), catatan (opsional), dan nada dering (opsional).
+- Agenda dengan nada dering berbunyi seperti alarm pada waktunya, dengan pilihan kapan berbunyi (tepat mulai sampai satu jam sebelum) dan pilihan nada. Titik merah menandai agenda ini di kalender.
+- Agenda bisa dibuat, diubah, dan dihapus dari panel hari. Kalender dan catatan berada dalam satu halaman, agenda lebih dulu lalu daftar catatan.
 - Dasbor menampilkan maksimal tiga agenda terdekat hari ini dan besok.
-- Pengingat dalam aplikasi hanya berjalan saat aplikasi terbuka.
+- Di web pengingat berjalan selama aplikasi terbuka. Di aplikasi Android, pengingat agenda dijadwalkan ke sistem sehingga tetap berbunyi saat aplikasi tertutup.
 
 ### FR-07 Alarm
 
 - Field: label, waktu, ulangi (sekali, setiap hari, atau hari tertentu), aktif, menit tunda.
 - Alarm berbunyi saat aplikasi terbuka. Bunyi memakai Web Audio, tanpa file audio eksternal pada v1.
+- Di aplikasi Android, alarm dijadwalkan ke sistem, berbunyi tepat waktu walau aplikasi tertutup, dan memakai salah satu dari enam nada bundel: Nadi, Lembut, Tegas, Lonceng, Denyut, Fajar.
 - Notifikasi browser dipakai jika izin diberikan.
 - Tombol tunda menunda 5 menit sebagai default.
-- Batas jelas di layar: "Alarm hanya berbunyi saat Nadi terbuka." Opsi alarm latar belakang masuk backlog Capacitor.
+- Batas jelas di layar saat web: "Alarm hanya berbunyi saat Nadi terbuka." Di Android batas ini digantikan penjadwalan native.
 - Alarm sekali pakai otomatis nonaktif setelah berbunyi.
+- Stopwatch dan timer tersedia di halaman Alarm. Timer tetap berbunyi saat aplikasi tertutup di Android.
 
 ### FR-08 Pengaturan
 
@@ -149,6 +154,8 @@ Rina, 31, reviewer portofolio. Membuka aplikasi sekali untuk menilai kualitas te
 - Awal minggu: Senin atau Minggu.
 - Ekspor data ke JSON, impor dari JSON dengan validasi.
 - Hapus semua data dengan konfirmasi teks.
+- Nada alarm: pilih satu dari enam nada bundel untuk alarm dan timer.
+- Aplikasi Android: unduh APK dari peramban.
 - Tentang: versi, sumber data, atribusi Open-Meteo dan CAMS, lisensi.
 
 ### FR-09 PWA dan offline
@@ -170,15 +177,29 @@ Rina, 31, reviewer portofolio. Membuka aplikasi sekali untuk menilai kualitas te
 - `prefers-reduced-motion` dihormati.
 - Seluruh alur utama bisa diselesaikan dengan keyboard.
 
+### FR-11 Kalkulator
+
+- Halaman sendiri di navigasi bawah, menggantikan tab kalender.
+- Mode Ilmiah: kurung, persen, pangkat, akar kuadrat dan kubik, sin, cos, tan beserta invers, log, ln, pi, e, faktorial, mode sudut derajat atau radian, pratinjau hasil langsung, dan riwayat singkat.
+- Mode BMI: tinggi dan berat, angka IMT, kategori memakai ambang Asia, dan rentang berat sehat.
+- Hasil memakai batas "panduan umum, bukan nasihat medis" pada bagian BMI.
+
+### FR-12 Alat dan kompas
+
+- Stopwatch dan timer di halaman Alarm. Timer memakai nada alarm terpilih dan di Android dijadwalkan ke sistem supaya tetap berbunyi saat aplikasi tertutup.
+- Kompas di dasbor memakai sensor `deviceorientation`. Tidak ada permintaan internet. Di peramban desktop hanya menampilkan ajakan mengaktifkan sensor.
+
 ## 10. Kebutuhan non-fungsional
 
 Performa:
+
 - JavaScript awal di bawah 200KB gzip, tanpa grafik yang dimuat malas.
 - Grafik AQI dimuat malas.
 - Font disubset ke latin dan latin-ext, dengan `font-display: swap`.
 - Tinggi kartu dicadangkan untuk mencegah layout shift.
 
 Aksesibilitas:
+
 - Struktur landmark: header, nav, main.
 - Satu `h1` per halaman, level heading tidak melompat.
 - Fokus terlihat di semua elemen interaktif.
@@ -186,45 +207,48 @@ Aksesibilitas:
 - Tombol ikon memiliki nama aksesibel.
 
 Privasi:
+
 - Tidak ada akun dan tidak ada analitik pada v1.
 - Koordinat dikirim ke Open-Meteo hanya untuk permintaan cuaca dan kualitas udara.
 - Semua data pribadi disimpan lokal.
 - Ekspor data hanya terjadi atas tindakan pengguna.
 
 Kompatibilitas:
+
 - Chrome, Edge, Firefox, dan Safari versi terbaru.
 - Android dan iOS, termasuk mode standalone.
 - Lebar 320px sampai 1440px.
 
 Lisensi dan atribusi:
+
 - Atribusi Open-Meteo dan CAMS tampil di Pengaturan dan Tentang.
 - Penggunaan non-komersial. Penggunaan komersial memerlukan peninjauan lisensi.
 
 ## 11. Batasan dan risiko
 
-| Risiko | Dampak | Mitigasi |
-|---|---|---|
-| Alarm web tidak berjalan saat aplikasi tertutup | Pengguna melewatkan alarm | Tulis batasan di UI, sediakan notifikasi browser, siapkan Capacitor untuk v2 |
-| Kuota dan kebijakan Open-Meteo berubah | Data cuaca berhenti | Cache respons terakhir, tangani 429 dengan backoff, pantau dokumentasi |
-| Izin lokasi ditolak | Pengalaman pertama terganggu | Fallback pencarian kota dan default yang diberi label |
-| Scope enam modul melebar | Rilis tertunda | Urutan milestone, fitur Should dan Could dipisah |
-| Perbedaan perilaku PWA di iOS | Install dan notifikasi terbatas | Uji di perangkat nyata, jelaskan batasan di Tentang |
-| Data AQI disalahartikan sebagai nasihat medis | Risiko komunikasi | Label standar, saran umum, disclaimer singkat |
+| Risiko                                          | Dampak                          | Mitigasi                                                                     |
+| ----------------------------------------------- | ------------------------------- | ---------------------------------------------------------------------------- |
+| Alarm web tidak berjalan saat aplikasi tertutup | Pengguna melewatkan alarm       | Tulis batasan di UI, sediakan notifikasi browser, siapkan Capacitor untuk v2 |
+| Kuota dan kebijakan Open-Meteo berubah          | Data cuaca berhenti             | Cache respons terakhir, tangani 429 dengan backoff, pantau dokumentasi       |
+| Izin lokasi ditolak                             | Pengalaman pertama terganggu    | Fallback pencarian kota dan default yang diberi label                        |
+| Scope enam modul melebar                        | Rilis tertunda                  | Urutan milestone, fitur Should dan Could dipisah                             |
+| Perbedaan perilaku PWA di iOS                   | Install dan notifikasi terbatas | Uji di perangkat nyata, jelaskan batasan di Tentang                          |
+| Data AQI disalahartikan sebagai nasihat medis   | Risiko komunikasi               | Label standar, saran umum, disclaimer singkat                                |
 
 ## 12. Rencana rilis
 
-| Milestone | Isi |
-|---|---|
-| M0 | Fondasi proyek, tooling, shell, tema, PWA dasar |
-| M1 | Design system dan komponen dasar |
-| M2 | Jam, tanggal, lokasi |
-| M3 | Cuaca |
-| M4 | Kualitas udara |
-| M5 | Catatan |
-| M6 | Kalender dan agenda |
-| M7 | Alarm |
-| M8 | Pengaturan, offline, aksesibilitas, performa |
-| M9 | Rilis dan pengujian instalasi |
+| Milestone | Isi                                             |
+| --------- | ----------------------------------------------- |
+| M0        | Fondasi proyek, tooling, shell, tema, PWA dasar |
+| M1        | Design system dan komponen dasar                |
+| M2        | Jam, tanggal, lokasi                            |
+| M3        | Cuaca                                           |
+| M4        | Kualitas udara                                  |
+| M5        | Catatan                                         |
+| M6        | Kalender dan agenda                             |
+| M7        | Alarm                                           |
+| M8        | Pengaturan, offline, aksesibilitas, performa    |
+| M9        | Rilis dan pengujian instalasi                   |
 
 Rincian task ada di [TASKS.md](TASKS.md).
 

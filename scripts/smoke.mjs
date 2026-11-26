@@ -140,8 +140,8 @@ try {
   check('service worker aktif', serviceWorkerActive);
 
   const routes = [
-    ['Kalender', '/kalender', 'Kalender'],
-    ['Catatan', '/catatan', 'Catatan'],
+    ['Catatan', '/catatan', 'Agenda dan catatan'],
+    ['Kalkulator', '/kalkulator', 'Kalkulator'],
     ['Alarm', '/alarm', 'Alarm'],
     ['Pengaturan', '/pengaturan', 'Pengaturan'],
   ];
@@ -161,6 +161,19 @@ try {
     );
   }
 
+  // Kalkulator ilmiah dan BMI.
+  await page.goto(`${BASE}/kalkulator`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Kalkulator', exact: true }).waitFor();
+  await page.getByLabel('Rumus').fill('2 + 3 * 4');
+  await page.getByText('= 14').waitFor();
+  check('kalkulator ilmiah menghitung', await page.getByText('= 14').isVisible());
+
+  await page.getByRole('button', { name: 'BMI' }).click();
+  await page.getByLabel('Tinggi (cm)').fill('170');
+  await page.getByLabel('Berat (kg)').fill('70');
+  await page.getByText('24.2').waitFor();
+  check('kalkulator BMI menghitung', await page.getByText('24.2').isVisible());
+
   // Modul tumbuh kembang, dicapai lewat kartu di dasbor.
   await page.goto(`${BASE}/`, { waitUntil: 'load' });
   await page.locator('h1').first().waitFor();
@@ -176,7 +189,7 @@ try {
   check('tumbuh kembang menghitung tinggi ideal', await page.getByText('Tinggi ideal').isVisible());
 
   await page.goto(`${BASE}/catatan`, { waitUntil: 'load' });
-  await page.getByRole('heading', { level: 1, name: 'Catatan', exact: true }).waitFor();
+  await page.getByRole('heading', { level: 1, name: 'Agenda dan catatan', exact: true }).waitFor();
   await page.getByText('Catatan asap').waitFor();
   check('daftar catatan tampil', await page.getByText('Catatan asap').isVisible());
 
@@ -206,9 +219,9 @@ try {
   await page.getByText('Belum ada catatan').waitFor();
   check('catatan terhapus', await page.getByText('Belum ada catatan').isVisible());
 
-  await page.goto(`${BASE}/kalender`, { waitUntil: 'load' });
-  await page.getByRole('heading', { level: 1, name: 'Kalender', exact: true }).waitFor();
-  const monthHeading = page.getByRole('heading', { level: 2 });
+  await page.goto(`${BASE}/catatan`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Agenda dan catatan', exact: true }).waitFor();
+  const monthHeading = page.getByRole('heading', { level: 2 }).first();
   const beforeMonth = (await monthHeading.textContent()) ?? '';
   await page.getByRole('button', { name: 'Bulan berikutnya' }).click();
   await page.waitForFunction(
@@ -339,8 +352,8 @@ try {
     .innerText();
   check('format jam 12 jam dipakai', /(AM|PM)/.test(clockText), clockText);
 
-  await page.goto(`${BASE}/kalender`, { waitUntil: 'load' });
-  await page.getByRole('heading', { level: 1, name: 'Kalender', exact: true }).waitFor();
+  await page.goto(`${BASE}/catatan`, { waitUntil: 'load' });
+  await page.getByRole('heading', { level: 1, name: 'Agenda dan catatan', exact: true }).waitFor();
   const firstWeekday = await page
     .locator('div.grid-cols-7')
     .first()

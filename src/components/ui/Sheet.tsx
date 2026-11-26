@@ -39,7 +39,11 @@ export function Sheet({ open, onClose, title, description, children, footer }: S
           </IconButton>
         </div>
         {children ? <div className="mt-5">{children}</div> : null}
-        {footer ? <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">{footer}</div> : null}
+        {footer ? (
+          <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            {footer}
+          </div>
+        ) : null}
       </div>
     </dialog>
   );

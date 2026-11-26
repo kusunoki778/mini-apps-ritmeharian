@@ -1,18 +1,18 @@
 # Nadi
 
-Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, dan alarm dalam satu dasbor.
+Aplikasi web progresif untuk jam, cuaca, kualitas udara, agenda, catatan, alarm, dan kalkulator dalam satu dasbor.
 
-Status: M8 selesai, pembungkus Capacitor (M10) termasuk alarm layar penuh Tier 2, dan fitur tumbuh kembang (M11) sudah berjalan. Berikutnya M9 rilis dan uji di perangkat nyata.
+Status: M8 selesai, pembungkus Capacitor (M10) termasuk alarm layar penuh Tier 2 dan pilihan nada alarm, fitur tumbuh kembang (M11), serta tata ulang navigasi dan kalkulator (M12) sudah berjalan. Berikutnya M9 rilis dan uji di perangkat nyata.
 
 ## Tangkapan layar
 
-| Beranda (terang)                                          | Beranda (gelap)                                         | Kalender                                      |
-| --------------------------------------------------------- | ------------------------------------------------------- | --------------------------------------------- |
-| ![Beranda terang](docs/screenshots/01-beranda-terang.png) | ![Beranda gelap](docs/screenshots/02-beranda-gelap.png) | ![Kalender](docs/screenshots/03-kalender.png) |
+| Beranda (terang)                                          | Beranda (gelap)                                         | Agenda dan catatan                                            |
+| --------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------- |
+| ![Beranda terang](docs/screenshots/01-beranda-terang.png) | ![Beranda gelap](docs/screenshots/02-beranda-gelap.png) | ![Agenda dan catatan](docs/screenshots/03-catatan-agenda.png) |
 
-| Catatan                                     | Alarm                                   | Pengaturan (gelap)                                      |
-| ------------------------------------------- | --------------------------------------- | ------------------------------------------------------- |
-| ![Catatan](docs/screenshots/04-catatan.png) | ![Alarm](docs/screenshots/05-alarm.png) | ![Pengaturan](docs/screenshots/06-pengaturan-gelap.png) |
+| Kalkulator                                        | Alarm                                   | Pengaturan (gelap)                                      |
+| ------------------------------------------------- | --------------------------------------- | ------------------------------------------------------- |
+| ![Kalkulator](docs/screenshots/04-kalkulator.png) | ![Alarm](docs/screenshots/05-alarm.png) | ![Pengaturan](docs/screenshots/06-pengaturan-gelap.png) |
 
 Tinggi dan berat ideal: ![Tumbuh kembang](docs/screenshots/08-tumbuh-kembang.png)
 

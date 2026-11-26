@@ -326,6 +326,16 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
   - Tawaran muncul di Beranda dan bagian **Aplikasi Android** di Pengaturan, hanya di peramban dan hanya bila berkas tersedia. Tawaran di Beranda bisa ditolak permanen.
   - Penerimaan: tautan unduh tampil di peramban, berkas tersaji dengan tipe paket Android, dan tidak muncul di aplikasi native. Diuji di unit dan uji asap.
 
+- [x] T10.8 Pilihan nada alarm yang dibundel (M)
+  - Enam nada bebas lisensi dibuat sendiri lewat `scripts/make-alarm-sound.mjs` (`npm run sound`): Nadi, Lembut, Tegas, Lonceng, Denyut, Fajar. Berkas WAV ada di `android/app/src/main/res/raw/`, panjang 24 sampai 26 detik supaya terasa seperti alarm, bukan notifikasi singkat.
+  - Id nada disamakan antara `alarm-sounds.ts` (web) dan `AlarmSounds.java` (native). Pilihan disimpan di `settings.alarmSoundId`, disalin ke tiap kemunculan alarm dan timer native, lalu dibaca `AlarmSound.java` saat berbunyi.
+  - Kanal alarm dinaikkan ke `nadi-alarm-full-v2` dengan `setSound(null, null)` supaya tidak dobel dengan pemutar nada sendiri. Layanan latar depan memakai tipe `mediaPlayback` di Android 10 ke atas.
+  - Penerimaan: pilihan nada tersimpan dan dipakai alarm native serta timer, dengan cadangan nada alarm bawaan sistem bila berkas tidak ada. Diuji di unit.
+
+- [x] T10.9 Alat stopwatch, timer, dan kompas (S)
+  - Stopwatch dan timer di halaman Alarm. Timer native tetap berbunyi saat aplikasi tertutup lewat `scheduleNativeTimer` dengan nada terpilih. Kompas memakai sensor `deviceorientation`, jadi tidak butuh internet; di peramban desktop hanya menampilkan ajakan mengaktifkan sensor.
+  - Penerimaan: stopwatch berjalan dan bisa direset, timer menghitung mundur dan bisa direset, kompas menampilkan arah dari sensor. Diuji di unit.
+
 ## M11: Tinggi dan berat badan ideal
 
 Tujuan: menghitung tinggi dan berat badan ideal menurut umur, jenis kelamin, dan tinggi badan. Fitur punya rute sendiri `/tumbuh-kembang` dan kartu pintu masuk ringkas di dasbor.
@@ -346,6 +356,24 @@ Tujuan: menghitung tinggi dan berat badan ideal menurut umur, jenis kelamin, dan
   - Rumus Devine, Robinson, Miller, dan Hamwi di `adult-formula.ts`, terpisah dari tabel WHO agar halaman Pengaturan tidak membawa data pertumbuhan.
   - Pilihan rumus memakai `settings.idealWeightFormula` dan diubah dari halaman Pengaturan.
   - Penerimaan: pilihan tersimpan di pengaturan dan dipakai halaman Tumbuh kembang. Diuji di unit dan di halaman Pengaturan.
+
+## M12: Tata ulang navigasi, kalkulator, dan alarm agenda
+
+Tujuan: memadatkan navigasi bawah dan memindahkan kalkulator ke halaman sendiri, serta membuat agenda bisa berbunyi seperti alarm.
+
+- [x] T12.1 Gabungkan Kalender dan Catatan (M)
+  - `JournalPage.tsx` di rute `/catatan` menampilkan agenda bulanan lebih dulu, lalu daftar catatan di bawahnya. Bagian dipecah jadi `CalendarBoard.tsx` dan `NotesBoard.tsx`. Rute lama `/kalender` mengalihkan ke `/catatan` supaya tautan lama tetap jalan.
+  - Penerimaan: satu halaman memuat agenda dan catatan, pencarian serta tambah tetap berfungsi. Diuji di unit dan uji asap.
+
+- [x] T12.2 Ganti tab Kalender jadi Kalkulator (M)
+  - Navigasi bawah: Beranda, Catatan, Kalkulator, Alarm, Pengaturan. `CalculatorPage.tsx` di rute `/kalkulator` punya dua mode: Ilmiah (kurung, persen, pangkat, akar, sin, cos, tan, log, ln, pi, riwayat singkat) dan BMI.
+  - Mesin hitung `expression.ts` ditulis sendiri tanpa `eval` supaya bisa diuji tanpa DOM. Kalkulator lama di halaman Alarm dihapus.
+  - Penerimaan: kalkulator ilmiah dan BMI menghitung dengan benar, tab bawah mengarah ke halaman nyata. Diuji di unit dan uji asap.
+
+- [x] T12.3 Alarm dari agenda (M)
+  - `EventFormSheet` punya sakelar **Pasang nada dering** dengan pilihan kapan berbunyi (tepat mulai sampai 1 jam sebelum) dan pilihan nada. Agenda dapat `reminderMinutes`, `reminderSoundId`, dan `reminderFiredAt`.
+  - `buildNativeEventItems` menjadwalkan agenda sebagai alarm native sekali jalan dengan nada terpilih. Di web, `CalendarReminderEngine` berbunyi lewat `RingScreen` dan menandai `reminderFiredAt`. Titik merah di kalender menandai agenda dengan nada dering.
+  - Penerimaan: agenda dengan nada dering berbunyi seperti alarm, bisa ditunda, dan tidak berbunyi dua kali. Diuji di unit.
 
 ## Backlog setelah v1
 
@@ -385,6 +413,7 @@ Jangan mulai dari catatan atau alarm. Keduanya menggoda karena terasa mudah, tet
 | M9        | 1 hari                |
 | M10       | 3 hari                |
 | M11       | 2 hari                |
-| Total     | sekitar 32 hari kerja |
+| M12       | 3 hari                |
+| Total     | sekitar 35 hari kerja |
 
 Paruh waktu sekitar 6 sampai 8 minggu. Jika waktu terbatas, tunda M6 dan M7 ke v1.1 dan rilis dasbor, cuaca, AQI, serta catatan lebih dulu. Jangan memotong state, aksesibilitas, atau pengujian offline, karena ketiganya adalah nilai jual proyek ini.

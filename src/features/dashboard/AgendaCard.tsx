@@ -27,9 +27,7 @@ export function AgendaCard() {
 
   const upcoming = useMemo(
     () =>
-      (events ?? [])
-        .filter((event) => event.allDay || event.start >= now.getTime())
-        .slice(0, 3),
+      (events ?? []).filter((event) => event.allDay || event.start >= now.getTime()).slice(0, 3),
     [events, now],
   );
 
@@ -55,10 +53,10 @@ export function AgendaCard() {
             Tambah agenda
           </Button>
           <Link
-            to="/kalender"
+            to="/catatan"
             className="inline-flex items-center gap-1 text-[13px] font-medium text-accent hover:underline"
           >
-            Kalender <ArrowRight size={14} aria-hidden="true" />
+            Agenda <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </div>
       </div>

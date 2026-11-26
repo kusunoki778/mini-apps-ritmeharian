@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Input } from '@/components/ui/Input';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { toast } from '@/components/ui/toast-store';
 import type { Note } from '@/lib/db/db';
@@ -16,7 +15,8 @@ import { NoteListItem } from './NoteListItem';
 import { deleteNote, setPinned } from './notes-repo';
 import { useNotes } from './useNotes';
 
-export default function NotesPage() {
+// Daftar catatan tanpa judul halaman, dipakai halaman gabungan Catatan dan agenda.
+export function NotesBoard() {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 200);
   const notes = useNotes(debouncedQuery);
@@ -51,17 +51,13 @@ export default function NotesPage() {
 
   return (
     <div>
-      <PageHeader
-        eyebrow="Catatan"
-        title="Catatan"
-        description="Tulis hal cepat, cari, dan sematkan yang penting. Semua tersimpan di perangkat ini."
-        action={
-          <Button onClick={openCreate}>
-            <NotePencil size={18} aria-hidden="true" />
-            Catatan baru
-          </Button>
-        }
-      />
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold">Catatan</h2>
+        <Button onClick={openCreate}>
+          <NotePencil size={18} aria-hidden="true" />
+          Catatan baru
+        </Button>
+      </div>
 
       <div className="mb-5 max-w-md">
         <Input
@@ -110,9 +106,7 @@ export default function NotesPage() {
         </Card>
       )}
 
-      {editorOpen ? (
-        <NoteEditorSheet note={editing} onClose={() => setEditorOpen(false)} />
-      ) : null}
+      {editorOpen ? <NoteEditorSheet note={editing} onClose={() => setEditorOpen(false)} /> : null}
 
       <DeleteNoteDialog
         open={Boolean(pendingDelete)}

@@ -5,7 +5,6 @@ import { useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { IconButton } from '@/components/ui/IconButton';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { toast } from '@/components/ui/toast-store';
 import type { CalendarEvent } from '@/lib/db/db';
 import { useSettings } from '@/features/settings/useSettings';
@@ -25,7 +24,9 @@ import { EventFormSheet } from './EventFormSheet';
 import { deleteEvent } from './events-repo';
 import { useEventsBetween } from './useEvents';
 
-export default function CalendarPage() {
+// Papan kalender agenda. Dipakai halaman Catatan yang menggabungkan agenda dan
+// catatan, jadi bagian ini tidak memasang judul halaman sendiri.
+export function CalendarBoard() {
   const { settings } = useSettings();
   const weekStart = settings.weekStart;
   const [month, setMonth] = useState(() => new Date());
@@ -64,13 +65,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div>
-      <PageHeader
-        eyebrow="Kalender"
-        title="Kalender"
-        description="Agenda bulanan tersimpan di perangkat ini. Tekan tanggal untuk melihat dan menambah agenda."
-      />
-
+    <>
       <Card className="p-4 md:p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold">{monthLabel(month)}</h2>
@@ -119,12 +114,12 @@ export default function CalendarPage() {
                 aria-current={isToday(day) ? 'date' : undefined}
                 className={cn(
                   'flex min-h-14 flex-col items-center gap-1 rounded-control p-1 transition-colors hover:bg-accent-soft',
-                  !inMonth && 'text-ink-muted/60',
                 )}
               >
                 <span
                   className={cn(
                     'tabular flex size-7 items-center justify-center rounded-full text-sm',
+                    !inMonth && 'text-ink-muted',
                     isToday(day) && 'bg-accent font-bold text-paper',
                   )}
                 >
@@ -132,13 +127,24 @@ export default function CalendarPage() {
                 </span>
                 <span aria-hidden="true" className="flex h-1.5 items-center gap-0.5">
                   {dayEvents.slice(0, 3).map((event) => (
-                    <span key={event.id} className="size-1.5 rounded-full bg-accent" />
+                    <span
+                      key={event.id}
+                      className={cn(
+                        'size-1.5 rounded-full',
+                        event.reminderMinutes != null ? 'bg-danger' : 'bg-accent',
+                      )}
+                    />
                   ))}
                 </span>
               </button>
             );
           })}
         </div>
+
+        <p className="mt-3 flex items-center gap-2 text-[13px] text-ink-muted">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-danger" />
+          Titik merah menandakan agenda dengan nada dering.
+        </p>
       </Card>
 
       {selectedDay ? (
@@ -166,6 +172,6 @@ export default function CalendarPage() {
         onCancel={() => setPendingDelete(null)}
         onConfirm={() => void handleConfirmDelete()}
       />
-    </div>
+    </>
   );
 }

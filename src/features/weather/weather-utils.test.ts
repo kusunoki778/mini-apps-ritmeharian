@@ -1,11 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  currentHourIndex,
-  formatClock,
-  hourIsDaylight,
-  formatUpdatedAt,
-} from './weather-utils';
+import { currentHourIndex, formatClock, hourIsDaylight, formatUpdatedAt } from './weather-utils';
 
 describe('formatClock', () => {
   it('mengubah ISO lokal menjadi jam bertitik', () => {

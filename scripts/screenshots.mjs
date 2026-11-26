@@ -33,8 +33,8 @@ try {
   await page.screenshot({ path: `${OUT}/02-beranda-gelap.png` });
 
   for (const [path, name] of [
-    ['kalender', '03-kalender'],
-    ['catatan', '04-catatan'],
+    ['catatan', '03-catatan-agenda'],
+    ['kalkulator', '04-kalkulator'],
     ['alarm', '05-alarm'],
   ]) {
     await page.goto(`${BASE}/${path}`, { waitUntil: 'load' });

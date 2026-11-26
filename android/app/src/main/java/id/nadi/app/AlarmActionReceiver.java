@@ -18,9 +18,11 @@ public class AlarmActionReceiver extends BroadcastReceiver {
             int snoozeMinutes = intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5);
             String label = intent.getStringExtra(AlarmScheduler.EXTRA_LABEL);
             String alarmId = intent.getStringExtra(AlarmScheduler.EXTRA_ALARM_ID);
+            String soundId = intent.getStringExtra(AlarmScheduler.EXTRA_SOUND_ID);
             long triggerAt = System.currentTimeMillis() + snoozeMinutes * 60_000L;
             AlarmScheduler.schedule(context, notificationId, triggerAt, label, alarmId,
-                    snoozeMinutes);
+                    snoozeMinutes,
+                    soundId == null ? AlarmScheduler.DEFAULT_SOUND_ID : soundId);
         }
 
         AlarmService.stop(context);

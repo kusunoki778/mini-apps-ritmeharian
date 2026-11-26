@@ -21,7 +21,10 @@ describe('loadWeather', () => {
 
     expect(result.stale).toBe(false);
     expect(result.data).toEqual(SAMPLE_WEATHER);
-    expect(deps.writeCache).toHaveBeenCalledWith(weatherCacheKey(-6.2088, 106.8456), SAMPLE_WEATHER);
+    expect(deps.writeCache).toHaveBeenCalledWith(
+      weatherCacheKey(-6.2088, 106.8456),
+      SAMPLE_WEATHER,
+    );
   });
 
   it('memakai cache saat jaringan gagal, seperti saat offline atau timeout', async () => {
@@ -59,7 +62,9 @@ describe('loadWeather', () => {
       readCache,
     });
 
-    await expect(loadWeather(-6.2088, 106.8456, controller.signal, deps)).rejects.toThrow('aborted');
+    await expect(loadWeather(-6.2088, 106.8456, controller.signal, deps)).rejects.toThrow(
+      'aborted',
+    );
     expect(readCache).not.toHaveBeenCalled();
   });
 });

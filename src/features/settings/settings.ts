@@ -1,4 +1,9 @@
 import type { AdultFormula } from '@/features/growth/adult-formula';
+import {
+  DEFAULT_ALARM_SOUND,
+  isAlarmSoundId,
+  type AlarmSoundId,
+} from '@/features/alarms/alarm-sounds';
 import type { ClockFormat, TemperatureUnit } from '@/lib/format/preferences';
 import type { ThemePreference } from './theme';
 import type { WeekStart } from './week-start';
@@ -9,6 +14,7 @@ export interface Settings {
   clockFormat: ClockFormat;
   weekStart: WeekStart;
   idealWeightFormula: AdultFormula;
+  alarmSoundId: AlarmSoundId;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -17,6 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
   clockFormat: '24h',
   weekStart: 1,
   idealWeightFormula: 'devine',
+  alarmSoundId: DEFAULT_ALARM_SOUND,
 };
 
 // Menyaring nilai yang tidak dikenal dari penyimpanan atau impor tanpa melempar.
@@ -45,6 +52,9 @@ export function sanitizeSettings(value: unknown): Partial<Settings> {
     record.idealWeightFormula === 'hamwi'
   ) {
     result.idealWeightFormula = record.idealWeightFormula;
+  }
+  if (isAlarmSoundId(record.alarmSoundId)) {
+    result.alarmSoundId = record.alarmSoundId;
   }
 
   return result;

@@ -16,6 +16,11 @@ export interface CalendarEvent {
   end: number | null;
   allDay: boolean;
   note?: string;
+  // Pengingat agenda. reminderMinutes = menit sebelum mulai (0 = tepat saat mulai).
+  // Tidak ada nilai berarti agenda tidak berbunyi.
+  reminderMinutes?: number | null;
+  reminderSoundId?: string;
+  reminderFiredAt?: number;
   createdAt: number;
   updatedAt: number;
 }

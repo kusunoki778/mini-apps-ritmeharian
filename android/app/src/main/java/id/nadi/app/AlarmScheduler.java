@@ -20,6 +20,9 @@ final class AlarmScheduler {
     static final String EXTRA_LABEL = "label";
     static final String EXTRA_ALARM_ID = "alarmId";
     static final String EXTRA_SNOOZE_MINUTES = "snoozeMinutes";
+    static final String EXTRA_SOUND_ID = "soundId";
+    static final String DEFAULT_SOUND_ID = "nadi";
+    static final int TIMER_ID = 2147483001;
 
     private static final String PREFS = "nadi_alarm_store";
     private static final String KEY = "scheduled";
@@ -27,12 +30,12 @@ final class AlarmScheduler {
     private AlarmScheduler() {}
 
     static void schedule(Context context, int notificationId, long triggerAt, String label,
-                         String alarmId, int snoozeMinutes) {
+                         String alarmId, int snoozeMinutes, String soundId) {
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (manager == null) return;
 
         PendingIntent intent = pendingIntent(context, notificationId, triggerAt, label, alarmId,
-                snoozeMinutes);
+                snoozeMinutes, soundId);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !manager.canScheduleExactAlarms()) {
             // Izin alarm pasti belum diberikan. Pakai alarm tidak pasti agar tetap berbunyi.
@@ -43,7 +46,7 @@ final class AlarmScheduler {
             manager.setExact(AlarmManager.RTC_WAKEUP, triggerAt, intent);
         }
 
-        persist(context, notificationId, triggerAt, label, alarmId, snoozeMinutes);
+        persist(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId);
     }
 
     static void cancel(Context context, int notificationId) {
@@ -64,9 +67,10 @@ final class AlarmScheduler {
         JSONArray stored = read(context);
         for (int index = 0; index < stored.length(); index += 1) {
             JSONObject item = stored.optJSONObject(index);
-            if (item != null) cancel(context, item.optInt(EXTRA_NOTIFICATION_ID, 0));
+            if (item != null && item.optInt(EXTRA_NOTIFICATION_ID, 0) != TIMER_ID) {
+                cancel(context, item.optInt(EXTRA_NOTIFICATION_ID, 0));
+            }
         }
-        clear(context);
     }
 
     // Dipakai setelah reboot untuk memasang ulang alarm yang masih di masa depan.
@@ -80,18 +84,21 @@ final class AlarmScheduler {
             if (triggerAt <= now) continue;
             schedule(context, item.optInt(EXTRA_NOTIFICATION_ID, 0), triggerAt,
                     item.optString(EXTRA_LABEL, "Alarm"), item.optString(EXTRA_ALARM_ID, ""),
-                    item.optInt(EXTRA_SNOOZE_MINUTES, 5));
+                    item.optInt(EXTRA_SNOOZE_MINUTES, 5),
+                    item.optString(EXTRA_SOUND_ID, DEFAULT_SOUND_ID));
         }
     }
 
     private static PendingIntent pendingIntent(Context context, int notificationId, long triggerAt,
-                                               String label, String alarmId, int snoozeMinutes) {
+                                               String label, String alarmId, int snoozeMinutes,
+                                               String soundId) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
         intent.putExtra(EXTRA_TRIGGER_AT, triggerAt);
         intent.putExtra(EXTRA_LABEL, label);
         intent.putExtra(EXTRA_ALARM_ID, alarmId);
         intent.putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes);
+        intent.putExtra(EXTRA_SOUND_ID, soundId);
         return PendingIntent.getBroadcast(context, notificationId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
@@ -101,7 +108,8 @@ final class AlarmScheduler {
     }
 
     private static synchronized void persist(Context context, int notificationId, long triggerAt,
-                                             String label, String alarmId, int snoozeMinutes) {
+                                             String label, String alarmId, int snoozeMinutes,
+                                             String soundId) {
         JSONArray next = new JSONArray();
         JSONArray stored = read(context);
         for (int index = 0; index < stored.length(); index += 1) {
@@ -118,6 +126,7 @@ final class AlarmScheduler {
             entry.put(EXTRA_LABEL, label);
             entry.put(EXTRA_ALARM_ID, alarmId);
             entry.put(EXTRA_SNOOZE_MINUTES, snoozeMinutes);
+            entry.put(EXTRA_SOUND_ID, soundId);
         } catch (JSONException ignored) {
             return;
         }

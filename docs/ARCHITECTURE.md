@@ -174,15 +174,16 @@ Aturan folder:
 
 ## 5. Routing
 
-| Path              | Halaman         | Catatan                     |
-| ----------------- | --------------- | --------------------------- |
-| `/`               | Beranda         | Dasbor                      |
-| `/kalender`       | Kalender        | Bulan dan agenda            |
-| `/catatan`        | Catatan         | Daftar dan editor           |
-| `/alarm`          | Alarm           | Daftar dan form             |
-| `/tumbuh-kembang` | Tumbuh kembang  | Tinggi dan berat ideal      |
-| `/pengaturan`     | Pengaturan      | Lokasi, tema, data, tentang |
-| `*`               | Tidak ditemukan | Tautan kembali ke Beranda   |
+| Path              | Halaman            | Catatan                        |
+| ----------------- | ------------------ | ------------------------------ |
+| `/`               | Beranda            | Dasbor                         |
+| `/catatan`        | Agenda dan catatan | Agenda bulanan lalu catatan    |
+| `/kalender`       | -                  | Dialihkan ke `/catatan`        |
+| `/kalkulator`     | Kalkulator         | Ilmiah dan BMI                 |
+| `/alarm`          | Alarm              | Daftar, form, stopwatch, timer |
+| `/tumbuh-kembang` | Tumbuh kembang     | Tinggi dan berat ideal         |
+| `/pengaturan`     | Pengaturan         | Lokasi, tema, alarm, data      |
+| `*`               | Tidak ditemukan    | Tautan kembali ke Beranda      |
 
 Semua route dimuat malas dengan `React.lazy` dan `Suspense`. Halaman Beranda dimuat paling awal karena itu entry point. Grafik hanya dimuat saat kartu AQI terlihat.
 
@@ -207,6 +208,9 @@ interface CalendarEvent {
   end: number | null;
   allDay: boolean;
   note?: string;
+  reminderMinutes?: number | null;
+  reminderSoundId?: string;
+  reminderFiredAt?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -233,6 +237,8 @@ interface Settings {
   unit: 'c' | 'f';
   timeFormat: '24h' | '12h';
   weekStart: 0 | 1;
+  idealWeightFormula: 'devine' | 'robinson' | 'miller' | 'hamwi';
+  alarmSoundId: 'nadi' | 'lembut' | 'tegas' | 'lonceng' | 'denyut' | 'fajar';
 }
 ```
 
@@ -241,6 +247,7 @@ Catatan model:
 - `pinned` memakai 0 atau 1 karena Dexie mengindeks angka, bukan boolean.
 - Waktu disimpan sebagai epoch milidetik, bukan string, agar sorting dan perbandingan konsisten.
 - `days` memakai 0 untuk Minggu sampai 6 untuk Sabtu, mengikuti `Date.getDay()`. Array kosong berarti sekali pakai.
+- `reminderMinutes` pada agenda adalah jumlah menit sebelum mulai. `0` berarti tepat saat mulai, `null` atau tidak ada berarti agenda tidak berbunyi. `reminderFiredAt` menyimpan waktu pengingat yang sudah dibunyikan agar tidak berbunyi dua kali.
 - Semua objek punya `id` dari `crypto.randomUUID()`. Fallback untuk browser lama disediakan di `lib/utils/id.ts`.
 
 ## 7. Penyimpanan
@@ -262,7 +269,7 @@ Tabel:
 - `notes`: catatan.
 - `events`: agenda.
 - `alarms`: alarm.
-- `settings`: key-value. Kunci `app` menyimpan objek `Settings` (tema, satuan suhu, format jam, awal minggu).
+- `settings`: key-value. Kunci `app` menyimpan objek `Settings` (tema, satuan suhu, format jam, awal minggu, rumus berat ideal, nada alarm).
 - `cache`: key-value untuk payload API terakhir. Kunci `weather:<lat>,<lon>`, `air:<lat>,<lon>`.
 
 Migrasi:
@@ -622,12 +629,12 @@ Alur di aplikasi (lapisan web):
 
 **Tier 2, plugin `NativeAlarm` (layar penuh).** Dipakai bila plugin terdaftar (`Capacitor.isPluginAvailable('NativeAlarm')`), yaitu di pembungkus native.
 
-- `alarm-scheduler.ts` menyusun item alarm murni lewat `buildNativeAlarms`, lalu memanggil `cancelAll` dan `schedule`. Setiap alarm berulang dijadwalkan sebagai tujuh kemunculan pasti satu per satu.
+- `alarm-scheduler.ts` menyusun item alarm murni lewat `buildNativeAlarms`, lalu pengingat agenda lewat `buildNativeEventItems`, lalu memanggil `cancelAll` dan `schedule`. Setiap alarm berulang dijadwalkan sebagai tujuh kemunculan pasti satu per satu. Agenda berpengingat dijadwalkan sekali di waktu pengingatnya.
 - Plugin Java menjadwalkan ke `AlarmManager` dengan `setExactAndAllowWhileIdle` dan menyimpan daftar di `SharedPreferences` agar bisa dipasang ulang.
 - Saat jatuh tempo, `AlarmReceiver` menyalakan `AlarmService`, sebuah layanan latar depan tipe `mediaPlayback`.
-- `AlarmService` menampilkan notifikasi dengan `setFullScreenIntent` dan memainkan `res/raw/alarm.wav` berulang lewat `MediaPlayer` dengan `USAGE_ALARM`, lalu menahan `PARTIAL_WAKE_LOCK`.
+- `AlarmService` menampilkan notifikasi dengan `setFullScreenIntent` dan memainkan nada terpilih dari `res/raw/` berulang lewat `MediaPlayer` dengan `USAGE_ALARM`, lalu menahan `PARTIAL_WAKE_LOCK`. Enam nada bundel dipetakan oleh `AlarmSounds.java`. Bila berkas tidak ada, dipakai nada alarm bawaan sistem.
 - `AlarmActivity` muncul di atas kunci layar (`setShowWhenLocked`, `setTurnScreenOn`) dengan tombol Tunda dan Matikan. Tombol notifikasi memakai `AlarmActionReceiver`. Tunda menjadwalkan ulang dan menghentikan layanan.
-- Kanal `nadi-alarm-full` importance maksimum dengan bunyi dan getaran.
+- Kanal `nadi-alarm-full-v2` importance maksimum dengan `setSound(null, null)` supaya bunyi hanya dari pemutar sendiri, tidak dobel. Getaran tetap aktif.
 - `BootReceiver` memasang ulang alarm yang tersimpan setelah reboot.
 - `MainActivity` mendaftarkan plugin ini lewat `registerPlugin(NativeAlarmPlugin.class)`.
 
@@ -636,6 +643,11 @@ Alur di aplikasi (lapisan web):
 - Notifikasi memakai `schedule.at` dengan `allowWhileIdle`, sehingga plugin memanggil `setExactAndAllowWhileIdle`.
 - Kanal `nadi-alarm` dibuat dengan importance maksimum dan bunyi bundel `res/raw/alarm.wav`. Di Android 8+ bunyi melekat pada kanal, bukan pada notifikasi.
 - Pemicu yang tertunda dipasang ulang otomatis setelah reboot oleh `LocalNotificationRestoreReceiver` milik plugin.
+
+**Agenda (web dan native).**
+
+- Agenda dengan `reminderMinutes` ikut diselaraskan lewat `NativeAlarmSync` sebagai alarm sekali jalan dengan nada terpilih.
+- Di web, `CalendarReminderEngine` memeriksa pengingat tiap detik dalam jendela dua hari, berbunyi lewat `RingScreen`, dan menandai `reminderFiredAt` supaya tidak berbunyi dua kali. Menunda menunggu lima menit. Di native komponen ini diam karena penjadwalan ditangani Android.
 
 **Bersama.**
 
@@ -759,9 +771,10 @@ Unit:
 
 Komponen:
 
-- Catatan: tambah, cari, pin, hapus dengan konfirmasi.
-- Alarm: validasi form, toggle, label berikutnya.
-- Kalender: navigasi bulan, buka panel hari.
+- Catatan dan agenda: tambah, cari, pin, hapus dengan konfirmasi, navigasi bulan, buka panel hari, agenda dengan nada dering.
+- Alarm: validasi form, toggle, label berikutnya, stopwatch dan timer.
+- Kalkulator: mesin rumus dan pengubahan ke teks, mode ilmiah dan BMI.
+- Kompas: state awal dan arah dari sensor.
 - Tema: pilihan tersimpan dan atribut berubah.
 - State kosong, loading, dan error pada setiap kartu data.
 

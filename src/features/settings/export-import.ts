@@ -51,6 +51,7 @@ const settingsSchema = z.object({
   clockFormat: z.enum(['24h', '12h']),
   weekStart: z.union([z.literal(0), z.literal(1)]),
   idealWeightFormula: z.enum(['devine', 'robinson', 'miller', 'hamwi']).default('devine'),
+  alarmSoundId: z.enum(['nadi', 'lembut', 'tegas', 'lonceng', 'denyut', 'fajar']).default('nadi'),
 });
 
 const locationSchema = z.object({

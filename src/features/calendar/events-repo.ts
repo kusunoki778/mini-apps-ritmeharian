@@ -9,6 +9,8 @@ export interface EventInput {
   startTime: string;
   endTime: string;
   note: string;
+  reminderMinutes: number | null;
+  reminderSoundId: string;
 }
 
 interface EventFields {
@@ -17,20 +19,33 @@ interface EventFields {
   end: number | null;
   allDay: boolean;
   note?: string;
+  reminderMinutes?: number | null;
+  reminderSoundId?: string;
 }
 
 export function buildEventFields(input: EventInput): EventFields {
   const title = input.title.trim();
   const note = input.note.trim();
+  const reminder =
+    input.reminderMinutes === null || input.reminderMinutes === undefined
+      ? undefined
+      : { reminderMinutes: input.reminderMinutes, reminderSoundId: input.reminderSoundId };
 
   if (input.allDay) {
-    return { title, start: dayStart(parseDateKey(input.date)), end: null, allDay: true, note: note || undefined };
+    return {
+      title,
+      start: dayStart(parseDateKey(input.date)),
+      end: null,
+      allDay: true,
+      note: note || undefined,
+      ...reminder,
+    };
   }
 
   const start = combineDateAndTime(input.date, input.startTime || '00:00');
   const end = input.endTime ? combineDateAndTime(input.date, input.endTime) : null;
 
-  return { title, start, end, allDay: false, note: note || undefined };
+  return { title, start, end, allDay: false, note: note || undefined, ...reminder };
 }
 
 // Agenda diurutkan menaik berdasarkan waktu mulai.
@@ -66,4 +81,24 @@ export async function updateEvent(id: string, input: EventInput): Promise<void> 
 
 export async function deleteEvent(id: string): Promise<void> {
   await db.events.delete(id);
+}
+
+// Tandai bahwa pengingat agenda sudah berbunyi, supaya tidak berbunyi berulang.
+export async function markReminderFired(id: string, at: number): Promise<void> {
+  await db.events.update(id, { reminderFiredAt: at });
+}
+
+// Agenda yang punya pengingat dan waktunya (mulai dikurangi menit pengingat) jatuh
+// di dalam rentang. Dipakai penjadwal native dan mesin pengingat web.
+export function reminderTimeOf(event: CalendarEvent): number | null {
+  if (event.reminderMinutes == null) return null;
+  return event.start - event.reminderMinutes * 60_000;
+}
+
+export async function listUpcomingReminders(
+  fromMs: number,
+  toMs: number,
+): Promise<CalendarEvent[]> {
+  const events = await listEventsBetween(fromMs, toMs);
+  return events.filter((event) => event.reminderMinutes != null);
 }

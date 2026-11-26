@@ -2,10 +2,12 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { Sheet } from '@/components/ui/Sheet';
 import { TextArea } from '@/components/ui/TextArea';
 import { Toggle } from '@/components/ui/Toggle';
 import { toast } from '@/components/ui/toast-store';
+import { ALARM_SOUNDS, DEFAULT_ALARM_SOUND } from '@/features/alarms/alarm-sounds';
 import type { CalendarEvent } from '@/lib/db/db';
 import { toDateKey, toTimeInput } from './calendar-utils';
 import { hasEventErrors, validateEvent, type EventErrors } from './event-validation';
@@ -18,6 +20,15 @@ interface EventFormSheetProps {
   onSaved?: (id: string) => void;
 }
 
+const LEAD_OPTIONS: { value: number; label: string }[] = [
+  { value: 0, label: 'Tepat saat mulai' },
+  { value: 5, label: '5 menit sebelum' },
+  { value: 10, label: '10 menit sebelum' },
+  { value: 15, label: '15 menit sebelum' },
+  { value: 30, label: '30 menit sebelum' },
+  { value: 60, label: '1 jam sebelum' },
+];
+
 function initialInput(event: CalendarEvent | null, initialDate: string): EventInput {
   if (!event) {
     return {
@@ -27,6 +38,8 @@ function initialInput(event: CalendarEvent | null, initialDate: string): EventIn
       startTime: '09:00',
       endTime: '',
       note: '',
+      reminderMinutes: null,
+      reminderSoundId: DEFAULT_ALARM_SOUND,
     };
   }
 
@@ -37,6 +50,8 @@ function initialInput(event: CalendarEvent | null, initialDate: string): EventIn
     startTime: event.allDay ? '09:00' : toTimeInput(event.start),
     endTime: event.allDay || !event.end ? '' : toTimeInput(event.end),
     note: event.note ?? '',
+    reminderMinutes: event.reminderMinutes ?? null,
+    reminderSoundId: event.reminderSoundId ?? DEFAULT_ALARM_SOUND,
   };
 }
 
@@ -46,6 +61,7 @@ export function EventFormSheet({ initialDate, event, onClose, onSaved }: EventFo
   const [saving, setSaving] = useState(false);
 
   const update = (patch: Partial<EventInput>) => setInput((current) => ({ ...current, ...patch }));
+  const reminderOn = input.reminderMinutes !== null;
 
   const handleSave = async () => {
     const nextErrors = validateEvent(input);
@@ -137,6 +153,47 @@ export function EventFormSheet({ initialDate, event, onClose, onSaved }: EventFo
           onChange={(changeEvent) => update({ note: changeEvent.target.value })}
           hint="Opsional"
         />
+
+        {input.allDay ? null : (
+          <div className="rounded-control border border-line p-4">
+            <Toggle
+              checked={reminderOn}
+              onChange={(checked) =>
+                update({ reminderMinutes: checked ? (input.reminderMinutes ?? 0) : null })
+              }
+              label="Pasang nada dering"
+              description="Agenda berbunyi seperti alarm saat waktunya, bukan cuma notifikasi."
+            />
+            {reminderOn ? (
+              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                <Select
+                  label="Kapan berbunyi"
+                  value={String(input.reminderMinutes ?? 0)}
+                  onChange={(changeEvent) =>
+                    update({ reminderMinutes: Number(changeEvent.target.value) })
+                  }
+                >
+                  {LEAD_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
+                <Select
+                  label="Nada dering"
+                  value={input.reminderSoundId}
+                  onChange={(changeEvent) => update({ reminderSoundId: changeEvent.target.value })}
+                >
+                  {ALARM_SOUNDS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            ) : null}
+          </div>
+        )}
       </div>
     </Sheet>
   );
