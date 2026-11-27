@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import { useEffect, useRef, useState } from 'react';
 
 import type { Alarm } from '@/lib/db/db';
@@ -33,6 +34,11 @@ export function AlarmEngine({
   const handledRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
+    // Di dalam pembungkus native, alarm ditangani layanan Android (bunyi, layar
+    // penuh, tombol Matikan). Mesin web harus diam supaya nada tidak dobel dan
+    // alarm tidak dianggap "terlewat" hanya karena halaman sempat tertutup.
+    if (Capacitor.isNativePlatform()) return;
+
     const currentAlarms = alarms ?? [];
 
     const ring = (alarm: Alarm, at: number) => {

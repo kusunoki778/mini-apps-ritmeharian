@@ -21,6 +21,7 @@ final class AlarmScheduler {
     static final String EXTRA_ALARM_ID = "alarmId";
     static final String EXTRA_SNOOZE_MINUTES = "snoozeMinutes";
     static final String EXTRA_SOUND_ID = "soundId";
+    static final String EXTRA_SNOOZED = "snoozed";
     static final String DEFAULT_SOUND_ID = "nadi";
     static final int TIMER_ID = 2147483001;
 
@@ -31,11 +32,17 @@ final class AlarmScheduler {
 
     static void schedule(Context context, int notificationId, long triggerAt, String label,
                          String alarmId, int snoozeMinutes, String soundId) {
+        schedule(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
+                false);
+    }
+
+    static void schedule(Context context, int notificationId, long triggerAt, String label,
+                         String alarmId, int snoozeMinutes, String soundId, boolean snoozed) {
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (manager == null) return;
 
         PendingIntent intent = pendingIntent(context, notificationId, triggerAt, label, alarmId,
-                snoozeMinutes, soundId);
+                snoozeMinutes, soundId, snoozed);
 
         boolean canExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
                 || manager.canScheduleExactAlarms();
@@ -52,7 +59,8 @@ final class AlarmScheduler {
             manager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAt, intent);
         }
 
-        persist(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId);
+        persist(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
+                snoozed);
     }
 
     // Info untuk setAlarmClock: intent yang membuka aplikasi saat pengguna menekan
@@ -81,14 +89,41 @@ final class AlarmScheduler {
         remove(context, notificationId);
     }
 
+    // Penyelarasan ulang dari lapisan web. Alarm yang sedang ditunda dilewati supaya
+    // membuka aplikasi tidak membatalkan tunda yang sudah dipasang.
     static void cancelAll(Context context) {
+        long now = System.currentTimeMillis();
         JSONArray stored = read(context);
         for (int index = 0; index < stored.length(); index += 1) {
             JSONObject item = stored.optJSONObject(index);
-            if (item != null && item.optInt(EXTRA_NOTIFICATION_ID, 0) != TIMER_ID) {
-                cancel(context, item.optInt(EXTRA_NOTIFICATION_ID, 0));
+            if (item == null) continue;
+            if (item.optInt(EXTRA_NOTIFICATION_ID, 0) == TIMER_ID) continue;
+            if (item.optBoolean(EXTRA_SNOOZED, false) && item.optLong(EXTRA_TRIGGER_AT, 0) > now) {
+                continue;
+            }
+            cancel(context, item.optInt(EXTRA_NOTIFICATION_ID, 0));
+        }
+    }
+
+    // Alarm yang sudah mulai berbunyi tidak lagi berstatus tunda.
+    static void markFired(Context context, int notificationId) {
+        JSONArray stored = read(context);
+        JSONObject target = null;
+        for (int index = 0; index < stored.length(); index += 1) {
+            JSONObject item = stored.optJSONObject(index);
+            if (item != null && item.optInt(EXTRA_NOTIFICATION_ID, 0) == notificationId) {
+                target = item;
+                break;
             }
         }
+        if (target == null || !target.optBoolean(EXTRA_SNOOZED, false)) return;
+
+        try {
+            target.put(EXTRA_SNOOZED, false);
+        } catch (JSONException ignored) {
+            return;
+        }
+        prefs(context).edit().putString(KEY, stored.toString()).apply();
     }
 
     // Dipakai setelah reboot untuk memasang ulang alarm yang masih di masa depan.
@@ -103,13 +138,14 @@ final class AlarmScheduler {
             schedule(context, item.optInt(EXTRA_NOTIFICATION_ID, 0), triggerAt,
                     item.optString(EXTRA_LABEL, "Alarm"), item.optString(EXTRA_ALARM_ID, ""),
                     item.optInt(EXTRA_SNOOZE_MINUTES, 5),
-                    item.optString(EXTRA_SOUND_ID, DEFAULT_SOUND_ID));
+                    item.optString(EXTRA_SOUND_ID, DEFAULT_SOUND_ID),
+                    item.optBoolean(EXTRA_SNOOZED, false));
         }
     }
 
     private static PendingIntent pendingIntent(Context context, int notificationId, long triggerAt,
                                                String label, String alarmId, int snoozeMinutes,
-                                               String soundId) {
+                                               String soundId, boolean snoozed) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
         intent.putExtra(EXTRA_TRIGGER_AT, triggerAt);
@@ -117,6 +153,7 @@ final class AlarmScheduler {
         intent.putExtra(EXTRA_ALARM_ID, alarmId);
         intent.putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes);
         intent.putExtra(EXTRA_SOUND_ID, soundId);
+        intent.putExtra(EXTRA_SNOOZED, snoozed);
         return PendingIntent.getBroadcast(context, notificationId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
@@ -127,7 +164,7 @@ final class AlarmScheduler {
 
     private static synchronized void persist(Context context, int notificationId, long triggerAt,
                                              String label, String alarmId, int snoozeMinutes,
-                                             String soundId) {
+                                             String soundId, boolean snoozed) {
         JSONArray next = new JSONArray();
         JSONArray stored = read(context);
         for (int index = 0; index < stored.length(); index += 1) {
@@ -145,6 +182,7 @@ final class AlarmScheduler {
             entry.put(EXTRA_ALARM_ID, alarmId);
             entry.put(EXTRA_SNOOZE_MINUTES, snoozeMinutes);
             entry.put(EXTRA_SOUND_ID, soundId);
+            entry.put(EXTRA_SNOOZED, snoozed);
         } catch (JSONException ignored) {
             return;
         }

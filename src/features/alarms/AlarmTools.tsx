@@ -1,8 +1,10 @@
 import { ClockCounterClockwise, Timer as TimerIcon } from '@phosphor-icons/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import { RingScreen } from '@/features/alarms/RingScreen';
+import { startAlarmSound } from '@/features/alarms/alarm-sound';
 import { useAlarmSoundId } from '@/features/settings/useSettings';
 import { fullAlarmSupported, scheduleNativeTimer, cancelNativeTimer } from './native-alarm';
 
@@ -57,24 +59,38 @@ function Timer() {
   const [minutes, setMinutes] = useState('5');
   const [remaining, setRemaining] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
+  const [ringing, setRinging] = useState(false);
+  const stopSoundRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     if (!running || remaining === null) return;
-    const id = window.setInterval(
-      () =>
-        setRemaining((value) => {
-          if (value === null || value <= 1) {
-            setRunning(false);
-            if (typeof navigator !== 'undefined' && 'vibrate' in navigator)
-              navigator.vibrate?.([300, 100, 300]);
-            return 0;
-          }
-          return value - 1;
-        }),
-      1000,
-    );
+    const id = window.setInterval(() => {
+      if (remaining <= 1) {
+        setRemaining(0);
+        setRunning(false);
+        // Di dalam APK, alarm native yang berbunyi, jadi lapisan web diam supaya
+        // nadanya tidak dobel.
+        if (!fullAlarmSupported()) setRinging(true);
+        return;
+      }
+      setRemaining(remaining - 1);
+    }, 1000);
     return () => window.clearInterval(id);
   }, [running, remaining]);
+
+  useEffect(() => {
+    if (!ringing) return;
+
+    stopSoundRef.current = startAlarmSound(soundId);
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate?.([300, 100, 300]);
+    }
+
+    return () => {
+      stopSoundRef.current();
+      stopSoundRef.current = () => {};
+    };
+  }, [ringing, soundId]);
 
   const start = () => {
     const value = Math.max(1, Number(minutes) || 0) * 60;
@@ -83,6 +99,13 @@ function Timer() {
     setRunning(true);
     if (fullAlarmSupported())
       void scheduleNativeTimer(Date.now() + duration * 1000, 'Timer', soundId);
+  };
+
+  const reset = () => {
+    setRunning(false);
+    setRemaining(null);
+    setRinging(false);
+    void cancelNativeTimer();
   };
 
   return (
@@ -111,11 +134,7 @@ function Timer() {
         <button
           type="button"
           className="min-h-11 rounded-control border border-line px-4 text-sm"
-          onClick={() => {
-            setRunning(false);
-            setRemaining(null);
-            void cancelNativeTimer();
-          }}
+          onClick={reset}
         >
           Reset
         </button>
@@ -125,6 +144,20 @@ function Timer() {
           ? 'Timer native tetap berbunyi saat Nadi tertutup.'
           : 'Timer web berjalan selama halaman terbuka.'}
       </p>
+
+      {ringing ? (
+        <RingScreen
+          kind="Timer"
+          time={formatDuration(0)}
+          title="Waktu habis"
+          onDismiss={() => {
+            setRinging(false);
+            setRemaining(null);
+            void cancelNativeTimer();
+          }}
+          hint="Tekan Matikan untuk menghentikan bunyi."
+        />
+      ) : null}
     </div>
   );
 }

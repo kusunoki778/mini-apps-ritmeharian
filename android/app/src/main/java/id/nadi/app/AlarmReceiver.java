@@ -13,6 +13,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        // Alarm yang sudah jatuh tempo tidak lagi berstatus tunda, supaya penyelarasan
+        // ulang berikutnya tidak melewatinya.
+        if (intent != null) {
+            AlarmScheduler.markFired(context,
+                    intent.getIntExtra(AlarmScheduler.EXTRA_NOTIFICATION_ID, 0));
+        }
+
         Intent service = new Intent(context, AlarmService.class);
         service.setAction(AlarmService.ACTION_START);
         if (intent != null && intent.getExtras() != null) {

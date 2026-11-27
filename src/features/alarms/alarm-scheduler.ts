@@ -93,13 +93,15 @@ export function buildNativeEventItems(
     const at = event.start - event.reminderMinutes * 60_000;
     if (at <= fromMs) continue;
 
+    const eventSound = isAlarmSoundId(event.reminderSoundId) ? event.reminderSoundId : soundId;
+
     items.push({
       id: notificationId(`event:${event.id}:${at}`),
       at,
       label: event.title || 'Agenda',
       alarmId: `event:${event.id}`,
       snoozeMinutes: 5,
-      soundId,
+      soundId: eventSound,
     });
   }
 

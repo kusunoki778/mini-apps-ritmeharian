@@ -344,6 +344,15 @@ Tujuan: alarm berbunyi tepat waktu lewat sistem, bahkan saat aplikasi tertutup d
   - `npm run publish:apk` mengunggah APK rilis ke aset rilis GitHub, mengganti aset lama bila ada. Tag diambil dari `versionName`, token dari `GITHUB_TOKEN` atau kredensial git tersimpan.
   - Penerimaan: `gradlew assembleRelease` sukses, `apksigner verify` menampilkan sertifikat rilis, dan berkas tersaji di web. Diuji di uji asap.
 
+- [x] T10.11 Jaring pengaman saat alarm berbunyi (M)
+  - Tiga jalur berhenti: tombol di `AlarmActivity`, tombol di notifikasi, dan layar Matikan di dalam aplikasi lewat plugin `getRinging`/`stopRinging`/`snoozeRinging`. Jalur ketiga menutup kasus notifikasi dimatikan atau intent layar penuh diblokir.
+  - Keadaan berbunyi disimpan di `AlarmRinging` dengan denyut 20 detik dan dianggap basi setelah 90 detik, jadi tombol Matikan tidak muncul untuk alarm yang sudah berhenti. Layanan juga berhenti sendiri setelah 10 menit.
+  - Tombol Tunda disembunyikan untuk timer (`snoozeMinutes <= 0`) di layar alarm, notifikasi, dan overlay web, supaya tidak ada penjadwalan ulang di detik yang sama.
+  - Mesin alarm dan pengingat web diam di dalam pembungkus native agar nada tidak dobel. Timer web juga tidak berbunyi sendiri di native.
+  - Kejadian berhenti dari lapisan Android disalin kembali ke Dexie lewat `consumeStops`/`applyNativeStops`: alarm sekali pakai nonaktif, pengingat agenda ditandai berbunyi.
+  - Penyegaran jadwal melewati alarm yang sedang ditunda, jadi membuka aplikasi tidak membatalkan tunda.
+  - Penerimaan: 281 uji unit lulus, termasuk uji overlay native, penyalinan stop ke Dexie, dan mesin web yang diam di native.
+
 ## M11: Tinggi dan berat badan ideal
 
 Tujuan: menghitung tinggi dan berat badan ideal menurut umur, jenis kelamin, dan tinggi badan. Fitur punya rute sendiri `/tumbuh-kembang` dan kartu pintu masuk ringkas di dasbor.

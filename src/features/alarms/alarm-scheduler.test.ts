@@ -158,8 +158,13 @@ describe('buildNativeEventItems', () => {
     expect(buildNativeEventItems([makeEvent({ start: past })], FROM)).toEqual([]);
   });
 
-  it('menyalin pilihan nada ke item agenda', () => {
-    const items = buildNativeEventItems([makeEvent()], FROM, 'fajar');
+  it('mengutamakan nada khusus agenda', () => {
+    const items = buildNativeEventItems([makeEvent({ reminderSoundId: 'tegas' })], FROM, 'fajar');
+    expect(items[0].soundId).toBe('tegas');
+  });
+
+  it('memakai nada bawaan bila agenda tidak punya nada sendiri', () => {
+    const items = buildNativeEventItems([makeEvent({ reminderSoundId: undefined })], FROM, 'fajar');
     expect(items[0].soundId).toBe('fajar');
   });
 

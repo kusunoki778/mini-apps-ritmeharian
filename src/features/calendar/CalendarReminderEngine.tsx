@@ -41,6 +41,8 @@ export function CalendarReminderEngine({
   const snoozeRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
+    // Di dalam pembungkus native, pengingat ditangani lapisan Android. Mesin web
+    // diam supaya tidak berbunyi dobel.
     if (Capacitor.isNativePlatform()) return;
 
     const list = events ?? [];

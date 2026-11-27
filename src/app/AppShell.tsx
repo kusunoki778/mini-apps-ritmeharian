@@ -20,6 +20,13 @@ const NativeAlarmSync = lazy(() =>
   })),
 );
 
+// Layar Matikan cadangan untuk alarm native, dipakai bila layar penuh diblokir.
+const NativeAlarmOverlay = lazy(() =>
+  import('@/features/alarms/NativeAlarmOverlay').then((module) => ({
+    default: module.NativeAlarmOverlay,
+  })),
+);
+
 // Pengingat agenda memakai Dexie dan Web Audio, jadi juga dimuat malas.
 const CalendarReminderEngine = lazy(() =>
   import('@/features/calendar/CalendarReminderEngine').then((module) => ({
@@ -148,6 +155,7 @@ export function AppShell() {
         <AlarmEngine />
         <CalendarReminderEngine />
         <NativeAlarmSync />
+        <NativeAlarmOverlay />
       </Suspense>
       <Toaster />
     </div>

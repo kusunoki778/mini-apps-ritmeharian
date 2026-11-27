@@ -15,11 +15,12 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 // Jembatan Capacitor untuk alarm layar penuh (Tier 2). Menjadwalkan alarm pasti ke
-// AlarmManager lewat AlarmScheduler, lalu AlarmService yang membunyikan dan menampilkan
+// AlarmManager lewat AlarmScheduler, lalu AlarmService membunyikan dan menampilkan
 // layar alarm. Berjalan terpisah dari lapisan web.
 @CapacitorPlugin(name = "NativeAlarm")
 public class NativeAlarmPlugin extends Plugin {
@@ -80,6 +81,87 @@ public class NativeAlarmPlugin extends Plugin {
     public void cancelTimer(PluginCall call) {
         AlarmScheduler.cancel(getContext(), AlarmScheduler.TIMER_ID);
         call.resolve();
+    }
+
+    // Alarm yang sedang berbunyi, atau null bila tidak ada. Dipakai lapisan web untuk
+    // menampilkan tombol Matikan di dalam aplikasi, termasuk saat intent layar penuh
+    // diblokir Android 14 ke atas.
+    @PluginMethod
+    public void getRinging(PluginCall call) {
+        JSONObject current = AlarmRinging.current(getContext());
+        JSObject result = new JSObject();
+        if (current == null) {
+            result.put("ringing", null);
+            call.resolve(result);
+            return;
+        }
+
+        JSObject ringing = new JSObject();
+        ringing.put("notificationId",
+                current.optInt(AlarmScheduler.EXTRA_NOTIFICATION_ID, 0));
+        ringing.put("at", current.optLong(AlarmScheduler.EXTRA_TRIGGER_AT, 0));
+        ringing.put("label", current.optString(AlarmScheduler.EXTRA_LABEL, "Alarm"));
+        ringing.put("alarmId", current.optString(AlarmScheduler.EXTRA_ALARM_ID, ""));
+        ringing.put("snoozeMinutes",
+                current.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5));
+        result.put("ringing", ringing);
+        call.resolve(result);
+    }
+
+    // Hentikan alarm dari dalam aplikasi.
+    @PluginMethod
+    public void stopRinging(PluginCall call) {
+        boolean snoozed = Boolean.TRUE.equals(call.getBoolean("snoozed", false));
+        AlarmService.stopWithRecord(getContext(), snoozed);
+        call.resolve();
+    }
+
+    // Tunda alarm dari dalam aplikasi: jadwalkan kemunculan berikutnya memakai info
+    // alarm yang sedang berbunyi, lalu hentikan bunyi saat ini.
+    @PluginMethod
+    public void snoozeRinging(PluginCall call) {
+        JSONObject current = AlarmRinging.current(getContext());
+        if (current == null) {
+            call.resolve();
+            return;
+        }
+
+        int notificationId = current.optInt(AlarmScheduler.EXTRA_NOTIFICATION_ID, 0);
+        int snoozeMinutes = current.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 0);
+        if (notificationId != 0 && snoozeMinutes > 0) {
+            long triggerAt = System.currentTimeMillis() + snoozeMinutes * 60_000L;
+            AlarmScheduler.schedule(getContext(), notificationId, triggerAt,
+                    current.optString(AlarmScheduler.EXTRA_LABEL, "Alarm"),
+                    current.optString(AlarmScheduler.EXTRA_ALARM_ID, ""),
+                    snoozeMinutes,
+                    current.optString(AlarmScheduler.EXTRA_SOUND_ID,
+                            AlarmScheduler.DEFAULT_SOUND_ID),
+                    true);
+        }
+
+        AlarmService.stopWithRecord(getContext(), snoozeMinutes > 0);
+        call.resolve();
+    }
+
+    // Ambil catatan alarm yang sudah berhenti (dari notifikasi, layar alarm, atau
+    // aplikasi) supaya Dexie bisa menandai alarm dan pengingat agenda. Entri hanya
+    // diberikan sekali.
+    @PluginMethod
+    public void consumeStops(PluginCall call) {
+        JSONArray stops = AlarmRinging.consumeStops(getContext());
+        JSArray result = new JSArray();
+        for (int index = 0; index < stops.length(); index += 1) {
+            JSONObject item = stops.optJSONObject(index);
+            if (item == null) continue;
+
+            JSObject entry = new JSObject();
+            entry.put("alarmId", item.optString(AlarmScheduler.EXTRA_ALARM_ID, ""));
+            entry.put("at", item.optLong(AlarmScheduler.EXTRA_TRIGGER_AT, 0));
+            result.put(entry);
+        }
+        JSObject payload = new JSObject();
+        payload.put("stops", result);
+        call.resolve(payload);
     }
 
     @PluginMethod
