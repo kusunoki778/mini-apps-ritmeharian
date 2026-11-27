@@ -9,12 +9,16 @@ export interface Note {
   updatedAt: number;
 }
 
+export type EventRepeat = 'none' | 'daily' | 'weekly' | 'monthly';
+
 export interface CalendarEvent {
   id: string;
   title: string;
   start: number;
   end: number | null;
   allDay: boolean;
+  // Pengulangan agenda. Tidak ada nilai berarti sekali jalan.
+  repeat?: EventRepeat;
   note?: string;
   // Pengingat agenda. reminderMinutes = menit sebelum mulai (0 = tepat saat mulai).
   // Tidak ada nilai berarti agenda tidak berbunyi.

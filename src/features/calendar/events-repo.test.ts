@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { db, type CalendarEvent } from '@/lib/db/db';
-import { combineDateAndTime, dayStart, parseDateKey } from './calendar-utils';
+import { combineDateAndTime, dayStart, parseDateKey, toDateKey } from './calendar-utils';
 import {
   buildEventFields,
   createEvent,
@@ -32,6 +32,7 @@ function input(overrides: Partial<EventInput> = {}): EventInput {
     allDay: false,
     startTime: '09:00',
     endTime: '10:00',
+    repeat: 'none',
     note: '',
     reminderMinutes: null,
     reminderSoundId: 'nadi',
@@ -155,5 +156,67 @@ describe('repositori events', () => {
     await markReminderFired(id, 12345);
 
     expect((await db.events.get(id))?.reminderFiredAt).toBe(12345);
+  });
+});
+
+describe('agenda berulang', () => {
+  beforeEach(async () => {
+    await db.events.clear();
+  });
+
+  it('menjabarkan agenda harian ke setiap hari dalam rentang', async () => {
+    await createEvent(
+      input({ date: '2026-11-26', startTime: '09:00', endTime: '10:00', repeat: 'daily' }),
+    );
+
+    const from = dayStart(parseDateKey('2026-11-26'));
+    const to = dayStart(parseDateKey('2026-11-29'));
+    const events = await listEventsBetween(from, to);
+
+    expect(events.map((event) => toDateKey(new Date(event.start)))).toEqual([
+      '2026-11-26',
+      '2026-11-27',
+      '2026-11-28',
+    ]);
+    expect((events[0].end ?? 0) - events[0].start).toBe(60 * 60_000);
+  });
+
+  it('menjabarkan agenda mingguan di hari yang sama', async () => {
+    await createEvent(input({ date: '2026-11-26', repeat: 'weekly' }));
+
+    const from = dayStart(parseDateKey('2026-11-26'));
+    const to = dayStart(parseDateKey('2026-12-18'));
+    const events = await listEventsBetween(from, to);
+
+    expect(events.map((event) => toDateKey(new Date(event.start)))).toEqual([
+      '2026-11-26',
+      '2026-12-03',
+      '2026-12-10',
+      '2026-12-17',
+    ]);
+  });
+
+  it('menjabarkan agenda bulanan di tanggal yang sama', async () => {
+    await createEvent(input({ date: '2026-11-26', repeat: 'monthly' }));
+
+    const from = dayStart(parseDateKey('2026-11-01'));
+    const to = dayStart(parseDateKey('2027-02-01'));
+    const events = await listEventsBetween(from, to);
+
+    expect(events.map((event) => toDateKey(new Date(event.start)))).toEqual([
+      '2026-11-26',
+      '2026-12-26',
+      '2027-01-26',
+    ]);
+  });
+
+  it('menghitung pengingat untuk setiap kemunculan berulang', async () => {
+    await createEvent(input({ date: '2026-11-26', reminderMinutes: 0, repeat: 'daily' }));
+
+    const from = dayStart(parseDateKey('2026-11-26'));
+    const to = dayStart(parseDateKey('2026-11-29'));
+    const reminders = await listUpcomingReminders(from, to);
+
+    expect(reminders).toHaveLength(3);
   });
 });

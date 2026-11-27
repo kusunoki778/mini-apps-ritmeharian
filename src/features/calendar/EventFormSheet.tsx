@@ -8,7 +8,7 @@ import { TextArea } from '@/components/ui/TextArea';
 import { Toggle } from '@/components/ui/Toggle';
 import { toast } from '@/components/ui/toast-store';
 import { ALARM_SOUNDS, DEFAULT_ALARM_SOUND } from '@/features/alarms/alarm-sounds';
-import type { CalendarEvent } from '@/lib/db/db';
+import type { CalendarEvent, EventRepeat } from '@/lib/db/db';
 import { toDateKey, toTimeInput } from './calendar-utils';
 import { hasEventErrors, validateEvent, type EventErrors } from './event-validation';
 import { createEvent, updateEvent, type EventInput } from './events-repo';
@@ -19,6 +19,13 @@ interface EventFormSheetProps {
   onClose: () => void;
   onSaved?: (id: string) => void;
 }
+
+const REPEAT_OPTIONS: { value: EventRepeat; label: string }[] = [
+  { value: 'none', label: 'Tidak berulang' },
+  { value: 'daily', label: 'Harian' },
+  { value: 'weekly', label: 'Mingguan' },
+  { value: 'monthly', label: 'Bulanan' },
+];
 
 const LEAD_OPTIONS: { value: number; label: string }[] = [
   { value: 0, label: 'Tepat saat mulai' },
@@ -41,6 +48,7 @@ function initialInput(event: CalendarEvent | null, initialDate: string): EventIn
       allDay: false,
       startTime: '09:00',
       endTime: '',
+      repeat: 'none',
       note: '',
       reminderMinutes: null,
       reminderSoundId: DEFAULT_ALARM_SOUND,
@@ -53,6 +61,7 @@ function initialInput(event: CalendarEvent | null, initialDate: string): EventIn
     allDay: event.allDay,
     startTime: event.allDay ? '09:00' : toTimeInput(event.start),
     endTime: event.allDay || !event.end ? '' : toTimeInput(event.end),
+    repeat: event.repeat ?? 'none',
     note: event.note ?? '',
     reminderMinutes: event.reminderMinutes ?? null,
     reminderSoundId: event.reminderSoundId ?? DEFAULT_ALARM_SOUND,
@@ -149,6 +158,19 @@ export function EventFormSheet({ initialDate, event, onClose, onSaved }: EventFo
             />
           </div>
         )}
+
+        <Select
+          label="Ulangi"
+          value={input.repeat}
+          hint="Agenda berulang memakai jam yang sama."
+          onChange={(changeEvent) => update({ repeat: changeEvent.target.value as EventRepeat })}
+        >
+          {REPEAT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
 
         <TextArea
           label="Catatan"
