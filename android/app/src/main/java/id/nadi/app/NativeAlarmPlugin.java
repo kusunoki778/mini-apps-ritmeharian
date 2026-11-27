@@ -43,7 +43,11 @@ public class NativeAlarmPlugin extends Plugin {
                         item.optString(AlarmScheduler.EXTRA_LABEL, "Alarm"),
                         item.optString(AlarmScheduler.EXTRA_ALARM_ID, ""),
                         item.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5),
-                        item.optString(AlarmScheduler.EXTRA_SOUND_ID, AlarmScheduler.DEFAULT_SOUND_ID));
+                        item.optString(AlarmScheduler.EXTRA_SOUND_ID, AlarmScheduler.DEFAULT_SOUND_ID),
+                        false,
+                        item.optBoolean(AlarmScheduler.EXTRA_VIBRATE, true),
+                        item.optInt(AlarmScheduler.EXTRA_SNOOZE_LIMIT, 0),
+                        0);
             }
             call.resolve();
         } catch (JSONException error) {
@@ -104,6 +108,10 @@ public class NativeAlarmPlugin extends Plugin {
         ringing.put("alarmId", current.optString(AlarmScheduler.EXTRA_ALARM_ID, ""));
         ringing.put("snoozeMinutes",
                 current.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5));
+        ringing.put("snoozeLimit",
+                current.optInt(AlarmScheduler.EXTRA_SNOOZE_LIMIT, 0));
+        ringing.put("snoozeCount",
+                current.optInt(AlarmScheduler.EXTRA_SNOOZE_COUNT, 0));
         result.put("ringing", ringing);
         call.resolve(result);
     }
@@ -128,7 +136,12 @@ public class NativeAlarmPlugin extends Plugin {
 
         int notificationId = current.optInt(AlarmScheduler.EXTRA_NOTIFICATION_ID, 0);
         int snoozeMinutes = current.optInt(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 0);
-        if (notificationId != 0 && snoozeMinutes > 0) {
+        int snoozeLimit = current.optInt(AlarmScheduler.EXTRA_SNOOZE_LIMIT, 0);
+        int snoozeCount = current.optInt(AlarmScheduler.EXTRA_SNOOZE_COUNT, 0);
+        boolean vibrate = current.optBoolean(AlarmScheduler.EXTRA_VIBRATE, true);
+        boolean limitReached = snoozeLimit > 0 && snoozeCount >= snoozeLimit;
+        boolean canSnooze = notificationId != 0 && snoozeMinutes > 0 && !limitReached;
+        if (canSnooze) {
             long triggerAt = System.currentTimeMillis() + snoozeMinutes * 60_000L;
             AlarmScheduler.schedule(getContext(), notificationId, triggerAt,
                     current.optString(AlarmScheduler.EXTRA_LABEL, "Alarm"),
@@ -136,10 +149,10 @@ public class NativeAlarmPlugin extends Plugin {
                     snoozeMinutes,
                     current.optString(AlarmScheduler.EXTRA_SOUND_ID,
                             AlarmScheduler.DEFAULT_SOUND_ID),
-                    true);
+                    true, vibrate, snoozeLimit, snoozeCount + 1);
         }
 
-        AlarmService.stopWithRecord(getContext(), snoozeMinutes > 0);
+        AlarmService.stopWithRecord(getContext(), canSnooze);
         call.resolve();
     }
 
@@ -190,6 +203,34 @@ public class NativeAlarmPlugin extends Plugin {
         JSObject result = new JSObject();
         result.put("granted", granted);
         call.resolve(result);
+    }
+
+    // OEM seperti Infinix, Xiaomi, dan Oppo bisa mematikan layanan latar belakang.
+    // Pengecualian optimasi baterai membuat alarm lebih tahan.
+    @PluginMethod
+    public void isIgnoringBatteryOptimizations(PluginCall call) {
+        boolean exempt = true;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            android.os.PowerManager manager = (android.os.PowerManager) getContext()
+                    .getSystemService(Context.POWER_SERVICE);
+            exempt = manager != null
+                    && manager.isIgnoringBatteryOptimizations(getContext().getPackageName());
+        }
+        JSObject result = new JSObject();
+        result.put("exempt", exempt);
+        call.resolve(result);
+    }
+
+    @PluginMethod
+    public void requestIgnoreBatteryOptimizations(PluginCall call) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            Intent intent = new Intent(
+                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                    Uri.parse("package:" + getContext().getPackageName()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            getContext().startActivity(intent);
+        }
+        call.resolve();
     }
 
     @PluginMethod

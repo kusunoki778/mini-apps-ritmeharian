@@ -61,9 +61,11 @@ export function NativeAlarmOverlay({ intervalMs = POLL_MS }: NativeAlarmOverlayP
 
   const close = () => setRinging(null);
 
-  // Timer tidak punya tunda, jadi tombolnya disembunyikan.
+  // Timer tidak punya tunda, jadi tombolnya disembunyikan. Batas tunda juga dihormati.
   const isTimer = ringing.alarmId === 'timer';
-  const canSnooze = !isTimer && ringing.snoozeMinutes > 0;
+  const limitReached =
+    ringing.snoozeLimit > 0 && ringing.snoozeCount >= ringing.snoozeLimit;
+  const canSnooze = !isTimer && ringing.snoozeMinutes > 0 && !limitReached;
 
   const snooze = () => {
     close();

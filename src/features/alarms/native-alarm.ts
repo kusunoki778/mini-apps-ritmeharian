@@ -10,6 +10,8 @@ export interface NativeAlarmItem {
   alarmId: string;
   snoozeMinutes: number;
   soundId: AlarmSoundId;
+  vibrate: boolean;
+  snoozeLimit: number;
 }
 
 // Alarm yang sedang berbunyi di layanan latar depan. Dipakai lapisan web supaya
@@ -20,6 +22,8 @@ export interface NativeRinging {
   label: string;
   alarmId: string;
   snoozeMinutes: number;
+  snoozeLimit: number;
+  snoozeCount: number;
 }
 
 // Catatan alarm yang sudah berhenti di luar aplikasi.
@@ -35,6 +39,8 @@ interface NativeAlarmBridge {
   canScheduleExactAlarms(): Promise<{ granted: boolean }>;
   canUseFullScreenIntent(): Promise<{ granted: boolean }>;
   openFullScreenIntentSettings(): Promise<void>;
+  isIgnoringBatteryOptimizations(): Promise<{ exempt: boolean }>;
+  requestIgnoreBatteryOptimizations(): Promise<void>;
   scheduleTimer(options: { at: number; label?: string; soundId?: string }): Promise<void>;
   cancelTimer(): Promise<void>;
   getRinging(): Promise<{ ringing: NativeRinging | null }>;
@@ -97,4 +103,20 @@ export async function consumeNativeStops(): Promise<NativeAlarmStop[]> {
   } catch {
     return [];
   }
+}
+
+// Pengecualian optimasi baterai. Null berarti tidak bisa dibaca, misalnya di web.
+export async function batteryExempt(): Promise<boolean | null> {
+  if (!fullAlarmSupported()) return null;
+  try {
+    const { exempt } = await NativeAlarm.isIgnoringBatteryOptimizations();
+    return exempt;
+  } catch {
+    return null;
+  }
+}
+
+export async function requestBatteryExemption(): Promise<void> {
+  if (!fullAlarmSupported()) return;
+  await NativeAlarm.requestIgnoreBatteryOptimizations();
 }

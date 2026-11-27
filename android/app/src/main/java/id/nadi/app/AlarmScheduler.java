@@ -22,6 +22,9 @@ final class AlarmScheduler {
     static final String EXTRA_SNOOZE_MINUTES = "snoozeMinutes";
     static final String EXTRA_SOUND_ID = "soundId";
     static final String EXTRA_SNOOZED = "snoozed";
+    static final String EXTRA_VIBRATE = "vibrate";
+    static final String EXTRA_SNOOZE_LIMIT = "snoozeLimit";
+    static final String EXTRA_SNOOZE_COUNT = "snoozeCount";
     static final String DEFAULT_SOUND_ID = "nadi";
     static final int TIMER_ID = 2147483001;
 
@@ -33,16 +36,23 @@ final class AlarmScheduler {
     static void schedule(Context context, int notificationId, long triggerAt, String label,
                          String alarmId, int snoozeMinutes, String soundId) {
         schedule(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
-                false);
+                false, true, 0, 0);
     }
 
     static void schedule(Context context, int notificationId, long triggerAt, String label,
                          String alarmId, int snoozeMinutes, String soundId, boolean snoozed) {
+        schedule(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
+                snoozed, true, 0, 0);
+    }
+
+    static void schedule(Context context, int notificationId, long triggerAt, String label,
+                         String alarmId, int snoozeMinutes, String soundId, boolean snoozed,
+                         boolean vibrate, int snoozeLimit, int snoozeCount) {
         AlarmManager manager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (manager == null) return;
 
         PendingIntent intent = pendingIntent(context, notificationId, triggerAt, label, alarmId,
-                snoozeMinutes, soundId, snoozed);
+                snoozeMinutes, soundId, snoozed, vibrate, snoozeLimit, snoozeCount);
 
         boolean canExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S
                 || manager.canScheduleExactAlarms();
@@ -60,7 +70,7 @@ final class AlarmScheduler {
         }
 
         persist(context, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
-                snoozed);
+                snoozed, vibrate, snoozeLimit, snoozeCount);
     }
 
     // Info untuk setAlarmClock: intent yang membuka aplikasi saat pengguna menekan
@@ -139,13 +149,17 @@ final class AlarmScheduler {
                     item.optString(EXTRA_LABEL, "Alarm"), item.optString(EXTRA_ALARM_ID, ""),
                     item.optInt(EXTRA_SNOOZE_MINUTES, 5),
                     item.optString(EXTRA_SOUND_ID, DEFAULT_SOUND_ID),
-                    item.optBoolean(EXTRA_SNOOZED, false));
+                    item.optBoolean(EXTRA_SNOOZED, false),
+                    item.optBoolean(EXTRA_VIBRATE, true),
+                    item.optInt(EXTRA_SNOOZE_LIMIT, 0),
+                    item.optInt(EXTRA_SNOOZE_COUNT, 0));
         }
     }
 
     private static PendingIntent pendingIntent(Context context, int notificationId, long triggerAt,
                                                String label, String alarmId, int snoozeMinutes,
-                                               String soundId, boolean snoozed) {
+                                               String soundId, boolean snoozed, boolean vibrate,
+                                               int snoozeLimit, int snoozeCount) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra(EXTRA_NOTIFICATION_ID, notificationId);
         intent.putExtra(EXTRA_TRIGGER_AT, triggerAt);
@@ -154,6 +168,9 @@ final class AlarmScheduler {
         intent.putExtra(EXTRA_SNOOZE_MINUTES, snoozeMinutes);
         intent.putExtra(EXTRA_SOUND_ID, soundId);
         intent.putExtra(EXTRA_SNOOZED, snoozed);
+        intent.putExtra(EXTRA_VIBRATE, vibrate);
+        intent.putExtra(EXTRA_SNOOZE_LIMIT, snoozeLimit);
+        intent.putExtra(EXTRA_SNOOZE_COUNT, snoozeCount);
         return PendingIntent.getBroadcast(context, notificationId, intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
@@ -164,7 +181,8 @@ final class AlarmScheduler {
 
     private static synchronized void persist(Context context, int notificationId, long triggerAt,
                                              String label, String alarmId, int snoozeMinutes,
-                                             String soundId, boolean snoozed) {
+                                             String soundId, boolean snoozed, boolean vibrate,
+                                             int snoozeLimit, int snoozeCount) {
         JSONArray next = new JSONArray();
         JSONArray stored = read(context);
         for (int index = 0; index < stored.length(); index += 1) {
@@ -183,6 +201,9 @@ final class AlarmScheduler {
             entry.put(EXTRA_SNOOZE_MINUTES, snoozeMinutes);
             entry.put(EXTRA_SOUND_ID, soundId);
             entry.put(EXTRA_SNOOZED, snoozed);
+            entry.put(EXTRA_VIBRATE, vibrate);
+            entry.put(EXTRA_SNOOZE_LIMIT, snoozeLimit);
+            entry.put(EXTRA_SNOOZE_COUNT, snoozeCount);
         } catch (JSONException ignored) {
             return;
         }

@@ -7,6 +7,7 @@ export interface WeatherCurrent {
   precipitation: number;
   weather_code: number;
   wind_speed_10m: number;
+  uv_index: number;
 }
 
 export interface WeatherHourly {
@@ -21,6 +22,7 @@ export interface WeatherDaily {
   weather_code: number[];
   temperature_2m_max: number[];
   temperature_2m_min: number[];
+  uv_index_max: number[];
   sunrise: string[];
   sunset: string[];
 }
@@ -85,7 +87,8 @@ export function parseWeatherResponse(payload: unknown): WeatherResponse | null {
     (current.is_day === 0 || current.is_day === 1) &&
     isNumber(current.precipitation) &&
     isNumber(current.weather_code) &&
-    isNumber(current.wind_speed_10m);
+    isNumber(current.wind_speed_10m) &&
+    isNumber(current.uv_index);
 
   const hourlyValid =
     isStringArray(hourly.time) &&
@@ -98,6 +101,7 @@ export function parseWeatherResponse(payload: unknown): WeatherResponse | null {
     isNumberArray(daily.weather_code) &&
     isNumberArray(daily.temperature_2m_max) &&
     isNumberArray(daily.temperature_2m_min) &&
+    isNumberArray(daily.uv_index_max) &&
     isStringArray(daily.sunrise) &&
     isStringArray(daily.sunset);
 
@@ -120,12 +124,12 @@ export function buildWeatherUrl(lat: number, lon: number): string {
   url.searchParams.set('longitude', String(lon));
   url.searchParams.set(
     'current',
-    'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m',
+    'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,wind_speed_10m,uv_index',
   );
   url.searchParams.set('hourly', 'temperature_2m,weather_code,precipitation_probability');
   url.searchParams.set(
     'daily',
-    'weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset',
+    'weather_code,temperature_2m_max,temperature_2m_min,uv_index_max,sunrise,sunset',
   );
   url.searchParams.set('timezone', 'auto');
   url.searchParams.set('forecast_days', '7');

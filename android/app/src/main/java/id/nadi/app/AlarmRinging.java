@@ -27,7 +27,8 @@ final class AlarmRinging {
     private AlarmRinging() {}
 
     static void start(Context context, int notificationId, long triggerAt, String label,
-                      String alarmId, int snoozeMinutes, String soundId) {
+                      String alarmId, int snoozeMinutes, String soundId, boolean vibrate,
+                      int snoozeLimit, int snoozeCount) {
         JSONObject current = new JSONObject();
         try {
             current.put(AlarmScheduler.EXTRA_NOTIFICATION_ID, notificationId);
@@ -36,6 +37,9 @@ final class AlarmRinging {
             current.put(AlarmScheduler.EXTRA_ALARM_ID, alarmId == null ? "" : alarmId);
             current.put(AlarmScheduler.EXTRA_SNOOZE_MINUTES, snoozeMinutes);
             current.put(AlarmScheduler.EXTRA_SOUND_ID, soundId);
+            current.put(AlarmScheduler.EXTRA_VIBRATE, vibrate);
+            current.put(AlarmScheduler.EXTRA_SNOOZE_LIMIT, snoozeLimit);
+            current.put(AlarmScheduler.EXTRA_SNOOZE_COUNT, snoozeCount);
             current.put(KEY_BEAT, System.currentTimeMillis());
         } catch (JSONException ignored) {
             return;

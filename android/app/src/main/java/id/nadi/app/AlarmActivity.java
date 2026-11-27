@@ -57,6 +57,9 @@ public class AlarmActivity extends AppCompatActivity {
         final long triggerAt = getIntent()
                 .getLongExtra(AlarmScheduler.EXTRA_TRIGGER_AT, System.currentTimeMillis());
         final int snoozeMinutes = getIntent().getIntExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5);
+        final int snoozeLimit = getIntent().getIntExtra(AlarmScheduler.EXTRA_SNOOZE_LIMIT, 0);
+        final int snoozeCount = getIntent().getIntExtra(AlarmScheduler.EXTRA_SNOOZE_COUNT, 0);
+        final boolean vibrate = getIntent().getBooleanExtra(AlarmScheduler.EXTRA_VIBRATE, true);
         final String label = getIntent().getStringExtra(AlarmScheduler.EXTRA_LABEL);
         final String alarmId = getIntent().getStringExtra(AlarmScheduler.EXTRA_ALARM_ID);
         String sound = getIntent().getStringExtra(AlarmScheduler.EXTRA_SOUND_ID);
@@ -68,15 +71,18 @@ public class AlarmActivity extends AppCompatActivity {
         labelView.setText(label == null || label.isEmpty() ? "Alarm" : label);
 
         Button snoozeButton = findViewById(R.id.alarm_snooze);
-        if (snoozeMinutes <= 0) {
-            // Timer tidak punya tunda, jadi tombolnya disembunyikan.
+        boolean canSnooze = snoozeMinutes > 0
+                && (snoozeLimit == 0 || snoozeCount < snoozeLimit);
+        if (!canSnooze) {
+            // Timer tidak punya tunda, dan alarm yang sudah mencapai batas tunda tidak
+            // boleh ditunda lagi. Tombolnya disembunyikan.
             snoozeButton.setVisibility(View.GONE);
         } else {
             snoozeButton.setText("Tunda " + snoozeMinutes + " menit");
             snoozeButton.setOnClickListener(view -> {
                 long next = System.currentTimeMillis() + snoozeMinutes * 60_000L;
                 AlarmScheduler.schedule(this, notificationId, next, label, alarmId, snoozeMinutes,
-                        soundId, true);
+                        soundId, true, vibrate, snoozeLimit, snoozeCount + 1);
                 AlarmService.stopWithRecord(this, true);
                 finish();
             });

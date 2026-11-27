@@ -36,3 +36,61 @@ export function hourIsDaylight(timeIso: string, sunrise: string[], sunset: strin
 
   return timeIso >= sunrise[index] && timeIso < sunset[index];
 }
+
+// Tingkat paparan sinar matahari. Ambang mengikuti skala UV baku (WHO).
+export function uvLevel(value: number): string {
+  if (value >= 11) return 'Ekstrem';
+  if (value >= 8) return 'Sangat tinggi';
+  if (value >= 6) return 'Tinggi';
+  if (value >= 3) return 'Sedang';
+  return 'Rendah';
+}
+
+export interface ComfortIndex {
+  score: number;
+  label: string;
+  advice: string;
+}
+
+// Indeks kenyamanan 0 sampai 100 dari beberapa unsur cuaca. Suhu dan kelembapan
+// punya rentang nyaman, sedangkan angin, UV, dan hujan menurunkan nilai.
+export function comfortIndex(input: {
+  apparentTemperature: number;
+  humidity: number;
+  windSpeed: number;
+  uvIndex: number;
+  precipitation: number;
+}): ComfortIndex {
+  let score = 100;
+
+  const temperature = input.apparentTemperature;
+  if (temperature < 18) score -= (18 - temperature) * 3;
+  else if (temperature > 27) score -= (temperature - 27) * 3;
+
+  const humidity = input.humidity;
+  if (humidity < 40) score -= (40 - humidity) * 0.5;
+  else if (humidity > 65) score -= (humidity - 65) * 0.7;
+
+  if (input.windSpeed > 20) score -= (input.windSpeed - 20) * 1.2;
+  if (input.uvIndex > 7) score -= (input.uvIndex - 7) * 4;
+  score -= Math.min(Math.max(input.precipitation, 0), 10) * 4;
+
+  score = Math.round(Math.max(0, Math.min(100, score)));
+
+  if (score >= 80) return { score, label: 'Nyaman', advice: 'Cuaca enak untuk aktivitas di luar.' };
+  if (score >= 60) {
+    return {
+      score,
+      label: 'Cukup nyaman',
+      advice: 'Masih nyaman. Jaga cairan dan lindungi kulit dari matahari.',
+    };
+  }
+  if (score >= 40) {
+    return {
+      score,
+      label: 'Kurang nyaman',
+      advice: 'Batasi aktivitas luar dan cari tempat teduh.',
+    };
+  }
+  return { score, label: 'Tidak nyaman', advice: 'Sebaiknya beraktivitas di dalam ruangan.' };
+}

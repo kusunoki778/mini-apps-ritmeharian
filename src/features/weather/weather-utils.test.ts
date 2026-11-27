@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { currentHourIndex, formatClock, hourIsDaylight, formatUpdatedAt } from './weather-utils';
+import {
+  comfortIndex,
+  currentHourIndex,
+  formatClock,
+  hourIsDaylight,
+  formatUpdatedAt,
+  uvLevel,
+} from './weather-utils';
 
 describe('formatClock', () => {
   it('mengubah ISO lokal menjadi jam bertitik', () => {
@@ -46,5 +53,52 @@ describe('currentHourIndex', () => {
 
   it('memilih jam terakhir saat data sudah lewat', () => {
     expect(currentHourIndex(times, new Date(2026, 10, 27, 3, 0))).toBe(2);
+  });
+});
+
+describe('uvLevel', () => {
+  it('memetakan angka UV ke tingkat paparan', () => {
+    expect(uvLevel(0)).toBe('Rendah');
+    expect(uvLevel(4)).toBe('Sedang');
+    expect(uvLevel(7)).toBe('Tinggi');
+    expect(uvLevel(9)).toBe('Sangat tinggi');
+    expect(uvLevel(12)).toBe('Ekstrem');
+  });
+});
+
+describe('comfortIndex', () => {
+  it('memberi nilai tinggi saat cuaca sejuk dan kering', () => {
+    const result = comfortIndex({
+      apparentTemperature: 24,
+      humidity: 50,
+      windSpeed: 8,
+      uvIndex: 2,
+      precipitation: 0,
+    });
+    expect(result.score).toBe(100);
+    expect(result.label).toBe('Nyaman');
+  });
+
+  it('menurunkan nilai saat panas, lembap, dan UV tinggi', () => {
+    const result = comfortIndex({
+      apparentTemperature: 34,
+      humidity: 88,
+      windSpeed: 10,
+      uvIndex: 11,
+      precipitation: 0,
+    });
+    expect(result.score).toBeLessThan(60);
+    expect(result.label).not.toBe('Nyaman');
+  });
+
+  it('tidak pernah keluar dari rentang 0 sampai 100', () => {
+    const result = comfortIndex({
+      apparentTemperature: 50,
+      humidity: 100,
+      windSpeed: 90,
+      uvIndex: 20,
+      precipitation: 30,
+    });
+    expect(result.score).toBe(0);
   });
 });

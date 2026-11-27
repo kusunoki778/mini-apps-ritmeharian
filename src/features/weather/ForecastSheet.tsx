@@ -36,7 +36,7 @@ export function ForecastSheet({ open, onClose, daily }: ForecastSheetProps) {
               </p>
               <p className="truncate text-[12px] text-ink-muted">
                 Terbit {formatClock(daily.sunrise[index])} · Terbenam{' '}
-                {formatClock(daily.sunset[index])}
+                {formatClock(daily.sunset[index])} · UV {daily.uv_index_max?.[index] ?? 0}
               </p>
             </div>
             <span className="tabular shrink-0 text-sm">

@@ -16,7 +16,9 @@ import { allDays, DAY_LABELS, DAY_ORDER, repeatModeFromDays, type RepeatMode } f
 import { hasAlarmErrors, validateAlarm, type AlarmErrors } from './alarm-validation';
 import {
   createAlarm,
+  DEFAULT_SNOOZE_LIMIT,
   DEFAULT_SNOOZE_MINUTES,
+  SNOOZE_LIMIT_OPTIONS,
   SNOOZE_OPTIONS,
   updateAlarm,
   type AlarmInput,
@@ -47,6 +49,8 @@ function initialInput(alarm: Alarm | null, defaultSoundId: AlarmSoundId): AlarmI
       repeat: 'once',
       days: [],
       snoozeMinutes: DEFAULT_SNOOZE_MINUTES,
+      vibrate: true,
+      snoozeLimit: DEFAULT_SNOOZE_LIMIT,
       enabled: true,
       soundId: defaultSoundId,
     };
@@ -58,6 +62,8 @@ function initialInput(alarm: Alarm | null, defaultSoundId: AlarmSoundId): AlarmI
     repeat: repeatModeFromDays(alarm.days),
     days: alarm.days,
     snoozeMinutes: alarm.snoozeMinutes,
+    vibrate: alarm.vibrate ?? true,
+    snoozeLimit: alarm.snoozeLimit ?? DEFAULT_SNOOZE_LIMIT,
     enabled: alarm.enabled,
     soundId: isAlarmSoundId(alarm.soundId) ? alarm.soundId : defaultSoundId,
   };
@@ -205,6 +211,26 @@ export function AlarmFormSheet({ alarm, onClose, onSaved }: AlarmFormSheetProps)
             </option>
           ))}
         </Select>
+
+        <Select
+          label="Tunda maksimal"
+          value={input.snoozeLimit}
+          hint="Berapa kali alarm boleh ditunda sebelum harus dimatikan."
+          onChange={(event) => update({ snoozeLimit: Number(event.target.value) })}
+        >
+          {SNOOZE_LIMIT_OPTIONS.map((count) => (
+            <option key={count} value={count}>
+              {count === 0 ? 'Tanpa batas' : `${count} kali`}
+            </option>
+          ))}
+        </Select>
+
+        <Toggle
+          checked={input.vibrate}
+          onChange={(checked) => update({ vibrate: checked })}
+          label="Bergetar"
+          description="Ponsel bergetar saat alarm berbunyi."
+        />
 
         <Select
           label="Nada dering"

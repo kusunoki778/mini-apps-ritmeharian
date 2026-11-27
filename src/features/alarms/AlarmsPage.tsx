@@ -9,6 +9,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Skeleton } from '@/components/ui/Skeleton';
 import { toast } from '@/components/ui/toast-store';
 import type { Alarm } from '@/lib/db/db';
+import { AlarmBatteryBanner } from './AlarmBatteryBanner';
 import { AlarmFormSheet } from './AlarmFormSheet';
 import { AlarmPermissionBanner } from './AlarmPermissionBanner';
 import { ensureAlarmPermissions } from './alarm-permissions';
@@ -89,6 +90,7 @@ export default function AlarmsPage() {
       </div>
 
       <AlarmPermissionBanner />
+      <AlarmBatteryBanner />
 
       <AlarmTools />
 

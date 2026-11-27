@@ -27,6 +27,10 @@ const LEAD_OPTIONS: { value: number; label: string }[] = [
   { value: 15, label: '15 menit sebelum' },
   { value: 30, label: '30 menit sebelum' },
   { value: 60, label: '1 jam sebelum' },
+  { value: 120, label: '2 jam sebelum' },
+  { value: 1440, label: '1 hari sebelum' },
+  { value: 2880, label: '2 hari sebelum' },
+  { value: 10080, label: '1 minggu sebelum' },
 ];
 
 function initialInput(event: CalendarEvent | null, initialDate: string): EventInput {

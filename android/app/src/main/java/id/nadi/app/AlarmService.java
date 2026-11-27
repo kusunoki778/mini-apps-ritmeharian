@@ -13,6 +13,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.PowerManager;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 
 import androidx.core.app.NotificationCompat;
@@ -44,6 +46,7 @@ public class AlarmService extends Service {
     private static final long DENYUT_MS = 20 * 1000L;
 
     private AlarmSound sound;
+    private Vibrator vibrator;
     private PowerManager.WakeLock wakeLock;
     private final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -87,8 +90,9 @@ public class AlarmService extends Service {
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Alarm layar penuh",
                 NotificationManager.IMPORTANCE_HIGH);
         channel.setDescription("Alarm Nadi yang membangunkan layar dan berbunyi berulang.");
-        channel.enableVibration(true);
-        channel.setVibrationPattern(new long[] {0, 800, 400, 800, 400, 800});
+        // Getar diatur sendiri per alarm lewat Vibrator, supaya alarm bisa dibuat
+        // tanpa getar. Kanal sengaja tanpa getar agar tidak dobel.
+        channel.enableVibration(false);
         // Nada diputar sendiri oleh AlarmSound agar bisa berganti dan berulang. Kanal
         // sengaja tanpa suara supaya tidak dobel dengan pemutar alarm.
         channel.setSound(null, null);
@@ -125,13 +129,27 @@ public class AlarmService extends Service {
                 : 5;
         String soundId = intent != null ? intent.getStringExtra(AlarmScheduler.EXTRA_SOUND_ID) : null;
         if (soundId == null) soundId = AlarmScheduler.DEFAULT_SOUND_ID;
+        boolean vibrate = intent == null
+                || intent.getBooleanExtra(AlarmScheduler.EXTRA_VIBRATE, true);
+        int snoozeLimit = intent != null
+                ? intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_LIMIT, 0)
+                : 0;
+        int snoozeCount = intent != null
+                ? intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_COUNT, 0)
+                : 0;
 
-        AlarmRinging.start(this, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId);
+        AlarmRinging.start(this, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
+                vibrate, snoozeLimit, snoozeCount);
 
         acquireWakeLock();
         startSound(soundId);
-        Notification notification =
-                buildNotification(label, triggerAt, alarmId, snoozeMinutes, notificationId, soundId);
+        if (vibrate) {
+            startVibration();
+        } else {
+            stopVibration();
+        }
+        Notification notification = buildNotification(label, triggerAt, alarmId, snoozeMinutes,
+                notificationId, soundId, vibrate, snoozeLimit, snoozeCount);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(notificationId, notification,
                     ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK);
@@ -142,7 +160,8 @@ public class AlarmService extends Service {
         // Jalur cadangan bila intent layar penuh ditolak atau notifikasi dimatikan:
         // coba buka layar alarm langsung. Bila sistem melarang, alarm tetap bisa
         // dihentikan dari tombol di dalam aplikasi.
-        openAlarmScreen(intent, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId);
+        openAlarmScreen(intent, notificationId, triggerAt, label, alarmId, snoozeMinutes, soundId,
+                vibrate, snoozeLimit, snoozeCount);
 
         handler.removeCallbacks(denyut);
         handler.postDelayed(denyut, DENYUT_MS);
@@ -156,6 +175,7 @@ public class AlarmService extends Service {
     public void onDestroy() {
         handler.removeCallbacksAndMessages(null);
         releaseSound();
+        stopVibration();
         releaseWakeLock();
         super.onDestroy();
     }
@@ -166,7 +186,8 @@ public class AlarmService extends Service {
     }
 
     private Notification buildNotification(String label, long triggerAt, String alarmId,
-                                           int snoozeMinutes, int notificationId, String soundId) {
+                                           int snoozeMinutes, int notificationId, String soundId,
+                                           boolean vibrate, int snoozeLimit, int snoozeCount) {
         Intent fullScreen = new Intent(this, AlarmActivity.class);
         fullScreen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         fullScreen.putExtra(AlarmScheduler.EXTRA_NOTIFICATION_ID, notificationId);
@@ -175,6 +196,9 @@ public class AlarmService extends Service {
         fullScreen.putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId);
         fullScreen.putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, snoozeMinutes);
         fullScreen.putExtra(AlarmScheduler.EXTRA_SOUND_ID, soundId);
+        fullScreen.putExtra(AlarmScheduler.EXTRA_VIBRATE, vibrate);
+        fullScreen.putExtra(AlarmScheduler.EXTRA_SNOOZE_LIMIT, snoozeLimit);
+        fullScreen.putExtra(AlarmScheduler.EXTRA_SNOOZE_COUNT, snoozeCount);
         PendingIntent fullScreenIntent = PendingIntent.getActivity(this, notificationId, fullScreen,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
@@ -208,14 +232,17 @@ public class AlarmService extends Service {
                 .setSound(null)
                 .addAction(R.drawable.ic_alarm_notification, "Matikan",
                         actionIntent(notificationId, ACTION_STOP, label, alarmId, snoozeMinutes,
-                                soundId, false));
+                                soundId, false, vibrate, snoozeLimit, snoozeCount));
 
-        // Tunda hanya untuk alarm yang punya menit tunda. Timer tidak punya tunda, dan
-        // tombol Tunda pada timer akan menjadwalkan ulang tepat di detik yang sama.
-        if (snoozeMinutes > 0) {
+        // Tunda hanya untuk alarm yang punya menit tunda dan belum mencapai batas
+        // tunda. Timer tidak punya tunda, dan tombol Tunda pada timer akan
+        // menjadwalkan ulang tepat di detik yang sama.
+        boolean canSnooze = snoozeMinutes > 0
+                && (snoozeLimit == 0 || snoozeCount < snoozeLimit);
+        if (canSnooze) {
             builder.addAction(R.drawable.ic_alarm_notification, "Tunda",
                     actionIntent(notificationId, ACTION_SNOOZE, label, alarmId, snoozeMinutes,
-                            soundId, true));
+                            soundId, true, vibrate, snoozeLimit, snoozeCount));
         }
 
         return builder.build();
@@ -223,7 +250,8 @@ public class AlarmService extends Service {
 
     private PendingIntent actionIntent(int notificationId, String action, String label,
                                        String alarmId, int snoozeMinutes, String soundId,
-                                       boolean snoozed) {
+                                       boolean snoozed, boolean vibrate, int snoozeLimit,
+                                       int snoozeCount) {
         Intent intent = new Intent(this, AlarmActionReceiver.class);
         intent.setAction(action);
         intent.putExtra(AlarmScheduler.EXTRA_NOTIFICATION_ID, notificationId);
@@ -231,6 +259,9 @@ public class AlarmService extends Service {
         intent.putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId);
         intent.putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, snoozeMinutes);
         intent.putExtra(AlarmScheduler.EXTRA_SOUND_ID, soundId);
+        intent.putExtra(AlarmScheduler.EXTRA_VIBRATE, vibrate);
+        intent.putExtra(AlarmScheduler.EXTRA_SNOOZE_LIMIT, snoozeLimit);
+        intent.putExtra(AlarmScheduler.EXTRA_SNOOZE_COUNT, snoozeCount);
         intent.putExtra(EXTRA_SNOOZED, snoozed);
         int requestCode = notificationId * 10 + (ACTION_SNOOZE.equals(action) ? 1 : 2);
         return PendingIntent.getBroadcast(this, requestCode, intent,
@@ -240,7 +271,8 @@ public class AlarmService extends Service {
     // Membuka AlarmActivity tanpa menunggu intent layar penuh. Diabaikan bila sistem
     // melarang aktivitas dari latar belakang, karena masih ada tombol di aplikasi.
     private void openAlarmScreen(Intent source, int notificationId, long triggerAt, String label,
-                                 String alarmId, int snoozeMinutes, String soundId) {
+                                 String alarmId, int snoozeMinutes, String soundId, boolean vibrate,
+                                 int snoozeLimit, int snoozeCount) {
         try {
             Intent screen = new Intent(this, AlarmActivity.class);
             screen.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
@@ -252,6 +284,9 @@ public class AlarmService extends Service {
             screen.putExtra(AlarmScheduler.EXTRA_ALARM_ID, alarmId);
             screen.putExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, snoozeMinutes);
             screen.putExtra(AlarmScheduler.EXTRA_SOUND_ID, soundId);
+            screen.putExtra(AlarmScheduler.EXTRA_VIBRATE, vibrate);
+            screen.putExtra(AlarmScheduler.EXTRA_SNOOZE_LIMIT, snoozeLimit);
+            screen.putExtra(AlarmScheduler.EXTRA_SNOOZE_COUNT, snoozeCount);
             startActivity(screen);
         } catch (RuntimeException error) {
             Log.w(TAG, "Layar alarm tidak bisa dibuka dari latar belakang", error);
@@ -268,6 +303,26 @@ public class AlarmService extends Service {
         if (sound == null) return;
         sound.stop();
         sound = null;
+    }
+
+    // Getar pola alarm berulang sampai dihentikan. Dipakai hanya bila alarm meminta getar.
+    private void startVibration() {
+        if (vibrator != null) return;
+        Vibrator manager = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (manager == null || !manager.hasVibrator()) return;
+        vibrator = manager;
+        long[] pattern = {0, 800, 400, 800, 400, 800};
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(VibrationEffect.createWaveform(pattern, 0));
+        } else {
+            vibrator.vibrate(pattern, 0);
+        }
+    }
+
+    private void stopVibration() {
+        if (vibrator == null) return;
+        vibrator.cancel();
+        vibrator = null;
     }
 
     private void acquireWakeLock() {

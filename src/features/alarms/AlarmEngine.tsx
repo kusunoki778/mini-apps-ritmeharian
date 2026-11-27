@@ -14,6 +14,7 @@ const CHECK_INTERVAL_MS = 1000;
 interface RingingState {
   alarm: Alarm;
   at: number;
+  canSnooze: boolean;
 }
 
 interface AlarmEngineProps {
@@ -32,6 +33,7 @@ export function AlarmEngine({
   const stopSoundRef = useRef<() => void>(() => {});
   const snoozeUntilRef = useRef<Map<string, number>>(new Map());
   const handledRef = useRef<Map<string, number>>(new Map());
+  const snoozeCountRef = useRef<Map<string, number>>(new Map());
 
   useEffect(() => {
     // Di dalam pembungkus native, alarm ditangani layanan Android (bunyi, layar
@@ -41,14 +43,21 @@ export function AlarmEngine({
 
     const currentAlarms = alarms ?? [];
 
-    const ring = (alarm: Alarm, at: number) => {
+    const ring = (alarm: Alarm, at: number, fromSnooze = false) => {
       if (ringingRef.current) return;
 
-      const state = { alarm, at };
+      const count = fromSnooze ? (snoozeCountRef.current.get(alarm.id) ?? 0) : 0;
+      if (!fromSnooze) snoozeCountRef.current.set(alarm.id, 0);
+      const limit = alarm.snoozeLimit ?? 0;
+      const state = { alarm, at, canSnooze: limit === 0 || count < limit };
       ringingRef.current = state;
       handledRef.current.set(alarm.id, at);
+      if (!fromSnooze) snoozeCountRef.current.set(alarm.id, 0);
       setRinging(state);
       stopSoundRef.current = soundFactory(alarm.soundId);
+      if (alarm.vibrate !== false && typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+        navigator.vibrate?.([500, 300, 500, 300, 500]);
+      }
       showAlarmNotification(alarm.label, formatAlarmTime(alarm.hour, alarm.minute));
     };
 
@@ -61,6 +70,7 @@ export function AlarmEngine({
       for (const alarm of currentAlarms) {
         if (!alarm.enabled) {
           snoozeUntilRef.current.delete(alarm.id);
+          snoozeCountRef.current.delete(alarm.id);
           continue;
         }
 
@@ -68,7 +78,7 @@ export function AlarmEngine({
         if (snoozeAt !== undefined) {
           if (nowMs >= snoozeAt) {
             snoozeUntilRef.current.delete(alarm.id);
-            ring(alarm, snoozeAt);
+            ring(alarm, snoozeAt, true);
           }
           continue;
         }
@@ -101,7 +111,9 @@ export function AlarmEngine({
     if (!state) return;
 
     stopSoundRef.current();
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate?.(0);
     ringingRef.current = null;
+    snoozeCountRef.current.delete(state.alarm.id);
     setRinging(null);
     await markTriggered(state.alarm.id, state.at, state.alarm.days.length === 0);
   };
@@ -111,7 +123,12 @@ export function AlarmEngine({
     if (!state) return;
 
     stopSoundRef.current();
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) navigator.vibrate?.(0);
     ringingRef.current = null;
+    snoozeCountRef.current.set(
+      state.alarm.id,
+      (snoozeCountRef.current.get(state.alarm.id) ?? 0) + 1,
+    );
     setRinging(null);
     await markTriggered(state.alarm.id, state.at, false);
     snoozeUntilRef.current.set(state.alarm.id, Date.now() + state.alarm.snoozeMinutes * 60_000);
@@ -119,13 +136,15 @@ export function AlarmEngine({
 
   if (!ringing) return null;
 
+  const canSnooze = ringing.canSnooze;
+
   return (
     <RingScreen
       kind="Alarm"
       time={formatAlarmTime(ringing.alarm.hour, ringing.alarm.minute)}
       title={ringing.alarm.label}
-      snoozeLabel={`Tunda ${ringing.alarm.snoozeMinutes} menit`}
-      onSnooze={() => void snooze()}
+      snoozeLabel={canSnooze ? `Tunda ${ringing.alarm.snoozeMinutes} menit` : undefined}
+      onSnooze={canSnooze ? () => void snooze() : undefined}
       onDismiss={() => void dismiss()}
     />
   );

@@ -14,6 +14,7 @@ export const SAMPLE_WEATHER: WeatherResponse = {
     precipitation: 0,
     weather_code: 2,
     wind_speed_10m: 9.5,
+    uv_index: 0,
   },
   hourly: {
     time: ['2026-11-26T20:00', '2026-11-26T21:00'],
@@ -26,6 +27,7 @@ export const SAMPLE_WEATHER: WeatherResponse = {
     weather_code: [2, 61],
     temperature_2m_max: [32, 31],
     temperature_2m_min: [25, 24],
+    uv_index_max: [9, 7],
     sunrise: ['2026-11-26T05:28', '2026-11-27T05:28'],
     sunset: ['2026-11-26T17:52', '2026-11-27T17:52'],
   },

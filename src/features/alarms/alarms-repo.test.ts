@@ -21,6 +21,8 @@ function input(overrides: Partial<AlarmInput> = {}): AlarmInput {
     repeat: 'once',
     days: [],
     snoozeMinutes: 5,
+    vibrate: true,
+    snoozeLimit: 0,
     enabled: true,
     soundId: DEFAULT_ALARM_SOUND,
     ...overrides,

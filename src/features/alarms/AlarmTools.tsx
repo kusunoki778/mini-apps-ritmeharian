@@ -56,7 +56,9 @@ function Stopwatch() {
 
 function Timer() {
   const soundId = useAlarmSoundId();
+  const [hours, setHours] = useState('0');
   const [minutes, setMinutes] = useState('5');
+  const [seconds, setSeconds] = useState('0');
   const [remaining, setRemaining] = useState<number | null>(null);
   const [running, setRunning] = useState(false);
   const [ringing, setRinging] = useState(false);
@@ -97,7 +99,9 @@ function Timer() {
   }, [ringing, soundId]);
 
   const start = () => {
-    const value = Math.max(1, Number(minutes) || 0) * 60;
+    const typed =
+      (Number(hours) || 0) * 3600 + (Number(minutes) || 0) * 60 + (Number(seconds) || 0);
+    const value = Math.max(1, Math.floor(typed));
     const duration = remaining && remaining > 0 ? remaining : value;
     setRemaining(duration);
     setRunning(true);
@@ -118,12 +122,26 @@ function Timer() {
         <TimerIcon size={18} aria-hidden="true" /> Timer
       </div>
       {remaining === null ? (
-        <Input
-          label="Menit"
-          inputMode="numeric"
-          value={minutes}
-          onChange={(event) => setMinutes(event.target.value)}
-        />
+        <div className="grid grid-cols-3 gap-2">
+          <Input
+            label="Jam"
+            inputMode="numeric"
+            value={hours}
+            onChange={(event) => setHours(event.target.value)}
+          />
+          <Input
+            label="Menit"
+            inputMode="numeric"
+            value={minutes}
+            onChange={(event) => setMinutes(event.target.value)}
+          />
+          <Input
+            label="Detik"
+            inputMode="numeric"
+            value={seconds}
+            onChange={(event) => setSeconds(event.target.value)}
+          />
+        </div>
       ) : (
         <p className="font-mono text-3xl tabular-nums">{formatDuration(remaining)}</p>
       )}

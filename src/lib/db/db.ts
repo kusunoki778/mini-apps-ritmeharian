@@ -33,6 +33,10 @@ export interface Alarm {
   days: number[];
   enabled: boolean;
   snoozeMinutes: number;
+  // Bergetar saat berbunyi. Tidak ada nilai berarti bergetar.
+  vibrate?: boolean;
+  // Batas berapa kali boleh ditunda. 0 berarti tanpa batas.
+  snoozeLimit?: number;
   // Nada alarm khusus alarm ini. Tidak ada nilai berarti memakai nada dari pengaturan.
   soundId?: string;
   lastTriggeredAt?: number;

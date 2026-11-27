@@ -5,7 +5,8 @@ const holder = vi.hoisted(() => ({
   supported: true,
   ringing: null as
     | null
-    | { notificationId: number; at: number; label: string; alarmId: string; snoozeMinutes: number },
+    | { notificationId: number; at: number; label: string; alarmId: string; snoozeMinutes: number;
+        snoozeLimit: number; snoozeCount: number },
   stopped: [] as boolean[],
   snoozed: 0,
   stops: [] as Array<{ alarmId: string; at: number }>,
@@ -44,6 +45,8 @@ const ALARM = {
   label: 'Bangun',
   alarmId: 'a',
   snoozeMinutes: 5,
+  snoozeLimit: 0,
+  snoozeCount: 0,
 };
 
 beforeEach(() => {
@@ -96,6 +99,14 @@ describe('NativeAlarmOverlay', () => {
 
     const titles = await screen.findAllByText('Timer');
     expect(titles.length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: /Tunda/ })).not.toBeInTheDocument();
+  });
+
+  it('menyembunyikan tombol Tunda saat batas tunda tercapai', async () => {
+    holder.ringing = { ...ALARM, snoozeLimit: 2, snoozeCount: 2 };
+    render(<NativeAlarmOverlay intervalMs={50} />);
+
+    await screen.findByText('Bangun');
     expect(screen.queryByRole('button', { name: /Tunda/ })).not.toBeInTheDocument();
   });
 

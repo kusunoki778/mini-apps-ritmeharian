@@ -8,7 +8,9 @@ import { markReminderFired, reminderTimeOf } from './events-repo';
 import { useRemindersBetween } from './useEvents';
 
 const CHECK_INTERVAL_MS = 1000;
-const WINDOW_MS = 2 * 24 * 60 * 60 * 1000;
+// Rentang ini harus mencakup agenda yang pengingatnya beberapa hari sebelum mulai,
+// jadi jendelanya lebih lebar dari jarak biasanya.
+const WINDOW_MS = 10 * 24 * 60 * 60 * 1000;
 const SNOOZE_MS = 5 * 60 * 1000;
 const GRACE_MS = 60_000;
 

@@ -19,8 +19,12 @@ public class AlarmActionReceiver extends BroadcastReceiver {
         boolean snoozed = intent.getBooleanExtra("snoozed", false);
 
         int snoozeMinutes = intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_MINUTES, 5);
+        int snoozeLimit = intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_LIMIT, 0);
+        int snoozeCount = intent.getIntExtra(AlarmScheduler.EXTRA_SNOOZE_COUNT, 0);
+        boolean vibrate = intent.getBooleanExtra(AlarmScheduler.EXTRA_VIBRATE, true);
+        boolean limitReached = snoozeLimit > 0 && snoozeCount >= snoozeLimit;
         boolean canSnooze = AlarmService.ACTION_SNOOZE.equals(action) && snoozed
-                && snoozeMinutes > 0;
+                && snoozeMinutes > 0 && !limitReached;
 
         if (canSnooze) {
             String label = intent.getStringExtra(AlarmScheduler.EXTRA_LABEL);
@@ -29,7 +33,8 @@ public class AlarmActionReceiver extends BroadcastReceiver {
             long triggerAt = System.currentTimeMillis() + snoozeMinutes * 60_000L;
             AlarmScheduler.schedule(context, notificationId, triggerAt, label, alarmId,
                     snoozeMinutes,
-                    soundId == null ? AlarmScheduler.DEFAULT_SOUND_ID : soundId, true);
+                    soundId == null ? AlarmScheduler.DEFAULT_SOUND_ID : soundId, true, vibrate,
+                    snoozeLimit, snoozeCount + 1);
         }
 
         // PendingIntent.getBroadcast dengan FLAG_UPDATE_CURRENT dipakai bersama antar

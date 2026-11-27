@@ -1,4 +1,4 @@
-import { Drop, Wind } from '@phosphor-icons/react';
+import { Drop, Sun, Wind } from '@phosphor-icons/react';
 
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -7,7 +7,7 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { formatTemperature } from '@/lib/format/units';
 import { DayStrip } from './DayStrip';
 import type { WeatherResult } from './weather-service';
-import { formatUpdatedAt } from './weather-utils';
+import { comfortIndex, formatUpdatedAt, uvLevel } from './weather-utils';
 import { WeatherGlyph } from './WeatherGlyph';
 import { describeWeather } from './wmo';
 
@@ -63,6 +63,14 @@ export function WeatherCard({
   const { data, fetchedAt, stale } = result;
   const { current, hourly, daily } = data;
   const description = describeWeather(current.weather_code);
+  const uv = current.uv_index ?? 0;
+  const comfort = comfortIndex({
+    apparentTemperature: current.apparent_temperature,
+    humidity: current.relative_humidity_2m,
+    windSpeed: current.wind_speed_10m,
+    uvIndex: uv,
+    precipitation: current.precipitation,
+  });
 
   return (
     <Card className="p-5">
@@ -105,6 +113,28 @@ export function WeatherCard({
             <p className="text-sm font-medium">{Math.round(current.wind_speed_10m)} km/j</p>
           </div>
         </div>
+        <div className="flex items-center gap-2">
+          <Sun size={18} aria-hidden="true" className="text-ink-muted" />
+          <div className="leading-tight">
+            <p className="text-[12px] text-ink-muted">Sinar UV</p>
+            <p className="text-sm font-medium">
+              {uv} · {uvLevel(uv)}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 rounded-control border border-line p-4">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[13px] font-medium">Indeks kenyamanan</p>
+          <p className="text-sm font-semibold">
+            {comfort.label} · {comfort.score}
+          </p>
+        </div>
+        <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-line">
+          <div className="h-full rounded-full bg-accent" style={{ width: `${comfort.score}%` }} />
+        </div>
+        <p className="mt-2 text-[12px] text-ink-muted">{comfort.advice}</p>
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">

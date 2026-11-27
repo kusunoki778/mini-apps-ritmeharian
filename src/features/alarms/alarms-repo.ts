@@ -5,6 +5,9 @@ import { allDays, parseTimeInput, sortDays, type RepeatMode } from './alarm-util
 
 export const SNOOZE_OPTIONS = [1, 5, 10, 15, 30] as const;
 export const DEFAULT_SNOOZE_MINUTES = 5;
+// 0 berarti tanpa batas. Urutan ini dipakai sebagai pilihan "tunda berapa kali".
+export const SNOOZE_LIMIT_OPTIONS = [0, 1, 3, 5, 10] as const;
+export const DEFAULT_SNOOZE_LIMIT = 0;
 
 export interface AlarmInput {
   label: string;
@@ -12,6 +15,8 @@ export interface AlarmInput {
   repeat: RepeatMode;
   days: number[];
   snoozeMinutes: number;
+  vibrate: boolean;
+  snoozeLimit: number;
   enabled: boolean;
   soundId: AlarmSoundId;
 }
@@ -23,6 +28,8 @@ interface AlarmFields {
   days: number[];
   enabled: boolean;
   snoozeMinutes: number;
+  vibrate: boolean;
+  snoozeLimit: number;
   soundId: AlarmSoundId;
 }
 
@@ -37,6 +44,8 @@ export function buildAlarmFields(input: AlarmInput): AlarmFields {
       input.repeat === 'once' ? [] : input.repeat === 'daily' ? allDays() : sortDays(input.days),
     enabled: input.enabled,
     snoozeMinutes: input.snoozeMinutes,
+    vibrate: input.vibrate,
+    snoozeLimit: Math.max(0, Math.floor(input.snoozeLimit)),
     soundId: isAlarmSoundId(input.soundId) ? input.soundId : DEFAULT_ALARM_SOUND,
   };
 }

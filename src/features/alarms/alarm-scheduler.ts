@@ -71,6 +71,8 @@ export function buildNativeAlarms(
         alarmId: alarm.id,
         snoozeMinutes: alarm.snoozeMinutes,
         soundId: alarmSound,
+        vibrate: alarm.vibrate !== false,
+        snoozeLimit: alarm.snoozeLimit ?? 0,
       });
     }
   }
@@ -102,6 +104,8 @@ export function buildNativeEventItems(
       alarmId: `event:${event.id}`,
       snoozeMinutes: 5,
       soundId: eventSound,
+      vibrate: true,
+      snoozeLimit: 0,
     });
   }
 
