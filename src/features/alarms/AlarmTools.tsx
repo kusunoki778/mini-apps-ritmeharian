@@ -66,11 +66,15 @@ function Timer() {
     if (!running || remaining === null) return;
     const id = window.setInterval(() => {
       if (remaining <= 1) {
-        setRemaining(0);
         setRunning(false);
-        // Di dalam APK, alarm native yang berbunyi, jadi lapisan web diam supaya
-        // nadanya tidak dobel.
-        if (!fullAlarmSupported()) setRinging(true);
+        // Di dalam APK, alarm native yang berbunyi. Hitungan web kembali ke awal
+        // supaya siap dipakai lagi setelah alarm dimatikan.
+        if (fullAlarmSupported()) {
+          setRemaining(null);
+          return;
+        }
+        setRemaining(0);
+        setRinging(true);
         return;
       }
       setRemaining(remaining - 1);
