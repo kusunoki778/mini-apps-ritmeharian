@@ -18,7 +18,11 @@ export function getCurrentCoordinates(): Promise<Coordinates> {
         }),
       (error) => {
         if (error.code === error.PERMISSION_DENIED) {
-          reject(new Error('Izin lokasi tidak aktif. Pilih kota secara manual.'));
+          reject(
+            new Error(
+              'Izin lokasi tidak aktif. Aktifkan di Pengaturan Android > Aplikasi > Nadi > Izin, atau pilih kota manual.',
+            ),
+          );
           return;
         }
 
